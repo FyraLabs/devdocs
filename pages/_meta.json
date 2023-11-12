@@ -1,13 +1,17 @@
 {
-  "index": "Introduction",
-  "about": {
-    "title": "About",
-    "type": "page"
-  },
+  "index": "Home",
   "contact": {
     "title": "Contact ↗",
     "type": "page",
     "href": "https://twitter.com/shuding_",
     "newWindow": true
+  },
+  "terra": {
+    "title": "Terra",
+    "type": "page"
+  },
+  "helium": {
+    "title": "Helium",
+    "type": "page"
   }
 }
