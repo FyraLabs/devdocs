@@ -9,7 +9,7 @@ const config: DocsThemeConfig = {
   chat: {
     link: "https://discord.gg/BHNfGewTXX",
   },
-  docsRepositoryBase: "https://github.com/FyraLabs/devdocs-next",
+  docsRepositoryBase: "https://github.com/FyraLabs/devdocs-next/tree/main",
   footer: {
     text: (
       <span>
