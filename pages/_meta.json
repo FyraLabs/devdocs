@@ -1,5 +1,8 @@
 {
-  "index": "Home",
+  "index": {
+    "title": "Home",
+    "type": "page"
+  },
   "contact": {
     "title": "Contact ↗",
     "type": "page",
