@@ -11,7 +11,16 @@ const config: DocsThemeConfig = {
   },
   docsRepositoryBase: "https://github.com/FyraLabs/devdocs-next",
   footer: {
-    text: "MIT 2023 © Fyra Labs; Made with love by catgirls",
+    text: (
+      <span>
+        Made with love by catgirls
+        <br />
+        MIT {new Date().getFullYear()} ©{" "}
+        <a href="https://fyralabs.com" target="_blank">
+          Fyra Labs
+        </a>
+      </span>
+    ),
   },
 };
 
