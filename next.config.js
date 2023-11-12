@@ -1,4 +1,5 @@
 const { BUNDLED_LANGUAGES, getHighlighter } = require("shiki");
+const path = require("path");
 
 const withNextra = require("nextra")({
   theme: "nextra-theme-docs",
@@ -15,7 +16,7 @@ const withNextra = require("nextra")({
               id: "spec",
               scopeName: "source.spec",
               aliases: ["rpmspec"],
-              path: "../../public/spec.json",
+              path: path.join(__dirname, "public/spec.json"),
             },
           ],
         }),
