@@ -2,7 +2,7 @@ import React from "react";
 import { DocsThemeConfig } from "nextra-theme-docs";
 
 const config: DocsThemeConfig = {
-  primaryHue: 282,
+  primaryHue: 270,
   logo: (
     <>
       <svg
