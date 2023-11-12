@@ -24,4 +24,11 @@ const withNextra = require("nextra")({
   },
 });
 
-module.exports = withNextra();
+module.exports = withNextra({
+  output: "export",
+  // Thanks for not having build-time image optimization :)
+  // TODO: fix this
+  images: {
+    unoptimized: true,
+  },
+});
