@@ -1,0 +1,181 @@
+---
+title: Automatic Updates
+description: "How automatic updates can be set up for your package."
+---
+
+import { Callout } from "nextra/components";
+
+# Automatic Updates
+
+There have been a few evolutions regarding the ways we deal with automatic updates and a few solutions have been explored in Terra.
+Despite how the automatic package update tracking system works changes as often as a new Fedora release version comes out, we still
+make our best effort to document the latest way to set up automatic updates in Terra. (Seriously!)
+
+## Solutions
+
+### AndaX (Andaman Rhai scripts)
+
+Yes, I know it sounds unusual, but `.rhai` scripts are used to update packages in Terra. You can check out the [Rhai] documentations.
+Put your Rhai script in `update.rhai` next to the corresponding `anda.hcl` file. Andaman will detect it automatically.
+
+```ts
+// An example of AndaX update script.
+let ver = gh("FyraLabs/subatomic"); // gets latest version from GitHub
+rpm.version(ver); // updates the version in the spec file using `ver`
+```
+
+<Callout type="warning">you need SEMICOLONS! (`;`)</Callout>
+
+Updates are triggered every 30 minutes using the command `anda update -vv`. However, nightly packages are updated every 24 hours using
+`anda update -vv --filters nightly=1`. Their `anda.hcl` files should look something like this:
+
+```hcl
+project pkg {
+	rpm {
+		spec = "pkg.spec"
+	}
+	labels {
+		nightly = "1"
+	}
+}
+```
+
+The best way to get started is to just search for other Rhai scripts in Terra. They are usually enough to do most of the tasks.
+If not, continue reading below.
+
+#### Functions and Modules
+
+In most cases, `rpm.version(gh("..."));` as a one-liner is enough to make it work™. However, you may also use the following functions:
+
+```ts
+let html_content = get("https://fyralabs.com");
+let latest_ver = gh("group/repo_name");
+let latest_tag = gh_tag("group/repo_name"); // for gh repos with tags but not releases
+let pypi_latest = pypi("example");
+let max_stable_version = crates("anda");
+let max_version = crates_max("anda");
+let newest_version = crates_newest("anda");
+let npm_latest = npm("example");
+
+let env_val = env("KEY");
+
+// === Requests ===
+let req = new_req("https://fyralabs.com");
+req.redirects(max_number_of_redirections_allowed);
+req.head("Content-Type", "application/json");
+let html_result = req.get();
+
+// === JSON Operations ===
+let obj = json("{\"a\":1}");
+print(obj.a); // 1
+print(obj["a"]); // 1
+let arr = json_arr("[1,2,3]");
+print(arr[1]); // 2
+let str = to_json(obj);
+let back_to_map_obj = from_json(str);
+
+// === Regex Operations ===
+let found = find("(\\d{3})", "abc1c2345", 1); // gets regex group 1
+print(found); // 234
+let substituted = sub("(\\s+)", " ", "I   hate spaces      !!!");
+print(substituted); // I hate spaces !!!
+
+// === IO and Commands ===
+let (rc, stdout, stderr) = sh("echo hai"); // `sh -c 'echo hai'`
+let (rc, stdout, stderr) = sh(["echo", "hai"]); // `echo hai`
+let (rc, stdout, stderr) = sh(["rm", "-rf", "/path/with/some space"]); // `rm -rf "/path/with/some space"`
+let (rc, stdout, stderr) = sh("ls -al", "/current/working/directory"); // `sh -c 'ls -al'` with cwd specified
+let (rc, stdout, stderr) = sh(["grep", "andaman", "file"], "/working/dir"); // `grep andaman file` with cwd specified
+for x in ls("/") {
+    if x == "bin" {
+        print("I found the `/bin` folder!");
+    }
+}
+let foo = "bar";
+foo.write("bar.txt"); // this might be counterintuitive but the string "bar" is written into the file "bar.txt"
+obj.write("tmp.json"); // object (maps) are turned into JSON automatically
+
+// === Templates ===
+print(template(#{a: "value", b: "hai"}, "%{a} and %{b} @{random_rpm_spec_macro}"));
+// value and hai %{random_rpm_spec_macro}
+// Note that @{} are used to represent rpm macros (they unfortunate conflict)
+// `@{` are converted to `%{` automatically.
+print(template_file(#{...}, "path/to/a.hcl"));
+
+// === RPMBuild ===
+// use these functions with sh() :3
+anda::rpmbuild::cmd_srpm("test.spec", "sources"); // ["mock", "--buildsrpm", "--spec", "test.spec", "--sources", "sources", ...];
+anda::rpmbuild::cmd_rpm("test.spec", "sources"); // ["mock", "--rebuild", ...];
+
+// === Anda-Config ===
+let cfg_map_obj = anda::cfg::load("path/to/anda.hcl");
+```
+
+#### Special Variables
+
+```ts
+// === RPM Operations ===
+// note that the `rpm` object is only available in `anda update`, but not `anda run`.
+rpm.version(latest_ver); // note that version() resets the release back to 1 automatically
+// Source0: https://github.com/FyraLabs/anda/archive/refs/tags/0.1.17.tar.gz
+rpm.source(
+  0,
+  "https://github.com/FyraLabs/anda/archive/refs/tags/0.1.17.tar.gz"
+);
+// %define abc hai bai
+rpm.define("abc", "hai bai");
+// %global def give rabonuko a headpat!
+rpm.global("def", "give rabonuko a headpat!");
+rpm.release(); // resets release to 1: `Release: 1%?dist`
+rpm.release(3); // Release: 3%?dist
+let spec_content = rpm.f;
+rpm.f = new_spec_content;
+
+// === Labels and Constants ===
+const USER_AGENT = "AndaX";
+const IS_WIN32 = false; // `cfg!(windows)` in rust
+const ANDAX_VER = "0.1.3"; // `env!("CARGO_PKG_VERSION")` in rust
+```
+
+### HeadPAT
+
+[HeadPAT] is a work-in-progress package version tracker. It is (going to be) a self-hosted microservice.
+
+#### Planned usage
+
+Just like `update.rhai` scripts, a `.pat` file will be used with the following format:
+
+```
+ver gh FyraLabs/anda
+```
+
+That's it.
+
+However, we are exploring the posibility of adding Lua into the mix to make things more extensible:
+
+```
+lua
+```
+
+Then HeadPAT will look for `pat.lua` in the same directory.
+However, it is uncertain if the above will be the actual format as HeadPAT is still under heavy (but slow) development.
+
+## Guidelines
+
+<Callout type="warning">
+  Avoid using the <span title="This includes gh() and gh_tag()">GitHub API</span> for fetching the latest versions.
+  You may use GitLab, crates.io, Pypi, etc. instead.
+  This is because GitHub has an API rate-limit.
+</Callout>
+<Callout type="info">
+  Only update nightly packages when the list of filters contains `nightly`:
+  ```ts
+  if filters.contains("nightly") {
+    ...
+  }
+  ```
+</Callout>
+<Callout type="warning">Avoid running code unrelated to updating/bumping packages.</Callout>
+
+[rhai]: https://rhai.rs/
+[headpat]: https://github.com/terrapkg/headpat

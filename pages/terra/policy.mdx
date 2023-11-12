@@ -1,0 +1,67 @@
+---
+title: Policy
+description: "One of Terra's main focuses is package quality. Users should be able to install software from Terra in confidence. Our policies reflect that."
+---
+
+## Submission
+
+- Use common sense.
+- When it comes to submissions, anything is fair game, assuming that our policies are followed. However, there is a mild exception for GUI applications.
+
+  - Please refrain from submitting applications that work perfectly fine as a Flatpak, unless there is a technical or UX justification for it. Examples of these exceptions are:
+    - Terminal Emulators, as they may be used by users who refrain from using Flatpaks.
+    - CLI/TUI applications, as Flatpaks under CLI introduce bad UX by requiring the user to call Flatpak, and then the RDNN of the app.
+    - Applications that may require the user to manually modify its data files regularly (Prism Launcher, other modded game launchers, etc).
+    - Applications that suffer major performance or technical issues due to sandboxing (IDEs, text editors, file managers, DAWs and other applications that rely on native plugin support like VSTs or LV2, etc).
+    - System components, such as background system services, device drivers or important system configuration tools.
+    - Libraries required to build or use the aforementioned packages.
+    - Other applications may be excluded as per user demand, at the team's discretion.
+
+- You must have the rights or permission to redistribute the packaged software. Besides that, there is no prohibition on proprietary licenses.
+- Submissions must be maintained. We will reject submissions of unmaintained software.
+- Submissions must not be malicious.
+- Submissions should not conflict with Fedora's own packages.
+- Submissions _should_ include an auto-update script, updating the package spec to the latest released version, with an exception for nightly packages.
+- Package sources must be put in their appropriate sub-directory.
+  - Go packages must be put in [go/](https://github.com/terrapkg/packages/tree/main/anda/go)
+  - Rust packages must be put in [rust/](https://github.com/terrapkg/packages/tree/main/anda/rust)
+  - Library packages must be put in [lib/](https://github.com/terrapkg/packages/tree/main/anda/lib)
+  - Font packages must be put in [fonts/](https://github.com/terrapkg/packages/tree/main/anda/fonts)
+  - General utilities must be put in [tools/](https://github.com/terrapkg/packages/tree/main/anda/tools)
+  - Game packages must be put in [games/](https://github.com/terrapkg/packages/tree/main/anda/games)
+  - General GUI applications must be put in [apps/](https://github.com/terrapkg/packages/tree/main/anda/apps)
+  - Packages belonging to a certain desktop environment must be put in a sub-directory of [desktops/](https://github.com/terrapkg/packages/tree/main/anda/desktops)
+  - Packages that don't fit in any of the above categories may be put in [other/](https://github.com/terrapkg/packages/tree/main/anda/other)
+- When submitting a pull request, follow the provided template.
+- Packages must follow our packaging guidelines, see our [contribution guide](https://github.com/terrapkg/packages/wiki/Contribute). When not specified, refer to [Fedora's packaging guidelines](https://docs.fedoraproject.org/en-US/packaging-guidelines).
+- Low-quality contributions will be declined at the team's discretion.
+- Submissions must have at least 1 approving reviewers from the Terra team.
+- Do not include work-in-progress code or untested patches. See https://do-not-ship.it/.
+- Remember to add yourself to the [CODEOWNERS file](https://github.com/terrapkg/packages/tree/main/CODEOWNERS).
+- Commits in a submission must be GPG signed with a GitHub verified key.
+
+## Maintenance
+
+- Anyone may make a PR to an already existing package, when doing so, please refer to the [submission policies](#Submission).
+- Unmaintained packages may be removed at any time. Before doing so, we will create a GitHub issue to gauge community interest.
+- Terra will only support the latest version of Fedora, if a package doesn't build on the next version of Fedora, we might hold it back.
+- A review from the package's codeowner will be required before merging.
+- In the case that a package's codeowner is unable to maintain the package or is unresponsive, we will open an issue gauging community interest. The Terra team will elect a new codeowner.
+- If you would like to voluntarily resign your role of codeowner, please file a GitHub issue.
+
+## Naming
+
+Name the packages in the following order
+(that means nightly fonts should end with `-nightly-fonts`)
+
+- Nightly packages must end with `-nightly`.
+- Fonts must end with `-fonts`.
+- Libraries should preferably start with `lib`.
+
+## Security
+
+Our security policy is documented in the [SECURITY.md file](https://github.com/terrapkg/packages/blob/main/SECURITY.md).
+
+## Lifecycle
+
+Our support lifecycle is documented in the [lifecycle page](/terra/lifecycle).

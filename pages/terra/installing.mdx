@@ -1,0 +1,69 @@
+---
+title: Installing
+description: "Get access to the 1000+ packages that Fedora doesn't ship."
+---
+
+import { Callout } from "nextra/components";
+
+Currently (2022-11-28), Terra only supports RPM packages.
+
+## Adding Terra
+
+You can add Terra into DNF directly:
+
+```sh
+$ sudo dnf config-manager --add-repo https://github.com/terrapkg/subatomic-repos/raw/main/terra.repo
+```
+
+<Callout type="info">
+  There is also a fancy install script:
+
+{" "}
+
+<Callout type="warning">
+  Practice caution before running any commands on your system.
+</Callout>
+
+```sh
+$ sh <(curl https://terra.fyralabs.com/get.sh)
+```
+
+If you doubt the safety of the script (which you should), curl the script to stdout first:
+
+```sh
+$ curl https://terra.fyralabs.com/get.sh
+```
+
+Or, just don't use the fancy script. I guess.
+
+</Callout>
+
+## Using Terra
+
+### Install
+
+```sh
+$ sudo dnf install package-name another-package
+```
+
+### Search
+
+```sh
+$ dnf search package-name
+(or)
+$ dnf provides package-name
+```
+
+### Remove
+
+```sh
+$ sudo dnf remove package-name another-package
+```
+
+### Upgrade
+
+```sh
+$ sudo dnf upgrade
+(or)
+$ sudo dnf upgrade package-name another-package
+```
