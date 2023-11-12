@@ -44,6 +44,11 @@ const config: DocsThemeConfig = {
       </span>
     ),
   },
+  useNextSeoProps() {
+    return {
+      titleTemplate: "%s – Fyra Developer",
+    };
+  },
 };
 
 export default config;
