@@ -58,6 +58,7 @@ const config: DocsThemeConfig = {
   },
   head: (
     <>
+      <meta name="theme-color" content="#c800ff" />
       <meta name="msapplication-TileColor" content="#fff" />
       <meta httpEquiv="Content-Language" content="en" />
       <meta name="apple-mobile-web-app-title" content="Fyra Developer" />
