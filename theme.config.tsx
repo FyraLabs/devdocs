@@ -1,5 +1,5 @@
 import React from "react";
-import { DocsThemeConfig } from "nextra-theme-docs";
+import { DocsThemeConfig, useConfig } from "nextra-theme-docs";
 
 const config: DocsThemeConfig = {
   primaryHue: 287,
@@ -45,10 +45,24 @@ const config: DocsThemeConfig = {
     ),
   },
   useNextSeoProps() {
+    const { frontMatter } = useConfig();
+
     return {
       titleTemplate: "%s – Fyra Developer",
+      description:
+        frontMatter.description ?? "The Fyra Developer Documentation",
+      openGraph: {
+        title: frontMatter.title ?? "Fyra Developer",
+      },
     };
   },
+  head: (
+    <>
+      <meta name="msapplication-TileColor" content="#fff" />
+      <meta httpEquiv="Content-Language" content="en" />
+      <meta name="apple-mobile-web-app-title" content="Fyra Developer" />
+    </>
+  ),
 };
 
 export default config;
