@@ -62,6 +62,12 @@ const config: DocsThemeConfig = {
       <meta name="msapplication-TileColor" content="#fff" />
       <meta httpEquiv="Content-Language" content="en" />
       <meta name="apple-mobile-web-app-title" content="Fyra Developer" />
+      <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+      <script
+        defer
+        data-domain="developer.fyralabs.com"
+        src="https://anyawytics.fyralabs.com/js/script.js"
+      ></script>
     </>
   ),
 };
