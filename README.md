@@ -21,5 +21,5 @@ Simply clone this repo, then:
 
 ```bash
 pnpm install
-pnpm build
+pnpm build # or `pnpm dev` to run a development server
 ```
