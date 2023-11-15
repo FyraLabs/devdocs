@@ -26,12 +26,12 @@ const config: DocsThemeConfig = {
     </>
   ),
   project: {
-    link: "https://github.com/FyraLabs/devdocs-next",
+    link: "https://github.com/FyraLabs/devdocs",
   },
   chat: {
     link: "https://discord.gg/BHNfGewTXX",
   },
-  docsRepositoryBase: "https://github.com/FyraLabs/devdocs-next/tree/main",
+  docsRepositoryBase: "https://github.com/FyraLabs/devdocs/tree/main",
   footer: {
     text: (
       <span>

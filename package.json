@@ -9,12 +9,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/FyraLabs/devdocs-next"
+    "url": "git+https://github.com/FyraLabs/devdocs"
   },
   "author": "Lleyton Gray <lleyton@fyralabs.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/FyraLabs/devdocs-next/issues"
+    "url": "https://github.com/FyraLabs/devdocs/issues"
   },
   "homepage": "https://developer.fyralabs.com",
   "dependencies": {
