@@ -1,23 +1,25 @@
-# Nextra Docs Template 
+# Devdocs
 
-This is a template for creating documentation with [Nextra](https://nextra.site).
+The unified documentation experience for developers hacking on Fyra Labs projects.
 
-[**Live Demo →**](https://nextra-docs-template.vercel.app)
+###
 
-[![](.github/screenshot.png)](https://nextra-docs-template.vercel.app)
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
 
-## Quick Start
+## 🛠️ Dependencies
 
-Click the button to clone this repository and deploy it on Vercel:
+Please make sure you have these dependencies first before building.
 
-[![](https://vercel.com/button)](https://vercel.com/new/clone?s=https%3A%2F%2Fgithub.com%2Fshuding%2Fnextra-docs-template&showOptionalTeamCreation=false)
+```bash
+node
+pnpm
+```
 
-## Local Development
+## 🏗️ Building
 
-First, run `pnpm i` to install the dependencies.
+Simply clone this repo, then:
 
-Then, run `pnpm dev` to start the development server and visit localhost:3000.
-
-## License
-
-This project is licensed under the MIT License.
+```bash
+pnpm install
+pnpm build
+```
