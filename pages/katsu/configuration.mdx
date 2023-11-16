@@ -191,6 +191,19 @@ If the mountpoint depths are the same, they will be sorted alphabetically.
 
 File paths to other manifests to import and merge into the current manifest during runtime. Must be relative to the current manifest.
 
+Not all attributes get merged when importing another manfiest. The following
+attributes are not merged:
+
+- `bootloader`
+- `iso`
+- `disk`
+- `dnf` with the exception of
+  - `dnf.packages`
+  - `dnf.arch_packages`
+  - `dnf.options`
+  - `dnf.exclude`
+  - `dnf.repodir`
+
 ```yaml
 import:
   - ./modules/hello.yaml
