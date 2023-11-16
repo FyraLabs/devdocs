@@ -12,5 +12,10 @@
     "title": "Helium",
     "type": "page",
     "display": "hidden"
+  },
+  "katsu": {
+    "title": "Katsu",
+    "type": "page",
+    "display": "hidden"
   }
 }

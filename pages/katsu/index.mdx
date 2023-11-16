@@ -1,0 +1,75 @@
+---
+name: Introduction
+description: Learn how you can build modern Linux disk images from scratch with Katsu.
+---
+
+import { Callout } from "nextra/components";
+
+# Introduction
+
+Katsu is tool to create working Linux disk images from scratch.
+It is written in Rust and strives to be fast and modular, featuring a modular YAML configuration.
+
+Katsu can be used to create full-fledged disk images for virtual machines, containers, or bare-metal systems.
+It can even be used to create bootable ISO images powered by Limine or GRUB.
+
+Katsu is similar to tools like [mkosi], [Lorax],
+or [Packer], but it's designed to build images entirely from scratch,
+and focuses on modularity and readability.
+
+<Callout type="info">
+  Currently (2023-10-17), Katsu only supports building Fedora-based images, and
+  only ARM64 and x86_64 architectures are supported.
+</Callout>
+
+## Features
+
+- Modular, reusable YAML modules for common scripts and configurations.
+- Support for multiple architectures (currently ARM64 and x86_64).
+- Support for multiple image formats (currently raw and ISO).
+- Support for multiple bootloaders (currently Limine and GRUB, systemd-boot is planned).
+- OCI/Docker and LXC/LXD container image targets (planned).
+- File templating and variable substitution for configuration files. (planned)
+
+## Differences from other tools
+
+### mkosi
+
+- mkosi is part of the systemd project, and is written in Python, while Katsu is written in Rust and is created as part of the Ultramarine Linux and tauOS projects.
+- mkosi is primarily designed for integration tests for systemd, while Katsu is designed to be a general-purpose image builder.
+- mkosi uses a INI-like configuration format, while Katsu uses a completely modular YAML configuration format.
+- mkosi can only generate disk images.
+
+### Lorax
+
+- Lorax is written in Python, while Katsu is written in Rust.
+- Lorax has 2 different configuration formats, for different use cases, while Katsu has a single, modular YAML configuration format that builds for all outputs.
+  - The installer image is built using solely command-line arguments
+  - The live/disk images are built using Anaconda kickstart files, which is a DSL for the Anaconda installer. Since this is a non-standard DSL, it is not very portable.
+- Lorax uses Mako templates for configuring images later in the build process, while Katsu simply uses Tera templates, which is similar to Jinja2 and Django templates, lowering the learning curve.
+
+### Packer
+
+- Packer is written in Go, while Katsu is written in Rust.
+- Packer builds on top of existing images, while Katsu builds images from scratch.
+- Packer uses HCL or JSON for configuration, while Katsu uses a modular YAML configuration format.
+- Packer is primarily designed for building images for cloud providers, while Katsu is mostly designed for bare-metal and virtual machine images.
+- Packer has a large number of plugins, while Katsu relies on modular scripts installed in the workspace itself.
+
+### Antlir
+
+- [Antlir] relies on the Buck build system to even build images, while Katsu is completely standalone, and ingests YAML manifests.
+- Antlir makes heavy use of Btrfs subvolumes for caching and layering, while Katsu uses the traditional method of chrooting into the image and installing packages.
+- Antlir will only support Fedora-based images, while Katsu is planned to support any Linux distribution.
+
+### KIWI
+
+- [KIWI] is written in Python, while Katsu is written in Rust.
+- KIWI uses XML for configuration, while Katsu uses YAML.
+- KIWI is primarily made for OpenSUSE, while Katsu is made for Fedora.
+
+[mkosi]: https://github.com/systemd/mkosi
+[lorax]: https://github.com/weldr/lorax
+[packer]: https://www.packer.io/
+[antlir]: https://facebookincubator.github.io/antlir/
+[kiwi]: https://github.com/OSInside/kiwi
