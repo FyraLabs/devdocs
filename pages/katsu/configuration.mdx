@@ -181,7 +181,7 @@ The mountpoint to mount the partition at relative to the root of the image.
 ---
 
 The order of the partitions is important, as they are created in the order they are defined, however, mountpoints will be sorted
-by nesting level, so `/` will be mounted first, then `/boot`, then `/boot/efi` This is done using a topological sort algorithm.
+by nesting level, so `/` will be mounted first, then `/boot`, then `/boot/efi`. This is done using a topological sort algorithm.
 
 If the mountpoint depths are the same, they will be sorted alphabetically.
 
