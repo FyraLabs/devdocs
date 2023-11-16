@@ -1,8 +1,18 @@
 import "../styles/main.css";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { config } from "@fortawesome/fontawesome-svg-core";
+import Script from "next/script";
 
 export default function MyApp({ Component, pageProps }) {
   config.autoAddCss = false;
-  return <Component {...pageProps} />;
+  return (
+    <>
+      <Component {...pageProps} />
+      <Script
+        strategy="afterInteractive"
+        data-domain="developer.fyralabs.com"
+        src="https://anyawytics.fyralabs.com/js/script.js"
+      ></Script>
+    </>
+  );
 }
