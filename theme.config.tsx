@@ -52,7 +52,11 @@ const config: DocsThemeConfig = {
       description:
         frontMatter.description ?? "The Fyra Developer Documentation",
       openGraph: {
-        title: frontMatter.title ?? "Fyra Developer",
+        images: [
+          {
+            url: "https://fyralabs.com/logo.png",
+          },
+        ],
       },
     };
   },
