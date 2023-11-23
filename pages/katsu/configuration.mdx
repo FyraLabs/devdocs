@@ -131,6 +131,10 @@ This can also be any DNF spec string that DNF understands, such as `@core` or `f
 
 A map of packages to install for each architecture. The key is the architecture, and the value is a list of packages to install.
 
+#### `dnf.arch_exclude`
+
+A map of packages to exclude from the image per each architecture. The key is the architecture, and the value is a list of packages to exclude from the image.
+
 ### `disk`
 
 This section configures the disk layout (GPT only)
