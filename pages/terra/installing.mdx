@@ -14,7 +14,7 @@ Currently (2022-11-28), Terra only supports RPM packages.
 You can add Terra into DNF directly:
 
 ```sh
-$ sudo dnf config-manager --add-repo https://github.com/terrapkg/subatomic-repos/raw/main/terra.repo
+$ sudo dnf install --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' --setopt='terra.gpgkey=https://repos.fyralabs.com/terra$releasever/key.asc' terra-release
 ```
 
 <Callout type="info">

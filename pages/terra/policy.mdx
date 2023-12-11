@@ -24,16 +24,19 @@ description: "One of Terra's main focuses is package quality. Users should be ab
 - Submissions must not be malicious.
 - Submissions should not conflict with Fedora's own packages.
 - Submissions _should_ include an auto-update script, updating the package spec to the latest released version, with an exception for nightly packages.
-- Package sources must be put in their appropriate sub-directory.
-  - Go packages must be put in [go/](https://github.com/terrapkg/packages/tree/main/anda/go)
-  - Rust packages must be put in [rust/](https://github.com/terrapkg/packages/tree/main/anda/rust)
-  - Library packages must be put in [lib/](https://github.com/terrapkg/packages/tree/main/anda/lib)
-  - Font packages must be put in [fonts/](https://github.com/terrapkg/packages/tree/main/anda/fonts)
-  - General utilities must be put in [tools/](https://github.com/terrapkg/packages/tree/main/anda/tools)
-  - Game packages must be put in [games/](https://github.com/terrapkg/packages/tree/main/anda/games)
-  - General GUI applications must be put in [apps/](https://github.com/terrapkg/packages/tree/main/anda/apps)
-  - Packages belonging to a certain desktop environment must be put in a sub-directory of [desktops/](https://github.com/terrapkg/packages/tree/main/anda/desktops)
-  - Packages that don't fit in any of the above categories may be put in [other/](https://github.com/terrapkg/packages/tree/main/anda/other)
+- Submissions should be placed in the corresponding directory in `anda/`.
+  - Each folder should only contain 1 spec file (recursively).
+  - The following directories have a higher priority. Categorize your new package in the following order:
+    1. `fonts/`
+    2. `system/` (bootloaders, kernels, drivers, ...)
+    3. `tools/buildsys/` (software used to build other software)
+    4. `devs/` (tools for software development)
+    5. `games/`
+    6. `themes/`
+    7. `docker/` (software related to containers)
+    8. `desktops/` (applications specific to a Desktop Environment)
+    9. `apps/` (GUI applications)
+    10. `langs/` (software written in/for a specific programming language)
 - When submitting a pull request, follow the provided template.
 - Packages must follow our packaging guidelines, see our [contribution guide](https://github.com/terrapkg/packages/wiki/Contribute). When not specified, refer to [Fedora's packaging guidelines](https://docs.fedoraproject.org/en-US/packaging-guidelines).
 - Low-quality contributions will be declined at the team's discretion.
@@ -53,7 +56,7 @@ description: "One of Terra's main focuses is package quality. Users should be ab
 
 ## Naming
 
-Name the packages in the following order
+Prefix/Suffix the packages in the following order
 (that means nightly fonts should end with `-nightly-fonts`)
 
 - Nightly packages must end with `-nightly`.
