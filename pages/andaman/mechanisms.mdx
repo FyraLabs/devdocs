@@ -1,0 +1,148 @@
+---
+title: Mechanisms
+description: How Andaman Works
+---
+
+import { Callout } from "nextra/components";
+
+# Mechanisms
+
+Andaman is a meta-build system that calls upon other build systems to build packages.
+
+It reads the project manifest in `anda.hcl` and calls the corresponding build system to build the package. Multiple projects can be included in a single repository (known as a monorepo) recursively in different directories.
+
+The root directory contains a main configuration file (also `anda.hcl`) and the configurations will be inherited. All the other `anda.hcl` files in its subdirectory can independently represent multiple projects, and multiple ways to build a package can be specified in each project. Once properly configured, a project can be built by `anda build subdirectory_path/project_name`.
+
+All configurations should be written in the HashiCorp Configuration Language with the filename `anda.hcl` and will be parsed in `anda-config`.
+
+## Build Process
+
+When Anda needs to build RPMs, it first loads all the `anda.hcl` configuration files, then run all executable `pre_script`s. Then, Anda will build RPMs, Flatpak, Podman and Docker artifacts, then run the build scripts and finally the `post_script`s.
+
+All the scripts in Anda can either be a command that can be executed with `sh -c`, or a path to an AndaX script with the extension `.rhai`. Other package types are processed as follows:
+
+- RPM: Anda calls either `mock` or `rpmbuild` depending on the `--rpm_builder` option which defaults to `mock`.
+- Flatpak: The manifest is read using the `flatpak` crate and the application is built using `flatpak-builder`.
+  <Callout type="info">
+    As of 0.1.17, the output is always located at `.flatpak-builder/build/`, as
+    opposed to `anda-build/` used by other package types.
+  </Callout>
+- Docker/Podman: Anda calls `docker build` or `podman build`.
+
+## AndaX
+
+AndaX is an embedded scripting system powered by [Rhai](https://https://rhai.rs/). It is mainly for supporting automatic updates, but it is also the scripting system used behind `pre_script` and `post_script`.
+
+AndaX loads all the Rhai module script files from the following paths:
+
+- `/usr/lib/anda/`
+- `/usr/local/lib/anda/`
+- `/usr/lib64/anda/`
+- `/usr/local/lib64/anda/`
+- `~/.local/lib/anda/`
+
+The following static modules (built into AndaX directly) are also available:
+
+- `io`
+- `tsunagu`
+- `kokoro`
+- `tenshi`
+- `anda::rpmbuild`
+- `anda::cfg`
+
+Most if not all of the functions in the above static modules are well-documented in the [Terra documentation](/terra/autoupdate).
+
+You can pass labels into the AndaX executor during with the `--labels command-line argument`. A label is a key-value pair that can be used to tag packages (is it a nightly package?), adding special variables, etc.
+
+Different labels should be separated by commas, like so:
+
+```shell
+--labels commit_sha=abc1234,environment=gh_ci,key_value_pair=k=v
+```
+
+Which will be parsed to:
+
+```rhai
+{
+  "commit_sha": "abc1234",
+  "environment": "gh_ci",
+  "key_value_pair": "k=v"
+}
+```
+
+## Automatic Updates
+
+See [Terra autoupdate documentation](/terra/autoupdate) for supported functions in AndaX
+
+Anda has supports automatically updating packages via the `anda update` command. The command finds all the projects with the file `update.rhai` in the same directory or if the configuration file has the `update` property set to a value:
+
+```rhai
+project project_name {
+  update = "path/to/update_script.rhai"
+  labels {
+    a = "1"
+  }
+}
+```
+
+Then, AndaX executes the scripts in parallel, where each update script gets its own thread. This greatly reduces the time required to fetch package versions. Note that Rhai does not support asynchronous programming. Around 200 update scripts in Terra can be processed under a second.
+
+Projects can also be filtered by adding `--filters key=value,key2=value2` to the command. For example, the update script for the above project will be executed for `--filters a=1` or even without filters related to `a`, but it won't be executed for `--filters a=2`.
+
+## Configuration
+
+Andaman uses the HashiCorp Configuration Language (HCL) for its configuration format, known for being used in software by HashiCorp such as Terraform, Consul, Vault and Packer. Its syntax is similar to UCL and NGINX's configuration format.
+
+Consider the following. for `{ }` and `""`, they represent, respectively, an dictionary (empty by default) with keys and string values, and a string with no default value. Unless otherwise stated, all the attributes are optional.
+
+```hcl
+config {
+  mock_config = "" // default mock config for `anda build -c custom_mock_config`
+  strip_prefix = "" // strip prefix to form new project alias
+  strip_suffix = "" // strip suffix to form new project alias
+  project_regex = ""
+}
+project "project_name" { // the string quote is optional
+  rpm {
+    spec = "path/to/file.spec" // REQUIRED
+    sources = "."
+    package = ""
+    pre_script = "rpm_pre.rhai"
+    post_script = "rpm_post.rhai"
+    mock_config = ""
+    enable_scm = false
+    scm_opts { }
+    config { }
+    plugin_opts { }
+    macros { }
+    opts { }
+  }
+  podman tagname {
+    dockerfile = ""
+    import = ""
+    tag_latest = false
+    context = "" // REQUIRED
+    version = ""
+  }
+  docker tagname {
+    dockerfile = ""
+    import = ""
+    tag_latest = false
+    context = "" // REQUIRED
+    version = ""
+  }
+  flatpak {
+    manifest = "path/to/manifest.yml" // REQUIRED
+    pre_script = ""
+    post_script = ""
+  }
+  pre_script = "pre.rhai"
+  post_script = "post.rhai"
+  env { }
+  alias = [] // array of strings
+  scripts = [] // array of paths to AndaX scripts
+  labels { }
+  update = "update.rhai"
+  arches = ["x86_64", "aarch64"]
+}
+```

@@ -8,6 +8,11 @@
     "type": "page",
     "display": "hidden"
   },
+  "andaman": {
+    "title": "Andaman",
+    "type": "page",
+    "display": "hidden"
+  },
   "helium": {
     "title": "Helium",
     "type": "page",
@@ -18,10 +23,10 @@
     "type": "page",
     "display": "hidden"
   },
+
   "submarine": {
     "title": "Submarine",
     "type": "page",
     "display": "hidden"
   }
-
 }
