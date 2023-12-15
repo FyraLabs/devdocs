@@ -17,5 +17,11 @@
     "title": "Katsu",
     "type": "page",
     "display": "hidden"
+  },
+  "submarine": {
+    "title": "Submarine",
+    "type": "page",
+    "display": "hidden"
   }
+
 }
