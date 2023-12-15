@@ -1,0 +1,41 @@
+---
+title: Installation
+description: Install Andaman
+---
+
+# Installation
+
+## Ultramarine Linux
+
+Ultramarine comes with the Terra Repository, simply install Andaman!
+
+`sudo dnf install andaman`
+
+## Fedora Linux
+
+First, install the [Terra Repository](https://terra.fyralabs.com)
+
+`sudo dnf install --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' --setopt='terra.gpgkey=https://repos.fyralabs.com/terra$releasever/key.asc' terra-release`
+
+Then, install Terra
+
+`sudo dnf install andaman`
+
+## Elsewhere
+
+### Cargo
+
+Andaman is available as a Rust crate:
+
+`cargo install anda`
+
+## Building from Source
+
+Alternatively you can also manually download the sources from GitHub:
+
+```
+git clone https://github.com/FyraLabs/anda
+cd anda
+git checkout 0.1.18
+cargo install --path .
+```
