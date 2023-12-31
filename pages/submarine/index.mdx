@@ -69,6 +69,10 @@ Before you can boot submarine, you need to enable booting from external storage.
 crossystem dev_boot_signed_only=0
 ```
 
-For quick testing, you can flash `submarine-<arch>.bin` to an external drive. This image includes a partition table already set up for booting ChromeOS kernels. Plug in your drive with submarine to your device, then power it on. On the developer mode screen, press Ctrl + U to boot from external storage. If all goes well, you should soon see the submarine boot menu.
+For quick testing, you can flash `submarine-<arch>.bin` to an external drive. This image includes a partition table already set up for booting ChromeOS kernels.
+
+Alternatively, you can create your own partition to install submarine to. Start by creating a 16mb partition using your favorite partitioning tool. Next you will edit the partition flags to tell depthcharge that you can boot from that kernel by running `cgpt add -i <partition number> -t kernel -P 15 -T 1 -S 1 /dev/sdX`. As always, substitute in the correct values for your drive. You can then flash `submarine-<arch>.kpart` to the partition you just created.
+
+After installing submarine to an external drive, plug in your drive with submarine to your device while powered off, then power it on. On the developer mode screen, press Ctrl + U to boot from external storage. If all goes well, you should soon see the submarine boot menu.
 
 If you run into any issues, please report them. Include the model of your device, which can be found on the developer mode screen.
