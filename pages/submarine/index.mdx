@@ -9,7 +9,7 @@ description: Bootstrap a Linux system on Depthcharge with Submarine
 ### Experimental bootloader for ChromeOS' Depthcharge
 
 Submarine provides a minimal Linux environment that lives in a small partition (16mb) on the disk. 
-We use this environment to bootstrap a full Linux system (or a different system if you're brave.)
+This is used to boot into a full Linux distro using kexec.
 
 
 ## Prebuilt Images
@@ -60,3 +60,19 @@ So, for example, replace `/dev/sdX` with the device file of the external drive:
 ```bash
 sudo dd if=build/submarine.bin of=/dev/sdX
 ```
+
+## Usage
+
+Before you can boot submarine, you need to enable booting from external storage. On your Chrome device, press Ctrl + Alt + F2 (This will either be the refresh or forward key on the top row) to switch to vt2. Log in as root and run the following commands:
+
+```crossystem dev_boot_usb=1
+crossystem dev_boot_signed_only=0
+```
+
+For quick testing, you can flash `submarine-<arch>.bin` to an external drive. This image includes a partition table already set up for booting ChromeOS kernels.
+
+Alternatively, you can create your own partition to install submarine to. Start by creating a 16mb partition using your favorite partitioning tool. Next you will edit the partition flags to tell depthcharge that you can boot from that kernel by running `cgpt add -i <partition number> -t kernel -P 15 -T 1 -S 1 /dev/sdX`. As always, substitute in the correct values for your drive. You can then flash `submarine-<arch>.kpart` to the partition you just created.
+
+After installing submarine to an external drive, plug in your drive with submarine to your device while powered off, then power it on. On the developer mode screen, press Ctrl + U to boot from external storage. If all goes well, you should soon see the submarine boot menu.
+
+If you run into any issues, please report them. Include the model of your device, which can be found on the developer mode screen.
