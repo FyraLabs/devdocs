@@ -22,7 +22,7 @@ Remember, it takes effort to create a package. If you ever need help, hop into
 ### Before you begin...
 
 - Make sure the package name is not taken by other packages in Fedora repositories.
-- Review our [packaging policies](https://github.com/terrapkg/packages/wiki/Policy).
+- Review our [packaging policies](policy).
 - Review our custom [SRPM macros](#srpm-macros)
 
 ### Preparation
@@ -132,7 +132,7 @@ echo "this will also run when building pkg but for installing it into %{buildroo
 - Having anda installed, run the following command:
 
 ```sh
-anda build -c terra-38-x86_64 anda/fonts/lovelyfonttype-fonts/pkg
+anda build -c terra-39-x86_64 anda/fonts/lovelyfonttype-fonts/pkg
 ```
 
 - You don't need to create `pkg`. It's not supposed to exist
