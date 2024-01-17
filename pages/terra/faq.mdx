@@ -11,6 +11,10 @@ description: "Frequently Asked Questions"
 
 https://repos.fyralabs.com/terra39/
 
+or for sources
+
+https://repos.fyralabs.com/terra39-source/
+
 Replace `39` with your Fedora release version.
 
 ### What packages does Terra have?
@@ -22,13 +26,14 @@ You can search packages via `dnf search` or [Repology].
 
 ### Why YET another repository?
 
-- Terra has much more publicity
+- Terra has much more transparency and ease of use/contribution
 
   - You can see build logs via [Github Actions]
     - NOTE: due to [Github limitations](https://docs.github.com/en/actions/learn-github-actions/usage-limits-billing-and-administration#artifact-and-log-retention-policy), logs are kept for 90 days only
   - The [Andaman] build system and [Subatomic] are fully open sourced
 
 - You can add and manage packages much more easily (See [Contribute](contributing))
+- Our autoupdate system ensures that you get the latest packages, with less maintainer burden
 
 ## Pantheon
 
@@ -61,11 +66,9 @@ It manages, uploads, and signs packages.
 
 ### Where does the package signing key live, and how is it protected?
 
-[Subatomic] runs on JWT tokens, and only Cappy (one of the maintainers) and the pipeline have them. The secret changes once in a while (and no one has it). The GPG signing key lives on a separate Podman volume from the actual repositories.
+[Subatomic] runs on JWT tokens, and only Cappy (one of the maintainers) and the pipeline have them. The secret changes once in a while (and no one has it). The GPG signing key lives separately from the actual repositories.
 
-The repo server is only accessible via HTTP at https://repos.fyralabs.com/, and SSH is locked to only public keys.
-
-Most of the server infrastructure are locked behind NAT, and only accessible through a Tailscale tailnet. We only expose services when needed using `cloudflared`.
+The repo server is only accessible via HTTPS at https://repos.fyralabs.com/, and is only accessible by system administrators.
 
 ### Who has direct access to Terra?
 
