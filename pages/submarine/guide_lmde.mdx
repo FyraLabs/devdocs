@@ -1,0 +1,12 @@
+## Installing linux to the drive
+(This example is based on LMDE6, but it should work for any other distro that uses grub as its bootloader)
+
+First, ensure that you disk uses a GPT partition table. Then, create a 16mb partition, this is where submarine will be. Then, you need to add the neccesary flags, `cgpt add -i <partition number> -t kernel -P 15 -T 1 -S 1 /dev/sdX`, dont forget to put the correct values for your disk. Now you can flash `submarine-<arch>.kpart` to this partition!
+
+Submarine needs grub to be able to boot the distro, so create a second partition (anywhere from 64-256mb). Finally, create a third partition that will house you system. It can be any size but filling the rest of the disk would be most logical.
+
+Now you can begin installing your system to the drive, proceed with the usual installation until you get to the partition screen. This is where you need to mount the third (system) partition as `/`, and the second (grub) partition as `/boot/efi`. If asked, you should download the grub menu to the second partition, as thats where the grub bootloader will lie.
+
+The rest should be handled by the installer, and once the system finishes, you are ready to use the drive with your chromebook! Once the submarine menu boot up and shows the list of options, select the number wich correcsponds to your system.
+
+After installing, you should use [Tree's audio script](https://github.com/WeirdTreeThing/chromebook-linux-audio) to get audio working, note that this will create a new kernel, and sho will have a new entry in the boot menu wich you should select.
