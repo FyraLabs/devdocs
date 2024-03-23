@@ -51,6 +51,12 @@ In most cases, `rpm.version(gh("..."));` as a one-liner is enough to make it wor
 let html_content = get("https://fyralabs.com");
 let latest_ver = gh("group/repo_name");
 let latest_tag = gh_tag("group/repo_name"); // for gh repos with tags but not releases
+let latest_commit = gh_commit("group/repo_name");
+// the above gh functions are also available for gitlab, just replace `gh` with `gitlab`, and replace group/repo_name with repoid
+// you can also specify the custom domain as the first argument:
+print(gitlab_commit("gitlab.gnome.org", "1551", "main")); // special: you need to specify branch for gitlab commits
+print(gitlab_tag("25716028"));
+let raw_readme_content = gh_rawfile("group/repo_name", "main", "README.md"); // main is the branch
 let pypi_latest = pypi("example");
 let max_stable_version = crates("anda");
 let max_version = crates_max("anda");
@@ -81,11 +87,61 @@ let substituted = sub("(\\s+)", " ", "I   hate spaces      !!!");
 print(substituted); // I hate spaces !!!
 
 // === IO and Commands ===
-let (rc, stdout, stderr) = sh("echo hai"); // `sh -c 'echo hai'`
-let (rc, stdout, stderr) = sh(["echo", "hai"]); // `echo hai`
-let (rc, stdout, stderr) = sh(["rm", "-rf", "/path/with/some space"]); // `rm -rf "/path/with/some space"`
-let (rc, stdout, stderr) = sh("ls -al", "/current/working/directory"); // `sh -c 'ls -al'` with cwd specified
-let (rc, stdout, stderr) = sh(["grep", "andaman", "file"], "/working/dir"); // `grep andaman file` with cwd specified
+
+// `sh(command, opts)` is a very complicated function:
+//
+// ## `command`
+// you can supply `command` as a string or an array of strings
+// if `command` is a string, `sh -c <command>` will be used
+// otherwise it'll just call `command[0]` with the arguments `command[1..]`
+//
+// ## `opts`
+// `opts` has to be an `rhai::Map`. inside the map, you may have the following key-value pairs: (all are optional)
+// - `stdout`: possible values are "inherit" (default), "null" and "piped".
+// - `stderr`: possible values are "inherit" (default), "null" and "piped".
+// - `cwd`: path of current working directory as a string
+//
+// ## Errors
+// If you didn't use the function correctly, you will receive the following error:
+//
+// #{ 
+//   "outcome": "fatal",
+//   "ctx": #{
+//     "kind": "bad_param_type", // or: "empty_cmd_arr" | "bad_stdio_opt" | "bad_stdio_type"
+//     "expect": "…", // expected type
+//     "found": "…", // actual type received
+//   },
+// }
+//
+// 
+// If you did use the function correctly but there are some problems running the command:
+// (Note: this doesn't include cases where the command itself returns a non-zero exit code)
+//
+// #{ 
+//   "outcome": "failure",
+//   "ctx": #{
+//     "error": "…", // error message from the rust lib / operating system / idk
+//   },
+// }
+//
+//
+// Otherwise, the function will return this:
+//
+// #{ 
+//   "outcome": "success",
+//   "ctx": #{
+//     "stdout": "…",
+//     "stderr": "…",
+//     "rc": 0, // or other integers (status code)
+//   },
+// }
+//
+//
+// Here are some examples:
+print(sh("echo hai", #{}).ctx.rc); // most likely 0, and prints out stdout to console in real time, so you will see `hai` then `0`
+print(sh(["echo", "hai"], #{ "stdout": "piped" }).ctx.stdout); // hai
+print(sh("ls -alh", #{ "cwd": "anda/tools/umstellar/" })); // prints out the command output in real time, then the rhai map: `#{ "outcome": "success", "ctx": … }`
+
 for x in ls("/") {
     if x == "bin" {
         print("I found the `/bin` folder!");
@@ -118,10 +174,7 @@ let cfg_map_obj = anda::cfg::load("path/to/anda.hcl");
 // note that the `rpm` object is only available in `anda update`, but not `anda run`.
 rpm.version(latest_ver); // note that version() resets the release back to 1 automatically
 // Source0: https://github.com/FyraLabs/anda/archive/refs/tags/0.1.17.tar.gz
-rpm.source(
-  0,
-  "https://github.com/FyraLabs/anda/archive/refs/tags/0.1.17.tar.gz"
-);
+rpm.source(0, "https://github.com/FyraLabs/anda/archive/refs/tags/0.1.17.tar.gz");
 // %define abc hai bai
 rpm.define("abc", "hai bai");
 // %global def give rabonuko a headpat!
