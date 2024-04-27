@@ -26,7 +26,7 @@ crossystem dev_boot_signed_only=0
 
 ## Installing
 
-1. After chrooting into the new install, install GRUB. As there is no ESP, skip the `grub-install` step and only run `grub-mkconfig -o /boot/grub/grub.cfg`. You must first create the `/boot/grub` directory otherwise `grub-mkconfig` will fail.
+1. After chrooting into the new install, install the `grub` package. As there is no ESP, skip the `grub-install` step and only run `grub-mkconfig -o /boot/grub/grub.cfg`. You must first create the `/boot/grub` directory otherwise `grub-mkconfig` will fail.
 
 2. Install `curl` or `wget`, and `unzip` in order to download and extract Submarine. Here is the link again: https://nightly.link/FyraLabs/submarine/workflows/build/main/submarine-x86_64.zip
 
