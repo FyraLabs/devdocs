@@ -11,7 +11,8 @@
 4. Write `submarine-x86_64.kpart` to the Submarine partition created in step 2.
 
 5. Reminder: to boot Submarine from external media, you first need to run the following commands as root
-```crossystem dev_boot_usb=1
+```bash
+crossystem dev_boot_usb=1
 crossystem dev_boot_signed_only=0
 ```
 
@@ -30,7 +31,8 @@ crossystem dev_boot_signed_only=0
 2. Install `curl` or `wget`, and `unzip` in order to download and extract Submarine. Here is the link again: https://nightly.link/FyraLabs/submarine/workflows/build/main/submarine-x86_64.zip
 
 3. Arch does not package `cgpt`, but it is available in the AUR. Install `git`, and run the following commands
-```git clone https://aur.archlinux.org/cgpt-bin.git
+```bash
+git clone https://aur.archlinux.org/cgpt-bin.git
 cd cgpt-bin
 makepkg -si
 ```
