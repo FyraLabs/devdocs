@@ -68,7 +68,8 @@ sudo dd if=build/submarine.bin of=/dev/sdX
 
 Before you can boot submarine, you need to enable booting from external storage. On your Chrome device, press Ctrl + Alt + F2 (This will either be the refresh or forward key on the top row) to switch to vt2. Log in as root and run the following commands:
 
-```crossystem dev_boot_usb=1
+```bash
+crossystem dev_boot_usb=1
 crossystem dev_boot_signed_only=0
 ```
 
