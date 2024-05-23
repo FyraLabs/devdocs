@@ -1,13 +1,13 @@
 ---
-name: Infrastructure (How does Terra work exactly?)
+name: Infrastructure (How Does Terra Work Exactly?)
 description: The technical details behind the infrastructure and how different components work together.
 ---
 
-# How Terra works
+# How Terra Works
 
 This document outlines the process of how a package ends up to the end users.
 
-## Terra installation
+## Terra Installation
 
 There are two ways to install Terra:
 
@@ -15,7 +15,7 @@ There are two ways to install Terra:
    won't break even if we have any server migrations, infrastructure changes, etc.
 2. With `.repo` files. We provide `.repo` files at https://github.com/terrapkg/subatomic-repos.
 
-This document assumes Terra is installed via the 1st method. You should also look at the "Last
+This document assumes Terra is installed via the first method. You should also look at the "Last
 updated on" footnote (above the next page button; a feature of Nextra that you can see on all
 pages) because things might change over time.
 
@@ -108,7 +108,7 @@ A metalink generator, so the clients (dnf/dnf5) knows what mirrors a repo has an
 - GitHub: https://github.com/terrapkg/tetsudou
 - URL: https://tetsudou.fyralabs.com/metalink?repo=terrarawhide
 
-## When CI builds a new package
+## When CI Builds a New Package
 
 1. The `autobuild.yml` workflow detects for changes in commits
 2. In the `manifest` stage, `anda ci` finds out what directories have been changed in the last commit
@@ -118,7 +118,7 @@ A metalink generator, so the clients (dnf/dnf5) knows what mirrors a repo has an
 6. It uploads built SRPMs and RPMs to Subatomic only if the build is successful and it's not in a pull request
 7. It notifies Madoguchi for a successful/failed build
 
-## When dnf/dnf5 needs a Terra package
+## When dnf/dnf5 Needs a Terra Package
 
 1. It fetches a [metalink](https://en.wikipedia.org/wiki/Metalink) XML file from Tetsudou, which
    - finds the repository's mirror information: https://github.com/terrapkg/tetsudou/tree/main/repos
