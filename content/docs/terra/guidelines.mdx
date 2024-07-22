@@ -1,0 +1,30 @@
+---
+title: Guidelines
+description: "Here are some written rules that you definitely want to follow!"
+---
+
+# Guidelines
+
+Terra uses a slightly different packaging guideline for packages from Fedora's. This article is to outline the specific different guidelines in Terra.
+
+## Interpreted Languages (Python, Ruby, etc.)
+
+All packages using interpreted languages follow the traditional Fedora guidelines, with all dependencies **_must_** be packaged individually as they are considered runtime dependencies.
+
+## Dynamically compiled languages (C, C++, Vala)
+
+Dependencies must also be packaged separately if they are required for runtime.
+
+## Statically compiled languages
+
+As Terra does not strictly follow Fedora's reproducibility requirements, and we do not want large amounts of development library languages for them, packagers **should** vendor dependencies on build time.
+
+Terra's mock sandbox has networking enabled, so builders can download the dependencies directly on build time.
+
+### Rust
+
+Do not use the tradtional Fedora cargo prep macros. Use `%cargo_prep_online` from `anda-srpm-macros` instead, and do not use the `%generate_builddeps` macro, as it is useless.
+
+### Go
+
+Use the `go` compiler directly instead of using Fedora's Go macros, as this will generate offline dependencies that we do not want to package.

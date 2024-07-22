@@ -1,0 +1,35 @@
+---
+title: App Branding
+---
+
+# App Branding
+
+Crafting a solid app branding is crucial in the world of apps.
+
+It goes beyond just visual elements like shapes and colors – it's about creating
+a distinct identity. In a crowded space of various apps, having a well-defined brand
+helps communicate what your app is all about and sets it apart. Consistency in branding,
+from the app icon to other materials, contributes to a seamless user experience
+and strengthens brand recognition.
+
+This strategic approach not only builds user trust but also plays a key role in retaining
+users by creating a sense of familiarity and loyalty. So, thoughtful app branding is not
+just about looks; it's a strategic move to navigate the dynamic landscape of app design
+and leave a lasting impression on the people using it.
+
+## Adding brand colors
+
+Apps are expected to provide two different brand colors for light and dark.
+This is the snippet you need to include in your MetaInfo/AppData file:
+
+```xml
+<branding>
+  <color type="primary" scheme_preference="light">#faa298</color>
+  <color type="primary" scheme_preference="dark">#7f2c22</color>
+</branding>
+```
+
+When selecting colors, ensure they suit their context (avoid light yellow for dark themes)
+and complement the app icon. For light schemes, opt for a lighter tint of the main icon color;
+for dark schemes, choose a darker shade or a complementary color that harmonizes with the
+icon's colors. This maintains contrast and enhances visual appeal.

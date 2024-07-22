@@ -1,0 +1,64 @@
+---
+title: Configuration
+description: Configure Andaman
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+
+## Configuration
+
+Andaman uses the HashiCorp Configuration Language (HCL) for its configuration format, known for being used in software by HashiCorp such as Terraform, Consul, Vault and Packer. Its syntax is similar to UCL and NGINX's configuration format.
+
+Consider the following. for `{ }` and `""`, they represent, respectively, an dictionary (empty by default) with keys and string values, and a string with no default value. Unless otherwise stated, all the attributes are optional.
+
+```hcl
+config {
+  mock_config = "" // default mock config for `anda build -c custom_mock_config`
+  strip_prefix = "" // strip prefix to form new project alias
+  strip_suffix = "" // strip suffix to form new project alias
+  project_regex = ""
+}
+project "project_name" { // the string quote is optional
+  rpm {
+    spec = "path/to/file.spec" // REQUIRED
+    sources = "."
+    package = ""
+    pre_script = "rpm_pre.rhai"
+    post_script = "rpm_post.rhai"
+    mock_config = ""
+    enable_scm = false
+    scm_opts { }
+    config { }
+    plugin_opts { }
+    macros { }
+    opts { }
+  }
+  podman tagname {
+    dockerfile = ""
+    import = ""
+    tag_latest = false
+    context = "" // REQUIRED
+    version = ""
+  }
+  docker tagname {
+    dockerfile = ""
+    import = ""
+    tag_latest = false
+    context = "" // REQUIRED
+    version = ""
+  }
+  flatpak {
+    manifest = "path/to/manifest.yml" // REQUIRED
+    pre_script = ""
+    post_script = ""
+  }
+  pre_script = "pre.rhai"
+  post_script = "post.rhai"
+  env { }
+  alias = [] // array of strings
+  scripts = [] // array of paths to AndaX scripts
+  labels { }
+  update = "update.rhai"
+  arches = ["x86_64", "aarch64"]
+}
+```
