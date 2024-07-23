@@ -24,7 +24,7 @@ All the scripts in Anda can either be a command that can be executed with `sh -c
 - RPM: Anda calls either `mock` or `rpmbuild` depending on the `--rpm_builder` option which defaults to `mock`.
 - Flatpak: The manifest is read using the `flatpak` crate and the application is built using `flatpak-builder`.
   <Callout type="info">
-    As of 0.1.17, the output is always located at `.flatpak-builder/build/`, as
+    As of 0.2.3, the output is always located at `.flatpak-builder/build/`, as
     opposed to `anda-build/` used by other package types.
   </Callout>
 - Docker/Podman: Anda calls `docker build` or `podman build`.
