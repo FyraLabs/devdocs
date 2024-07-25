@@ -8,7 +8,7 @@ An app's interface is nothing without text. Size, position, among other things d
 
 ## General Rules
 
-- Use the system font wherever possible. tauOS uses Manrope (by Mikhail Sharanda designed in 2018 and updated frequently.) at 10pt size.
+- Use the system font wherever possible. tauOS uses Geist (by Vercel, with our own small changes) [[1]](https://github.com/FyraLabs/zeitgeist) at 11pt size.
 - Don't place text over a busy background like an image or a gradient, without proper protection with a scrim.
 
 ## Geometry
@@ -30,13 +30,13 @@ These are the recommended font styles for use in tauOS apps.
 | Name                   | Specs                  | CSS Class                | Usage                                                                               |
 | ---------------------- | ---------------------- | ------------------------ | :---------------------------------------------------------------------------------- |
 | Big Display            | Regular 57px           | `.big-display`           | Used for very large text, such as timers or text that needs to be big.              |
-| Display                | Light 40px             | `.display`               | Relatively large text on the screen, display is reserved for short, important text. |
-| View Title             | Light 24px             | `.view-title`            | Used for view titles, it's big enough to title an app's view.                       |
+| Display                | <span style="font-weight: 200;">Light 40px</span>             | `.display`               | Relatively large text on the screen, display is reserved for short, important text. |
+| View Title             | <span style="font-weight: 200;">Light 32px</span>              | `.view-title`            | Used for view titles, it's big enough to title an app's view.                       |
 | View Subtitle          | Regular 20px           | `.view-subtitle`         | Used for subtitles within a View.                                                   |
 | Content Block Title    | **Bold 18px**          | `.cb-title`              | Used for the titles on Content Blocks.                                              |
 | Content Block Subtitle | Regular 15px           | `.cb-subtitle`           | Used for the subtitles on Content Blocks.                                           |
 | Header                 | **ALL-CAPS BOLD 10px** | `.header`                | Used for headings in a Sidebar.                                                     |
-| Body                   | Regular 10px           | `.body` (is the default) | Used for all the text on the interface.                                             |
+| Body                   | Regular 11px           | `.body` (is the default) | Used for all the text on the interface.                                             |
 | Caption                | **Bold 9px**           | `.caption`               | For sub-text that accompanies a text body or an image.                              |
 
 Note: These CSS classes are available on both GTK4 and GTK3.
