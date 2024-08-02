@@ -34,21 +34,7 @@ You can search packages via `dnf search` or [Repology].
 
 - You can add and manage packages much more easily (See [Contribute](contributing))
 - Our autoupdate system ensures that you get the latest packages, with less maintainer burden
-
-## Pantheon
-
-### How can I install Pantheon?
-
-`sudo dnf groupinstall pantheon-desktop`
-
-### Why no `elementary-tasks`?
-
-You can install it via flatpak.
-
-The issue is a bit similar to [#1](../issues/1).
-`evolution-data-server` requires both libsoup3-devel and libsoup-devel.
-`elementary-tasks` will fail to compile as the compiler sees both libs.
-Conflict arises when it is compiled with both libsoup versions.
+- You should see the full introduction at https://terra.fyralabs.com
 
 ## Technical details
 
@@ -59,6 +45,8 @@ Conflict arises when it is compiled with both libsoup versions.
 ### Why [Andaman]?
 
 Written in rust, it provides an easy and efficient way to manage packages. [Ultramarine Linux] did use Koji, but the complexity makes it harder for us to maintain packages, which is why we decided to create anda.
+
+Anda is responsible for handling autoupdate and building the output artifacts. It supports both `rpmbuild` and `mock`, which couldn't be done using koji.
 
 ### What is [Subatomic]?
 
@@ -74,9 +62,9 @@ The repo server is only accessible via HTTPS at https://repos.fyralabs.com/, and
 
 See [team members of `terrapkg`](https://github.com/orgs/terrapkg/people).
 
-### How can I grab the SRPMs
+### How can I grab the SRPMs?
 
-https://repos.fyralabs.com/terra39-source/
+https://repos.fyralabs.com/terrarawhide-source/
 
 You should be able to grab them by `dnf download --source <pkgname>`
 
