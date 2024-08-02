@@ -190,6 +190,7 @@ const IS_WIN32 = false; // `cfg!(windows)` in rust
 const ANDAX_VER = "0.1.3"; // `env!("CARGO_PKG_VERSION")` in rust
 ```
 
+{/*
 ### HeadPAT
 
 [HeadPAT] is a work-in-progress package version tracker. It is (going to be) a self-hosted microservice.
@@ -212,6 +213,7 @@ lua
 
 Then HeadPAT will look for `pat.lua` in the same directory.
 However, it is uncertain if the above will be the actual format as HeadPAT is still under heavy (but slow) development.
+*/}
 
 ## Guidelines
 
@@ -221,12 +223,7 @@ However, it is uncertain if the above will be the actual format as HeadPAT is st
   This is because GitHub has an API rate-limit.
 </Callout>
 <Callout type="info">
-  Only update nightly packages when the list of filters contains `nightly`:
-  ```ts
-  if filters.contains("nightly") {
-    ...
-  }
-  ```
+  You might see scripts with `if filters.contains("nightly")`. This `if` statement is no longer needed.
 </Callout>
 <Callout type="warning">Avoid running code unrelated to updating/bumping packages.</Callout>
 

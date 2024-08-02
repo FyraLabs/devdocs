@@ -40,10 +40,7 @@ Remember, it takes effort to create a package. If you ever need help, hop into
 
 ### Writing sources
 
-- After you've forked/cloned the [Terra sources repo](https://github.com/terrapkg/packages),
-  check for existing directories in `anda/`
-  for the corresponding category your package belongs to
-  - If it doesn't belong to any, go to `anda/`
+- Fork/clone the [Terra sources repo](https://github.com/terrapkg/packages)
 - Create a folder named after the package name.
   - e.g. you are creating a font package `lovelyfonttype`. Create `anda/fonts/lovelyfonttype`
   - A Pantheon DE package goes into `anda/desktops/elementary/`.
@@ -53,6 +50,7 @@ Remember, it takes effort to create a package. If you ever need help, hop into
   - The name of the folder name actually is just for identifications for Terra package maintainers.
     What matters is that the spec file name must match with the package name defined in the spec file later.
     This is a Fedora `mock` limitation.
+  - For more information, check out our [packaging policies](policy).
 - Edit `anda.hcl`, which tells [Andaman] how to build the package:
 
 ```hcl
@@ -77,19 +75,23 @@ A generic spec file looks like this:
 ```rpmspec
 Name:           pkgname
 Version:        1.2.3
-Release:        %autorelease
+Release:        1%?dist
 Summary:        A package example
 URL:            https://example.com
 Source0:        https://github.com/some/repo/archive/%{version}.tar.gz
+# You should change the above link to the source tarball you got from the preparation section
 License:        MIT
 BuildRequires:  some dependencies >= 3.2.1 another-dep
 Requires:       deps here
+# We *highly* encourage you to add yourself as the packager here:
+Packager:       Your Name <meowy@example.com>
 
 %description
 This is a description of the package that literally does nothing.
 
 %prep
 %autosetup -n name-of-folder-after-source0-expansion
+# if you are not using a tarball, simply use normal shell commands to extract the sources
 echo "hai"
 
 %build
@@ -160,7 +162,7 @@ See the "book" (more like guide) for [Rhai](https://rhai.rs/book/).
 - You also need to add `labels { nightly = "1" }` in anda.hcl for nightly packages.
 
 <Callout type="info">Remember to add semicolons in Rhai scripts! (`;`)</Callout>
-<Callout type="warning">
+<Callout type="info">
   Anda defaults the filename to `update.rhai`.
   If it's not `update.rhai`, add a new entry inside `anda.hcl`:
   ```hcl
@@ -179,11 +181,11 @@ We provide SPRM macros to ease packaging and better integrate into our workflow.
 
 These are provided in the `anda-srpm-macros` package, if you use them, make sure to add `anda-srpm-macros` as a `BuildRequires` in the spec file.
 
-| Macro                        | Function                                                                                                                                       |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `%git_clone`                 | Clones a git repository into a tarball given a URL and branch name <br/><br/> Example: `%git_clone https://github.com/<OWNER>/<REPO>.git main` |
-| `%cargo_prep_online`         | Enables internet access for `cargo`. Replaces `%cargo_prep` and should be used in `%prep`                                                      |
-| `%cargo_prep_online_sccache` | Enables `sccache` and internet access for `cargo`. Replaces `%cargo_prep` and `%cargo_prep_online` - should be used in `%prep`                 |
+| Macro                           | Function                                                                                  |
+| ------------------------------- | ----------------------------------------------------------------------------------------- |
+| `%cargo_prep_online`            | Enables internet access for `cargo`. Replaces `%cargo_prep` and should be used in `%prep` |
+| `%cargo_license_online`         | Replaces `%cargo_license` in `%build`                                                     |
+| `%cargo_license_summary_online` | Replaces `%cargo_license_summary` in `%build`                                             |
 
 [andaman]: https://github.com/FyraLabs/anda/
 [rpm packaging guide]: https://rpm-packaging-guide.github.io/
