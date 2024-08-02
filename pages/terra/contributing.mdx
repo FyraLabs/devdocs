@@ -40,7 +40,7 @@ Remember, it takes effort to create a package. If you ever need help, hop into
 
 ### Writing sources
 
-- After you've forked/cloned Terra (this repo),
+- After you've forked/cloned the [Terra sources repo](https://github.com/terrapkg/packages),
   check for existing directories in `anda/`
   for the corresponding category your package belongs to
   - If it doesn't belong to any, go to `anda/`
@@ -132,12 +132,15 @@ echo "this will also run when building pkg but for installing it into %{buildroo
 - Having anda installed, run the following command:
 
 ```sh
-anda build -c terra-40-x86_64 anda/fonts/lovelyfonttype-fonts/pkg
+anda build -c terra-rawhide-x86_64 anda/fonts/lovelyfonttype-fonts/pkg
 ```
+
+If you would like to use the `rpmbuild` mode instead (which will instead not set up a container), add `--rpm-builder=rpmbuild`. Remember to install the build dependencies using `dnf builddep path/to/pkgname.spec`!
 
 - You don't need to create `pkg`. It's not supposed to exist
 - Modify the architecture to match your machine
 - If the package fails to build, fix your spec file accordingly
+  - Usually the actual useful error message can be found before the Python traceback (from mock).
 - The built RPM will be inside `anda-build/`
 
 ## Done?
