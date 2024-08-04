@@ -11,7 +11,18 @@ Currently (2022-11-28), Terra only supports RPM packages.
 
 ## Adding Terra
 
-You can add Terra into DNF directly:
+### Fedora Atomic Editions
+
+On Immutable editions of Fedora, run the following command:
+
+```
+curl -fsSL https://github.com/terrapkg/subatomic-repos/raw/main/terra.repo | pkexec tee /etc/yum.repos.d/terra.repo
+sudo rpm-ostree install terra-release
+```
+
+### Other Fedora Editions
+
+Directly install `terra-release`:
 
 ```sh
 $ sudo dnf install --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' --setopt='terra.gpgkey=https://repos.fyralabs.com/terra$releasever/key.asc' terra-release
