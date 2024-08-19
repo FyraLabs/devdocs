@@ -7,7 +7,6 @@ description: "One of Terra's main focuses is package quality. Users should be ab
 
 - Use common sense.
 - When it comes to submissions, anything is fair game, assuming that our policies are followed. However, there is a mild exception for GUI applications.
-
   - Please refrain from submitting applications that work perfectly fine as a Flatpak, unless there is a technical or UX justification for it. Examples of these exceptions are:
     - Terminal Emulators, as these often only work properly when run directly on the host system.
     - CLI/TUI applications, as the UX of Flatpak isn't optimized for these types of applications. (ex. requiring the user to call Flatpak, and then the RDNN of the app)
@@ -16,12 +15,11 @@ description: "One of Terra's main focuses is package quality. Users should be ab
     - System components, such as background system services, device drivers or important system configuration tools.
     - Libraries required to build or use the aforementioned packages.
     - Other applications may be excluded as per user demand, at the team's discretion.
-
 - You must have the rights or permission to redistribute the packaged software. Besides that, there is no prohibition on proprietary licenses.
 - Submissions must be maintained. We will reject submissions of unmaintained software.
 - Submissions must not be malicious.
 - Submissions should not conflict with Fedora's own packages.
-- Submissions _should_ include an auto-update script, updating the package spec to the latest released version, with an exception for nightly packages.
+- Submissions should include an auto-update script.
 - Submissions should be placed in the corresponding directory in `anda/`.
   - Each folder should only contain 1 spec file (recursively).
   - The following directories have a higher priority. Categorize your new package in the following order:
@@ -85,10 +83,52 @@ As Terra does not strictly follow Fedora's reproducibility requirements, and we 
 
 Terra's mock sandbox has networking enabled, so builders can download the dependencies directly on build time.
 
+### Usages of the `mold` linker
+
+We encourage the use of `mold`, which may speed up build times especially in large projects. You may enable it in C/++ projects by adding `-fuse-ld=mold` in `CFLAGS`/`CXXFLAGS`.
+
 ### Rust
 
-Do not use the tradtional Fedora cargo prep macros. Use `%cargo_prep_online` from `anda-srpm-macros` instead, and do not use the `%generate_builddeps` macro, as it is useless.
+- Do not use the tradtional Fedora `%cargo_prep` macro. Use `%cargo_prep_online` from `anda-srpm-macros` instead, and do not use the `%generate_buildrequires` macro, as it is useless.
+- It is encouraged to use `%cargo_license_online` and `%cargo_license_summary_online`, although they are not a strict requirement.
+- Avoid using both `%cargo_build` and `%cargo_install` in the same spec file as `cargo install` might cause a rebuild due to a bug. You should only include either one of them. In most cases, you can just omit `%cargo_build` entirely and it will just build fine.
+
+You can enable `mold` by using `%bcond_without mold`.
+
+Example:
+```
+%prep
+%autosetup -n %{crate}-%{version} -p1
+%cargo_prep_online
+
+%build
+%{cargo_license_online} > LICENSE.dependencies
+
+%install
+%cargo_install
+```
 
 ### Go
 
 Use the `go` compiler directly instead of using Fedora's Go macros, as this will generate offline dependencies that we do not want to package.
+Alternative, use the `_online` macro variants:
+```
+%prep
+%goprep
+%autopatch -p1
+%go_prep_online
+
+%build
+%go_build_online %{goipath}
+
+%install
+%gopkginstall
+install -m 0755 -vd                     %{buildroot}%{_bindir}
+install -m 0755 -vp %{gobuilddir}/bin/* %{buildroot}%{_bindir}/
+```
+
+### Nim
+
+Use the `%nim_prep` and `%nim_c src/pkgname` macros.
+
+add `mold` as a `BuildRequires` to enable mold automatically.
