@@ -2,9 +2,9 @@
 
 ## Partitioning
 
-Ensure that you disk uses a GPT partition table.
+Ensure that your disk uses a GPT partition table.
 
-1. Create a 16mb partition, this is where Submarine will be.
+1. Create a 16mb EXT4 partition, this is where Submarine will be.
 
 2. Add the neccesary flags with `cgpt add -i <partition number> -t kernel -P 15 -T 1 -S 1 /dev/sdX`, dont forget to put the correct values for your disk.
 
