@@ -8,13 +8,22 @@ description: "One of Terra's main focuses is package quality. Users should be ab
 - Use common sense.
 - When it comes to submissions, anything is fair game, assuming that our policies are followed. However, there is a mild exception for GUI applications.
   - Please refrain from submitting applications that work perfectly fine as a Flatpak, unless there is a technical or UX justification for it. Examples of these exceptions are:
-    - Terminal Emulators, as these often only work properly when run directly on the host system.
-    - CLI/TUI applications, as the UX of Flatpak isn't optimized for these types of applications. (ex. requiring the user to call Flatpak, and then the RDNN of the app)
-    - Applications that may require the user to manually modify its data files regularly (Prism Launcher, other modded game launchers, etc).
-    - Applications that suffer major performance or technical issues due to sandboxing (IDEs, text editors, file managers, DAWs and other applications that rely on native plugin support like VSTs or LV2, etc).
-    - System components, such as background system services, device drivers or important system configuration tools.
-    - Libraries required to build or use the aforementioned packages.
-    - Other applications may be excluded as per user demand, at the team's discretion.
+
+    | Application Type | Justification |
+    |------------------|---------------|
+    | Terminal Emulators | These often only work properly when run directly on the host system. |
+    | CLI/TUI applications | The UX of Flatpak isn't optimized for these types of applications. (ex. requiring the user to call Flatpak, and then the RDNN of the app) |
+    | Modded/Multi-instance game launchers (i.e Minecraft launchers) | May require access to system libraries, and can be better managed by the user when not sandboxed. For example Minecraft launchers can easily access multiple JRE installations when not sandboxed. |
+    | Other appliactions that require manual modification of data files | Requires user to modify its data files regularly, applies in the same above case. |
+    | Applications that suffer major performance or technical issues due to sandboxing (IDEs, text editors, file managers, DAWs and other applications that rely on native plugin support like VSTs or LV2, etc.) | These applications usually require systems libraries to be present to work properly. |
+    | System components | These packages simply cannot be sandboxed, as they are part of the operating system itself. |
+    | Libraries required to build or use the aforementioned packages | These libraries are required to build or use the aforementioned packages, and are usually not sandboxed. |
+    
+    Other applications that are not specified here may be allowed on a case-by-case basis.
+    
+
+
+
 - You must have the rights or permission to redistribute the packaged software. Besides that, there is no prohibition on proprietary licenses.
 - Submissions must be maintained. We will reject submissions of unmaintained software.
 - Submissions must not be malicious.
