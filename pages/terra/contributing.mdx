@@ -40,31 +40,31 @@ Remember, it takes effort to create a package. If you ever need help, hop into
 
 ### Writing sources
 
-- Fork/clone the [Terra sources repo](https://github.com/terrapkg/packages)
-- Create a folder named after the package name.
-  - e.g. you are creating a font package `lovelyfonttype`. Create `anda/fonts/lovelyfonttype`
-  - A Pantheon DE package goes into `anda/desktops/elementary/`.
-- Inside the folder, create `anda.hcl` and `<packagename>.spec`
-  - note: font packages in Fedora repos should end with `-fonts`,
-    i.e. the folder name is `lovelyfonttype` but your spec file should be `lovelyfonttype-fonts.spec`
-  - The name of the folder name actually is just for identifications for Terra package maintainers.
-    What matters is that the spec file name must match with the package name defined in the spec file later.
-    This is a Fedora `mock` limitation.
-  - For more information, check out our [packaging policies](policy).
-- Edit `anda.hcl`, which tells [Andaman] how to build the package:
+1. Fork/clone the [Terra sources repo](https://github.com/terrapkg/packages).
+1. Create a folder named after the package name, for example:
+   - A font named `lovelyfonttype` would go in `anda/fonts/lovelyfonttype`.
+   - A Pantheon DE package would go in `anda/desktops/elementary/`.
+1. Inside the folder, create `anda.hcl` and `<packagename>.spec`.
+   - Note that font packages in Fedora repos should end with `-fonts`,
+     e.g. the folder name is `lovelyfonttype` but the spec file should be `lovelyfonttype-fonts.spec`.
+   - The name of the folder name actually is just for identifications for Terra package maintainers.
+     What matters is that the spec file name _must_ match with the package name defined in the spec file later.
+     This is a Fedora `mock` limitation.
+   - For more information, check out our [packaging policies](policy).
+1. Edit `anda.hcl`, which tells [Andaman] how to build the package:
 
-```hcl
-project pkg {
-    rpm {
-        spec = "<packagename>.spec"
-    }
-}
-```
+   ```hcl
+   project pkg {
+       rpm {
+           spec = "<packagename>.spec"
+       }
+   }
+   ```
 
-- Edit the spec file.
-  - It is a custom file format for RPM packages.
-  - This [RPM Packaging Guide] might help newbies with no prior experiences with RPM specs.
-  - This [Spec file format] docs goes into the details of the spec file format.
+1. Edit the spec file.
+   - It is a custom file format for RPM packages.
+   - This [RPM Packaging Guide] might help newbies with no prior experiences with RPM specs.
+   - This [Spec file format] docs goes into the details of the spec file format.
 
 #### Editing the Spec file
 
