@@ -183,15 +183,15 @@ We provide SPRM macros to ease packaging and better integrate into our workflow.
 
 These are provided in the `anda-srpm-macros` package, if you use them, make sure to add `anda-srpm-macros` as a `BuildRequires` in the spec file.
 
-| Macro                           | Function                                                                   |
-| ------------------------------- | -------------------------------------------------------------------------- |
-| `%cargo_prep_online`            | Enables internet access for `cargo`. Replaces `%cargo_prep` and in `%prep` |
-| `%cargo_license_online`         | Replaces `%cargo_license` in `%build`                                      |
-| `%cargo_license_summary_online` | Replaces `%cargo_license_summary` in `%build`                              |
-| `%go_prep_online`               | Same as `go mod download`                                                  |
-| `%go_build_online %goipath`     | Builds a go package in `%build`                                            |
-| `%nim_prep`                     | Setting up `nimble`                                                        |
-| `%nim_build` or `%nim_c`        | Builds a package. Requires an argument to `src/pkgname`                    |
+| Macro                           | Function                                                               |
+| ------------------------------- | ---------------------------------------------------------------------- |
+| `%cargo_prep_online`            | Enables internet access for `cargo`. Replaces `%cargo_prep` in `%prep` |
+| `%cargo_license_online`         | Replaces `%cargo_license` in `%build`                                  |
+| `%cargo_license_summary_online` | Replaces `%cargo_license_summary` in `%build`                          |
+| `%go_prep_online`               | Same as `go mod download`                                              |
+| `%go_build_online %goipath`     | Builds a go package in `%build`                                        |
+| `%nim_prep`                     | Setting up `nimble`                                                    |
+| `%nim_build` or `%nim_c`        | Builds a package. Requires an argument to `src/pkgname`                |
 
 [andaman]: https://github.com/FyraLabs/anda/
 [rpm packaging guide]: https://rpm-packaging-guide.github.io/
