@@ -26,7 +26,7 @@ rpm.version(ver); // updates the version in the spec file using `ver`
 
 <Callout type="warning">you need SEMICOLONS! (`;`)</Callout>
 
-Updates are triggered every 10 minutes using `anda update`.
+Updates are triggered every 10 minutes using `[1;32manda[97m update{:ansi}`.
 
 <Callout emoji="📔">
   Actually, the [full command](https://github.com/terrapkg/packages/blob/4767e5b9560f2986accaeb8447fbb4ea742041cf/.github/workflows/update.yml#L27-L31)
@@ -39,7 +39,8 @@ Updates are triggered every 10 minutes using `anda update`.
 #### Nightly packages
 
 Nightly packages are updated every 24 hours using
-`anda update -vv --filters nightly=1`. Their `anda.hcl` files should look something like this:
+`[1;32manda[97m update [0;3;37m-vv --filters[0;97;m nightly=1{:ansi}`.
+Their `anda.hcl` files should look something like this:
 
 ```hcl
 project pkg {
@@ -55,7 +56,7 @@ project pkg {
 #### Per-branch auto-update scripts
 
 Terra supports updating a package for specific branches instead of updating a package for all branches.
-This is achieved using `--filters updbranch=1 --labels branch=f40` (`f40` is replaced by the branch name).
+This is achieved using `[0;3;37m--filters[0;97;m updbranch=1 [0;3;37m--labels[0;97;m branch=f41{:ansi}` (`f41` is replaced by the branch name).
 The update command is run every 30 minutes.
 
 The `anda.hcl` file should look like this:
@@ -82,7 +83,7 @@ You can obtain the branch name during runtime in Rhai using `labels.branch` (str
 
 #### Functions and Modules
 
-In most cases, `rpm.version(gh("..."));` as a one-liner is enough to make it work™.
+In most cases, `rpm.version(gh("..."));{:ts}` as a one-liner is enough to make it work™.
 Documentations for more functions are available in the [Andaman
 devdocs](/andaman/andax#custom-functions).
 

@@ -28,7 +28,7 @@ Remember, it takes effort to create a package. If you ever need help, hop into
 ### Preparation
 
 - Install [Andaman] on your system and its mock configs
-  - `sudo dnf install anda terra-mock-configs` via Terra
+  - `[1;32msudo dnf[97m install [0;97;mterra-mock-configs{:ansi}` via Terra
   - anda is also available via rust crates.io
 - Use `rust2rpm` for **Rust** packages
 - Use `pyp2rpm` for **Python** packages
@@ -133,11 +133,13 @@ echo "this will also run when building pkg but for installing it into %{buildroo
 
 - Having anda installed, run the following command:
 
-```sh
-anda build -c terra-rawhide-x86_64 anda/fonts/lovelyfonttype-fonts/pkg
+```ansi
+[1;32manda[97m build [0;3;37m-c terra-rawhide-x86_64[0m anda/fonts/lovelyfonttype-fonts/pkg
 ```
 
-If you would like to use the `rpmbuild` mode instead (which will instead not set up a container), add `--rpm-builder=rpmbuild`. Remember to install the build dependencies using `dnf builddep path/to/pkgname.spec`!
+If you would like to use the `rpmbuild` mode instead (which will instead not set
+up a container), add `--rpm-builder=rpmbuild`. Remember to install the build
+dependencies using `[1;32msudo dnf[97m builddep [0;97;mpath/to/pkgname.spec{:ansi}`!
 
 - You don't need to create `pkg`. It's not supposed to exist
 - Modify the architecture to match your machine
@@ -159,7 +161,7 @@ See the "book" (more like guide) for [Rhai](https://rhai.rs/book/).
 
 - Create `update.rhai` inside the package folder.
 - See references from other packages.
-- You also need to add `labels { nightly = "1" }` in anda.hcl for nightly packages.
+- You also need to add `labels { nightly = "1" }{:hcl}` in anda.hcl for nightly packages.
 
 <Callout type="info">Remember to add semicolons in Rhai scripts! (`;`)</Callout>
 <Callout type="info">

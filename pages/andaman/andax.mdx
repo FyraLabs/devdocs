@@ -3,6 +3,8 @@ title: AndaX
 description: Scripting with Anda
 ---
 
+import { Callout } from "nextra/components";
+
 # AndaX
 
 AndaX is a port of the [rhai] scripting language embedded into Andaman.
@@ -146,71 +148,91 @@ print(substituted); // I hate spaces !!!
 
 ### IO and Commands
 
-```ts
-// `sh(command, opts)` is a very complicated function:
-//
-// ## `command`
-// you can supply `command` as a string or an array of strings
-// if `command` is a string, `sh -c <command>` will be used
-// otherwise it'll just call `command[0]` with the arguments `command[1..]`
-//
-// ## `opts`
-// `opts` is an `rhai::Map` with the following key-value pairs: (all optional)
-// - `stdout`: possible values are "inherit" (default), "null" and "piped".
-// - `stderr`: possible values are "inherit" (default), "null" and "piped".
-// - `cwd`: path of current working directory as a string
-//
-// ## Errors
-// If you didn't use the function correctly, you will receive the following error:
-//
-// #{
-//   "outcome": "fatal",
-//   "ctx": #{
-//     "kind": "bad_param_type", // or: "empty_cmd_arr" | "bad_stdio_opt" | "bad_stdio_type"
-//     "expect": "…", // expected type
-//     "found": "…", // actual type received
-//   },
-// }
-//
-//
-// If you did use the function correctly but there are some problems running the command:
-// (Note: this doesn't include cases where the command itself returns a non-zero exit code)
-//
-// #{
-//   "outcome": "failure",
-//   "ctx": #{
-//     "error": "…", // error message from the rust lib / operating system / idk
-//   },
-// }
-//
-//
-// Otherwise, the function will return this:
-//
-// #{
-//   "outcome": "success",
-//   "ctx": #{
-//     "stdout": "…",
-//     "stderr": "…",
-//     "rc": 0, // or other integers (status code)
-//   },
-// }
-//
-//
-// Here are some examples:
-print(sh("echo hai", #{}).ctx.rc); // most likely 0, and prints out stdout to console in real time, so you will see `hai` then `0`
-print(sh(["echo", "hai"], #{ "stdout": "piped" }).ctx.stdout); // hai
-print(sh("ls -alh", #{ "cwd": "anda/tools/umstellar/" })); // prints out the command output in real time, then: `#{ "outcome": "success", "ctx": … }`
+#### `sh(command, opts)`
 
+**`command`**  
+You can supply `command` as a string or an array of strings.  
+If `command` is a string, `sh -c <command>` will be used.  
+Otherwise it'll just call `command[0]` with the arguments `command[1..]`.
+
+**`opts`**  
+`opts` is an `rhai::Map` with the following key-value pairs: (all optional)
+- `stdout`: possible values are "inherit" (default), "null" and "piped".
+- `stderr`: possible values are "inherit" (default), "null" and "piped".
+- `cwd`: path of current working directory as a string
+
+**Errors**  
+If you didn't use the function correctly, you will receive the following error:
+```ts
+#{
+  "outcome": "fatal",
+  "ctx": #{
+    "kind": "bad_param_type", // or: "empty_cmd_arr" | "bad_stdio_opt" | "bad_stdio_type"
+    "expect": "…", // expected type
+    "found": "…", // actual type received
+  },
+}
+```
+If you did use the function correctly but there are some problems running the command:  
+(Note: this doesn't include cases where the command itself returns a non-zero exit code)
+```ts
+#{
+  "outcome": "failure",
+  "ctx": #{
+    "error": "…", // error message from the rust lib / operating system / idk
+  },
+}
+```
+
+Otherwise, the function will return this:
+```ts
+#{
+  "outcome": "success",
+  "ctx": #{
+    "stdout": "…",
+    "stderr": "…",
+    "rc": 0, // or other integers (status code)
+  },
+}
+```
+
+**Examples**
+```ts
+// shows most likely 0, and prints out stdout to console in real time, so you will see `hai` then `0`
+print(sh("echo hai", #{}).ctx.rc);
+// shows `hai`
+print(sh(["echo", "hai"], #{ "stdout": "piped" }).ctx.stdout);
+// prints out the command output in real time, then: `#{ "outcome": "success", "ctx": … }`
+print(sh("ls -alh", #{ "cwd": "anda/tools/umstellar/" }));
+```
+
+#### `ls(dir)`
+
+Returns an array of strings (files, folders inside the given dir)
+
+**Examples**
+```ts
 for x in ls("/") {
     if x == "bin" {
         print("I found the `/bin` folder!");
     }
 }
+```
+
+#### `write(text, filepath)`
+
+Write `text` into `filepath`, overwriting existing content.
+```ts
 let foo = "bar";
-foo.write("bar.txt"); // this might be counterintuitive but the string "bar" is written into the file "bar.txt"
+foo.write("bar.txt"); // counterintuitive but the string "bar" is written into the file "bar.txt"
 obj.write("tmp.json"); // object (maps) are turned into JSON automatically
 
 ```
+
+#### `rhai-fs`
+
+Visit [the rhai book](https://rhai.rs/book/lib/rhai-fs.html) for the
+documentation for `rhai-fs`.
 
 ### Others
 
