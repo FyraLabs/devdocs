@@ -100,13 +100,15 @@ Terra's mock sandbox has networking enabled, so builders can download the depend
 
 We encourage the use of `mold`, which may speed up build times especially in large projects. You may enable it in C/++ projects by adding `-fuse-ld=mold` in `CFLAGS`/`CXXFLAGS`.
 
+The `%with_mold` flag is enabled by default in `anda-srpm-macros`. `mold` is also preinstalled in the builders.
+
+You can disable `mold` in the following languages by using `%bcond_with mold`.
+
 ### Rust
 
 - Do not use the tradtional Fedora `%cargo_prep` macro. Use `%cargo_prep_online` from `anda-srpm-macros` instead, and do not use the `%generate_buildrequires` macro, as it is useless.
 - It is encouraged to use `%cargo_license_online` and `%cargo_license_summary_online`, although they are not a strict requirement.
 - Avoid using both `%cargo_build` and `%cargo_install` in the same spec file as `cargo install` might cause a rebuild due to a bug. You should only include either one of them. In most cases, you can just omit `%cargo_build` entirely and it will just build fine.
-
-You can enable `mold` by using `%bcond_without mold`.
 
 Example:
 ```
@@ -143,5 +145,3 @@ install -m 0755 -vp %{gobuilddir}/bin/* %{buildroot}%{_bindir}/
 ### Nim
 
 Use the `%nim_prep` and `%nim_c src/pkgname` macros.
-
-add `mold` as a `BuildRequires` to enable mold automatically.
