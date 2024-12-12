@@ -26,7 +26,7 @@ rpm.version(ver); // updates the version in the spec file using `ver`
 
 <Callout type="warning">you need SEMICOLONS! (`;`)</Callout>
 
-Updates are triggered every 10 minutes using `anda update`.
+Updates are triggered every 10 minutes using `[1;32manda[97m update{:ansi}`.
 
 <Callout emoji="📔">
   Actually, the [full command](https://github.com/terrapkg/packages/blob/4767e5b9560f2986accaeb8447fbb4ea742041cf/.github/workflows/update.yml#L27-L31)
@@ -39,7 +39,8 @@ Updates are triggered every 10 minutes using `anda update`.
 #### Nightly packages
 
 Nightly packages are updated every 24 hours using
-`anda update -vv --filters nightly=1`. Their `anda.hcl` files should look something like this:
+`[1;32manda[97m update [0;3;37m-vv --filters[0;97;m nightly=1{:ansi}`.
+Their `anda.hcl` files should look something like this:
 
 ```hcl
 project pkg {
@@ -55,7 +56,7 @@ project pkg {
 #### Per-branch auto-update scripts
 
 Terra supports updating a package for specific branches instead of updating a package for all branches.
-This is achieved using `--filters updbranch=1 --labels branch=f40` (`f40` is replaced by the branch name).
+This is achieved using `[0;3;37m--filters[0;97;m updbranch=1 [0;3;37m--labels[0;97;m branch=f41{:ansi}` (`f41` is replaced by the branch name).
 The update command is run every 30 minutes.
 
 The `anda.hcl` file should look like this:
@@ -82,150 +83,9 @@ You can obtain the branch name during runtime in Rhai using `labels.branch` (str
 
 #### Functions and Modules
 
-In most cases, `rpm.version(gh("..."));` as a one-liner is enough to make it work™. However, you may also use the following functions:
-
-```ts
-let html_content = get("https://fyralabs.com");
-let latest_ver = gh("group/repo_name");
-let latest_tag = gh_tag("group/repo_name"); // for gh repos with tags but not releases
-let latest_commit = gh_commit("group/repo_name");
-// the above gh functions are also available for gitlab, just replace `gh` with `gitlab`, and replace group/repo_name with repoid
-// you can also specify the custom domain as the first argument:
-print(gitlab_commit("gitlab.gnome.org", "1551", "main")); // special: you need to specify branch for gitlab commits
-print(gitlab_tag("25716028"));
-let raw_readme_content = gh_rawfile("group/repo_name", "main", "README.md"); // main is the branch
-let pypi_latest = pypi("example");
-let max_stable_version = crates("anda");
-let max_version = crates_max("anda");
-let newest_version = crates_newest("anda");
-let npm_latest = npm("example");
-
-let env_val = env("KEY");
-
-// === Requests ===
-let req = new_req("https://fyralabs.com");
-req.redirects(max_number_of_redirections_allowed);
-req.head("Content-Type", "application/json");
-let html_result = req.get();
-
-// === JSON Operations ===
-let obj = json("{\"a\":1}");
-print(obj.a); // 1
-print(obj["a"]); // 1
-let arr = json_arr("[1,2,3]");
-print(arr[1]); // 2
-let str = to_json(obj);
-let back_to_map_obj = from_json(str);
-
-// === Regex Operations ===
-let found = find("(\\d{3})", "abc1c2345", 1); // gets regex group 1
-print(found); // 234
-let substituted = sub("(\\s+)", " ", "I   hate spaces      !!!");
-print(substituted); // I hate spaces !!!
-
-// === IO and Commands ===
-
-// `sh(command, opts)` is a very complicated function:
-//
-// ## `command`
-// you can supply `command` as a string or an array of strings
-// if `command` is a string, `sh -c <command>` will be used
-// otherwise it'll just call `command[0]` with the arguments `command[1..]`
-//
-// ## `opts`
-// `opts` has to be an `rhai::Map`. inside the map, you may have the following key-value pairs: (all are optional)
-// - `stdout`: possible values are "inherit" (default), "null" and "piped".
-// - `stderr`: possible values are "inherit" (default), "null" and "piped".
-// - `cwd`: path of current working directory as a string
-//
-// ## Errors
-// If you didn't use the function correctly, you will receive the following error:
-//
-// #{
-//   "outcome": "fatal",
-//   "ctx": #{
-//     "kind": "bad_param_type", // or: "empty_cmd_arr" | "bad_stdio_opt" | "bad_stdio_type"
-//     "expect": "…", // expected type
-//     "found": "…", // actual type received
-//   },
-// }
-//
-//
-// If you did use the function correctly but there are some problems running the command:
-// (Note: this doesn't include cases where the command itself returns a non-zero exit code)
-//
-// #{
-//   "outcome": "failure",
-//   "ctx": #{
-//     "error": "…", // error message from the rust lib / operating system / idk
-//   },
-// }
-//
-//
-// Otherwise, the function will return this:
-//
-// #{
-//   "outcome": "success",
-//   "ctx": #{
-//     "stdout": "…",
-//     "stderr": "…",
-//     "rc": 0, // or other integers (status code)
-//   },
-// }
-//
-//
-// Here are some examples:
-print(sh("echo hai", #{}).ctx.rc); // most likely 0, and prints out stdout to console in real time, so you will see `hai` then `0`
-print(sh(["echo", "hai"], #{ "stdout": "piped" }).ctx.stdout); // hai
-print(sh("ls -alh", #{ "cwd": "anda/tools/umstellar/" })); // prints out the command output in real time, then the rhai map: `#{ "outcome": "success", "ctx": … }`
-
-for x in ls("/") {
-    if x == "bin" {
-        print("I found the `/bin` folder!");
-    }
-}
-let foo = "bar";
-foo.write("bar.txt"); // this might be counterintuitive but the string "bar" is written into the file "bar.txt"
-obj.write("tmp.json"); // object (maps) are turned into JSON automatically
-
-// === Templates ===
-print(template(#{a: "value", b: "hai"}, "%{a} and %{b} @{random_rpm_spec_macro}"));
-// value and hai %{random_rpm_spec_macro}
-// Note that @{} are used to represent rpm macros (they unfortunate conflict)
-// `@{` are converted to `%{` automatically.
-print(template_file(#{...}, "path/to/a.hcl"));
-
-// === RPMBuild ===
-// use these functions with sh() :3
-anda::rpmbuild::cmd_srpm("test.spec", "sources"); // ["mock", "--buildsrpm", "--spec", "test.spec", "--sources", "sources", ...];
-anda::rpmbuild::cmd_rpm("test.spec", "sources"); // ["mock", "--rebuild", ...];
-
-// === Anda-Config ===
-let cfg_map_obj = anda::cfg::load("path/to/anda.hcl");
-```
-
-#### Special Variables
-
-```ts
-// === RPM Operations ===
-// note that the `rpm` object is only available in `anda update`, but not `anda run`.
-rpm.version(latest_ver); // note that version() resets the release back to 1 automatically
-// Source0: https://github.com/FyraLabs/anda/archive/refs/tags/0.1.17.tar.gz
-rpm.source(0, "https://github.com/FyraLabs/anda/archive/refs/tags/0.1.17.tar.gz");
-// %define abc hai bai
-rpm.define("abc", "hai bai");
-// %global def give rabonuko a headpat!
-rpm.global("def", "give rabonuko a headpat!");
-rpm.release(); // resets release to 1: `Release: 1%?dist`
-rpm.release(3); // Release: 3%?dist
-let spec_content = rpm.f;
-rpm.f = new_spec_content;
-
-// === Labels and Constants ===
-const USER_AGENT = "AndaX";
-const IS_WIN32 = false; // `cfg!(windows)` in rust
-const ANDAX_VER = "0.1.3"; // `env!("CARGO_PKG_VERSION")` in rust
-```
+In most cases, `rpm.version(gh("..."));{:ts}` as a one-liner is enough to make it work™.
+Documentations for more functions are available in the [Andaman
+devdocs](/andaman/andax#custom-functions).
 
 {/*
 

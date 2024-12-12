@@ -1,0 +1,358 @@
+---
+title: AndaX
+description: Scripting with Anda
+---
+
+import { Callout } from "nextra/components";
+
+# AndaX
+
+AndaX is a port of the [rhai] scripting language embedded into Andaman.
+In short, AndaX is rhai but with extra functions and modules. These functions
+make AndaX a very viable choice for pre/post scripts, performing automatic
+updates (`[1;32manda[97m update{:ansi}`) or just scripting in general.
+
+For documentations, playground and built-in functions in [rhai], check out their
+website.
+
+This page contains documentation for additional functions and quirks in AndaX.
+
+<Callout type="warning">you need SEMICOLONS! (`;`)</Callout>
+
+## Running AndaX scripts
+
+To execute a script, use the `[1;32manda[97m run[0m myscript.rhai{:ansi}` command:
+
+```ansi
+[1;3;96m $ [32manda[97m run [0;3;37m--help[0m
+Run .rhai scripts
+
+[1m[4mUsage:[0m [1manda run[0m [OPTIONS] [SCRIPTS]...
+
+[1m[4mArguments:[0m
+  [SCRIPTS]...  
+
+[1m[4mOptions:[0m
+  [1m-l[0m, [1m--labels[0m <LABELS>  
+  [1m-v[0m, [1m--verbose[0m...       Increase logging verbosity
+  [1m-q[0m, [1m--quiet[0m...         Decrease logging verbosity
+  [1m-h[0m, [1m--help[0m             Print help
+```
+
+The *`--labels`* flag can be used to pass in labels. For more information, read
+the section [Working with Labels](#working-with-labels).
+
+As expected, the shebang `#!anda run` may be used.
+
+## Project Scripts
+
+Some scripts that exist in the same directory as `anda.hcl` will be executed
+during `anda build`. The path to these scripts can be modified in `anda.hcl`:
+
+```hcl
+project "project_name" {
+  // these are default values. Even when not given in the config file, anda will
+  // run them if they just exist in the same directory as the config.
+  pre_script = "pre.rhai"
+  post_script = "post.rhai"
+
+  rpm {
+    pre_script = "rpm_pre.rhai"
+    post_script = "rpm_post.rhai"
+  }
+
+  // this script is not executed during `anda build`.
+  // update = "update.rhai"
+}
+```
+
+However, if these options are modified and the extension does not end with
+`.rhai`, anda will run these files using `[1;32msh[97m [0;3;37m-c[0;97;m path/to/file{:ansi}`.
+
+For more information about `project.*.update{:hcl}` (`update.rhai`), check out the
+[Autoupdate section](#autoupdate).
+
+For more information about the `anda.hcl` configuration file, check out the
+[Configuration page](/andaman/configuration).
+
+
+## Special Constants
+
+```ts
+const USER_AGENT = "AndaX";
+const IS_WIN32 = false; // `cfg!(windows)` in rust
+const ANDAX_VER = "0.1.3"; // `env!("CARGO_PKG_VERSION")` in rust
+```
+
+## Custom Functions
+
+### Networking
+
+```ts
+// `get(link)` is basically a built-in `curl`
+let html_content = get("https://fyralabs.com");
+
+// if you want more control over how the request can be made:
+let req = new_req("https://fyralabs.com");
+req.redirects(max_number_of_redirections_allowed);
+req.head("Content-Type", "application/json");
+let html_result = req.get();
+
+// github-related version tracking functions
+let latest_ver = gh("group/repo_name");
+// for gh repos with tags but not releases, use gh_tag() instead:
+let latest_tag = gh_tag("group/repo_name");
+let latest_commit = gh_commit("group/repo_name");
+// "main" refers to the branch here
+let raw_readme_content = gh_rawfile("group/repo_name", "main", "README.md");
+
+// the above gh functions are also available for gitlab, just replace `gh` with
+// `gitlab`, and replace group/repo_name with repoid
+// you can also specify the custom domain as the first argument:
+// special: need to specify branch for gitlab commits
+print(gitlab_commit("gitlab.gnome.org", "1551", "main"));
+print(gitlab_tag("25716028"));
+// WARN: there is no gitlab_rawfile().
+
+// others
+let pypi_latest = pypi("example");
+let max_stable_version = crates("anda");
+let max_version = crates_max("anda");
+let newest_version = crates_newest("anda");
+let npm_latest = npm("example");
+```
+
+### JSON Operations
+
+```ts
+let obj = json(`{"a": 1}`);
+print(obj.a); // 1
+print(obj["a"]); // 1
+let arr = json_arr("[1,2,3]");
+print(arr[1]); // 2
+let str = to_json(obj);
+let back_to_map_obj = from_json(str);
+```
+
+[Maps](https://rhai.rs/book/language/object-maps.html) are also known as
+dictionaries in some other languages (like Python).
+
+### Regex Operations
+
+```ts
+let found = find("(\\d{3})", "abc1c2345", 1); // gets regex group 1
+print(found); // 234
+let substituted = sub("(\\s+)", " ", "I   hate spaces      !!!");
+print(substituted); // I hate spaces !!!
+```
+
+### IO and Commands
+
+#### `sh(command, opts)`
+
+**`command`**  
+You can supply `command` as a string or an array of strings.  
+If `command` is a string, `sh -c <command>` will be used.  
+Otherwise it'll just call `command[0]` with the arguments `command[1..]`.
+
+**`opts`**  
+`opts` is an `rhai::Map` with the following key-value pairs: (all optional)
+- `stdout`: possible values are "inherit" (default), "null" and "piped".
+- `stderr`: possible values are "inherit" (default), "null" and "piped".
+- `cwd`: path of current working directory as a string
+
+**Errors**  
+If you didn't use the function correctly, you will receive the following error:
+```ts
+#{
+  "outcome": "fatal",
+  "ctx": #{
+    "kind": "bad_param_type", // or: "empty_cmd_arr" | "bad_stdio_opt" | "bad_stdio_type"
+    "expect": "…", // expected type
+    "found": "…", // actual type received
+  },
+}
+```
+If you did use the function correctly but there are some problems running the command:  
+(Note: this doesn't include cases where the command itself returns a non-zero exit code)
+```ts
+#{
+  "outcome": "failure",
+  "ctx": #{
+    "error": "…", // error message from the rust lib / operating system / idk
+  },
+}
+```
+
+Otherwise, the function will return this:
+```ts
+#{
+  "outcome": "success",
+  "ctx": #{
+    "stdout": "…",
+    "stderr": "…",
+    "rc": 0, // or other integers (status code)
+  },
+}
+```
+
+**Examples**
+```ts
+// shows most likely 0, and prints out stdout to console in real time, so you will see `hai` then `0`
+print(sh("echo hai", #{}).ctx.rc);
+// shows `hai`
+print(sh(["echo", "hai"], #{ "stdout": "piped" }).ctx.stdout);
+// prints out the command output in real time, then: `#{ "outcome": "success", "ctx": … }`
+print(sh("ls -alh", #{ "cwd": "anda/tools/umstellar/" }));
+```
+
+#### `ls(dir)`
+
+Returns an array of strings (files, folders inside the given dir)
+
+**Examples**
+```ts
+for x in ls("/") {
+    if x == "bin" {
+        print("I found the `/bin` folder!");
+    }
+}
+```
+
+#### `write(text, filepath)`
+
+Write `text` into `filepath`, overwriting existing content.
+```ts
+let foo = "bar";
+foo.write("bar.txt"); // counterintuitive but the string "bar" is written into the file "bar.txt"
+obj.write("tmp.json"); // object (maps) are turned into JSON automatically
+
+```
+
+#### `rhai-fs`
+
+Visit [the rhai book](https://rhai.rs/book/lib/rhai-fs.html) for the
+documentation for `rhai-fs`.
+
+### Others
+
+```ts
+// === Templates ===
+print(template(#{a: "value", b: "hai"}, "%{a} and %{b} @{random_rpm_spec_macro}"));
+// value and hai %{random_rpm_spec_macro}
+// Note that @{} are used to represent rpm macros (they unfortunate conflict)
+// `@{` are converted to `%{` automatically.
+print(template_file(#{...}, "path/to/a.hcl"));
+
+// === RPMBuild ===
+// use these functions with sh() :3
+anda::rpmbuild::cmd_srpm("test.spec", "sources"); // ["mock", "--buildsrpm", "--spec", "test.spec", "--sources", "sources", ...];
+anda::rpmbuild::cmd_rpm("test.spec", "sources"); // ["mock", "--rebuild", ...];
+
+// === Anda-Config ===
+let cfg_map_obj = anda::cfg::load("path/to/anda.hcl");
+
+// === Environment Variables ===
+let env_val = env("KEY");
+```
+
+## Working with Labels
+
+Labels are one of the ways you may pass in runtime variables into the script.
+Think of `awk -v var=val` / `awk --assign=var=val` / `nim --define:var=val`.
+
+To pass in labels, provide them as a comma-separated list to *`--labels`*.
+
+A label is a key-value entry, joined together using `=`. In the script, labels
+can be accessed using the `labels` variable (a map):
+
+```ts
+// assume run with `anda run myscript.rhai --labels a=1,b=2,c=x=y --labels d=hai`
+print(labels["a"]);             // 1
+print(labels.b);                // 2
+print(labels.get("c"));         // x=y
+print(labels.remove("d"));      // hai
+print(labels.get("d") == ());   // true
+```
+
+## Autoupdate
+
+Andaman comes with an autoupdate system, readily available via `[1;32manda[97m update{:ansi}`:
+
+```ansi
+[1;3;96m $ [32manda[97m update [0;3;37m--help[0m
+Update all projects
+
+[1m[4mUsage:[0m [1manda update[0m [OPTIONS]
+
+[1m[4mOptions:[0m
+  [1m-l[0m, [1m--labels[0m <LABELS>
+          Labels to pass to the scripts
+
+  [1m-f[0m, [1m--filters[0m <FILTERS>
+          Only run update scripts in project with the specified labels
+          
+          This should be a comma-separated list of filters. Each time `--filters=...` is specified,
+          the comma-separated list of key-values will be checked against a project. If missing or
+          different, the project will be ignored. However, specifying `--filters` multiple times
+          will create an "or" effect --- the project will not be ignored if it satisfies one of the
+          list of `--filters`. For example, `-f a=1,b=2 -f c=3` means the project needs to satisfy
+          either "a=1" and "b=2", or only "c=3".
+
+  [1m-e[0m, [1m--excludes[0m <EXCLUDES>
+          Exclude update scripts in project with the specified labels
+          
+          This should be a comma-separated list of excludes. Each time `--exclude=...` is specified,
+          the comma-separated list of key-values will be checked against the labels of a project,
+          and it will be ignored if all the key-values are present. In addition, specifying
+          `--exclude` multiple times will create an "or" effect --- a project will be excluded if it
+          satisfies one of the list of `--filters`. For example, `-e a=1,b=2 -e c=3` means projects
+          with "a=1" and "b=2" at the same time, or "c=3", are excluded. Projects with only "a=1" or
+          "b=2" are not excluded.
+          
+          This will always override `--filters`.
+
+  [1m-v[0m, [1m--verbose[0m...
+          Increase logging verbosity
+
+  [1m-q[0m, [1m--quiet[0m...
+          Decrease logging verbosity
+
+  [1m-h[0m, [1m--help[0m
+          Print help (see a summary with '-h')
+```
+
+The *`--labels`* flag can be used to pass in labels. For more information, read
+the section [Working with Labels](#working-with-labels).
+
+`[1;32manda[97m update{:ansi}` execute all update scripts found in the repository recursively as
+defined by the `project.*.update{:hcl}` entry in `anda.hcl` separately:
+
+```hcl
+project "project_name" {
+  // the default value is "update.rhai"
+  update = "my_update_script.rhai"
+}
+```
+
+Additionally, the `rpm` object is provided under `[1;32manda[97m update{:ansi}`:
+
+```ts
+// note that the `rpm` object is only available in `anda update`, but not `anda run`.
+rpm.version(latest_ver); // note that version() resets the release back to 1 automatically
+// Source0: https://github.com/FyraLabs/anda/archive/refs/tags/0.1.17.tar.gz
+rpm.source(0, "https://github.com/FyraLabs/anda/archive/refs/tags/0.1.17.tar.gz");
+// %define abc hai bai
+rpm.define("abc", "hai bai");
+// %global def give rabonuko a headpat!
+rpm.global("def", "give rabonuko a headpat!");
+rpm.release(); // resets release to 1: `Release: 1%?dist`
+rpm.release(3); // Release: 3%?dist
+let spec_content = rpm.f;
+rpm.f = new_spec_content;
+// returns boolean that determine if the spec content is changed
+rpm.changed();
+```
+
+
+[rhai]: https://rhai.rs
