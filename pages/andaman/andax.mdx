@@ -10,7 +10,7 @@ import { Callout } from "nextra/components";
 AndaX is a port of the [rhai] scripting language embedded into Andaman.
 In short, AndaX is rhai but with extra functions and modules. These functions
 make AndaX a very viable choice for pre/post scripts, performing automatic
-updates (`anda update`) or just scripting in general.
+updates (`[1;32manda[97m update{:ansi}`) or just scripting in general.
 
 For documentations, playground and built-in functions in [rhai], check out their
 website.
@@ -21,7 +21,7 @@ This page contains documentation for additional functions and quirks in AndaX.
 
 ## Running AndaX scripts
 
-To execute a script, use the `anda run myscript.rhai` command:
+To execute a script, use the `[1;32manda[97m run[0m myscript.rhai{:ansi}` command:
 
 ```ansi
 [1;3;96m $ [32manda[97m run [0;3;37m--help[0m
@@ -39,7 +39,7 @@ Run .rhai scripts
   [1m-h[0m, [1m--help[0m             Print help
 ```
 
-The `--labels` flag can be used to pass in labels. For more information, read
+The *`--labels`* flag can be used to pass in labels. For more information, read
 the section [Working with Labels](#working-with-labels).
 
 As expected, the shebang `#!anda run` may be used.
@@ -67,9 +67,9 @@ project "project_name" {
 ```
 
 However, if these options are modified and the extension does not end with
-`.rhai`, anda will run these files using `sh -c path/to/file`.
+`.rhai`, anda will run these files using `[1;32msh[97m [0;3;37m-c[0;97;m path/to/file{:ansi}`.
 
-For more information about `project.*.update` (`update.rhai`), check out the
+For more information about `project.*.update{:hcl}` (`update.rhai`), check out the
 [Autoupdate section](#autoupdate).
 
 For more information about the `anda.hcl` configuration file, check out the
@@ -261,7 +261,7 @@ let env_val = env("KEY");
 Labels are one of the ways you may pass in runtime variables into the script.
 Think of `awk -v var=val` / `awk --assign=var=val` / `nim --define:var=val`.
 
-To pass in labels, provide them as a comma-separated list to `--labels`.
+To pass in labels, provide them as a comma-separated list to *`--labels`*.
 
 A label is a key-value entry, joined together using `=`. In the script, labels
 can be accessed using the `labels` variable (a map):
@@ -277,7 +277,7 @@ print(labels.get("d") == ());   // true
 
 ## Autoupdate
 
-Andaman comes with an autoupdate system, readily available via `anda update`:
+Andaman comes with an autoupdate system, readily available via `[1;32manda[97m update{:ansi}`:
 
 ```ansi
 [1;3;96m $ [32manda[97m update [0;3;37m--help[0m
@@ -322,11 +322,11 @@ Update all projects
           Print help (see a summary with '-h')
 ```
 
-The `--labels` flag can be used to pass in labels. For more information, read
+The *`--labels`* flag can be used to pass in labels. For more information, read
 the section [Working with Labels](#working-with-labels).
 
-`anda update` execute all update scripts found in the repository recursively as
-defined by the `project.*.update` entry in `anda.hcl` separately:
+`[1;32manda[97m update{:ansi}` execute all update scripts found in the repository recursively as
+defined by the `project.*.update{:hcl}` entry in `anda.hcl` separately:
 
 ```hcl
 project "project_name" {
@@ -335,7 +335,7 @@ project "project_name" {
 }
 ```
 
-Additionally, the `rpm` object is provided under `anda update`:
+Additionally, the `rpm` object is provided under `[1;32manda[97m update{:ansi}`:
 
 ```ts
 // note that the `rpm` object is only available in `anda update`, but not `anda run`.
