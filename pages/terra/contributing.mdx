@@ -30,7 +30,7 @@ Remember, it takes effort to create a package. If you ever need help, hop into
 - Install [Andaman] on your system and its mock configs
   - `[1;32msudo dnf[97m install [0;97;mterra-mock-configs{:ansi}` via Terra
   - anda is also available via rust crates.io
-  - If on an atomic system, this command works using podman: `podman run -it --cap-add=SYS_ADMIN --privileged --volume ./:/anda --workdir /anda ghcr.io/terrapkg/builder:frawhide anda`
+  - If on an atomic system, this command works using podman: `podman run --rm --cap-add=SYS_ADMIN --privileged --volume ./:/anda --volume mock_cache:/var/lib/mock --workdir /anda ghcr.io/terrapkg/builder:frawhide anda`
 - Use `rust2rpm` for **Rust** packages
 - Use `pyp2rpm` for **Python** packages
 - Use `go2rpm` for **Go** packages
