@@ -48,7 +48,7 @@ go install github.com/u-root/u-root@latest
 
 ## Building
 
-Simply clone this repo with submodules, so pass `--recurse-submodules` to `git clone`, then:
+Simply clone [this repo](https://github.com/FyraLabs/submarine) with submodules, so pass `--recurse-submodules` to `git clone`, then:
 
 ```bash
 make -j$(nproc) <x86_64|arm64>
@@ -66,7 +66,7 @@ sudo dd if=build/submarine.bin of=/dev/sdX
 
 ## Usage
 
-Before you can boot submarine, you need to enable booting from external storage. On your Chrome device, press Ctrl + Alt + F2 (This will either be the forward or refresh key on the top row) to switch to vt2. Log in as root (chronos, no password) and run the following commands:
+Before you can boot submarine, you need to enable booting from external storage. On your Chrome device, make sure developer mode is enabled, then go into ChromeOS, press Ctrl + Alt + F2 (This will either be the forward or refresh key on the top row) to switch to vt2. Log in as root (chronos, no password) and run the following command:
 
 ```bash
 sudo enable_dev_usb_boot
@@ -74,7 +74,7 @@ sudo enable_dev_usb_boot
 
 For quick testing, you can flash `submarine-<arch>.bin` to an external drive. This image includes a partition table already set up for booting ChromeOS kernels.
 
-Alternatively, you can create your own partition to install submarine to. Start by creating a 16mb EXT4 partition using your favorite partitioning tool. Next you will edit the partition flags to tell depthcharge that you can boot from that partition by running `cgpt add -i <partition number> -t kernel -P 15 -T 1 -S 1 /dev/sdX`. As always, substitute in the correct values for your drive. You can then flash `submarine-<arch>.kpart` to the partition you just created.
+Alternatively, you can create your own partition to install submarine to. Start by creating a 16mb EXT4 partition. Next you will edit the partition flags to tell depthcharge that you can boot from that partition by running `cgpt add -i <partition number> -t kernel -P 15 -T 1 -S 1 /dev/sdX`. As always, substitute in the correct values for your drive. You can then flash `submarine-<arch>.kpart` to the partition you just created.
 
 After installing submarine to an external drive, plug in your drive with submarine to your ChromeOS device. On the developer mode screen, press Ctrl + U to boot from external storage. If all goes well, you should soon see the submarine boot menu.
 

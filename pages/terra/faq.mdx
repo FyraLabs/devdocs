@@ -9,18 +9,18 @@ description: "Frequently Asked Questions"
 
 ### Where is the file server?
 
-https://repos.fyralabs.com/terra39/
+https://repos.fyralabs.com/terra41/
 
 or for sources
 
-https://repos.fyralabs.com/terra39-source/
+https://repos.fyralabs.com/terra41-source/
 
-Replace `39` with your Fedora release version.
+Replace `41` with your Fedora release version.
 
 ### What packages does Terra have?
 
-A lot! We have Pantheon packaged (apart from `elementary-tasks`)
-and also games, some apps, fonts, and more!
+A lot! 
+We have all necessary [Stardust XR](https://stardustxr.org/) compontents, various hardware enablement tools, and also games, apps, fonts, and more!
 
 You can search packages via `dnf search` or [Repology].
 
@@ -40,7 +40,7 @@ You can search packages via `dnf search` or [Repology].
 
 ### What is your Build Infrastructure?
 
-[Andaman]. Packages are built from [Github Actions] and pushed to the repo.
+[Andaman]. x86 packages are built in [Github Actions], while ARM packages are built using a cluster of Mac Minis owned and operated by Fyra Labs. These builds are then pushed to the repo.
 
 ### Why [Andaman]?
 
@@ -68,7 +68,7 @@ https://repos.fyralabs.com/terrarawhide-source/
 
 You should be able to grab them by `dnf download --source <pkgname>`
 
-[repology]: https://repology.org/repository/terra_39
+[repology]: https://repology.org/repository/terra_41
 [github actions]: https://github.com/terrapkg/packages/actions
 [andaman]: https://github.com/FyraLabs/anda
 [subatomic]: https://github.com/FyraLabs/subatomic
