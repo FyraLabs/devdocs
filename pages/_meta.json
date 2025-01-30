@@ -23,9 +23,13 @@
     "type": "page",
     "display": "hidden"
   },
-
   "submarine": {
     "title": "Submarine",
+    "type": "page",
+    "display": "hidden"
+  },
+  "rdms": {
+    "title": "Readymade Stack",
     "type": "page",
     "display": "hidden"
   }
