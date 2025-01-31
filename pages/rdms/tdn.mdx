@@ -15,11 +15,11 @@ menu […] meant to only be used for Ultramarine Linux 39's Anaconda post-instal
 due to a misconfiguration, `initial-setup` was never enabled in the final UM39/UM40 images, deeming
 the effort pretty much useless — except one part where stellar would be run in a special mode that
 checks for designated criteria and installs NVIDIA and broadcom drivers as accordingly, but only
-during the Anaconda installation under the presence of an Internet connection.
+during the Anaconda installation under the presence of an internet connection.
 
 We realized there is a need to create a new OOBE application alongside an installer, which is why
 we started to work on Taidan in late Oct, 2024. The development cycle spanned less than 3 months,
-and the app was basically finished in early Jan, 2025.
+and the app was finished in early Jan, 2025.
 
 ## Configurations
 
@@ -47,7 +47,9 @@ In order to gather a list of keymaps, `/usr/share/X11/xkb/rules/evdev.lst` is re
 
 ### Catalogue Customisations
 
-Here is an example of the catalogue yml configuration file (taken from [here](https://github.com/Ultramarine-Linux/taidan/blob/208612f391c0f0f2a2cf3535f3341fb5a7e664c9/catalogue/browser.yml#L1-L29)):
+Here is an example of the catalogue yml configuration file (taken
+[from](https://github.com/Ultramarine-Linux/taidan/blob/208612f391c0f0f2a2cf3535f3341fb5a7e664c9/catalogue/gaming.yml#L39-L48)
+[here](https://github.com/Ultramarine-Linux/taidan/blob/208612f391c0f0f2a2cf3535f3341fb5a7e664c9/catalogue/browser.yml#L1-L29)):
 
 ```yml
 category: Browsers
@@ -95,7 +97,7 @@ choices:
 Each yml file in the catalogue directory should specify the name of `category:`, gtk `icon:` id,
 and a list of `choices:`. Each choice should contain the `name:`, `provider:`, `description:` and
 `actions:`. `editions:`, `note:` and `options:` are optional fields. `editions:` must be a list of
-strings. The app will be shown to systems with matching edition listed in this field.
+strings. The app will be shown to systems with a matching edition listed in this field.
 
 An option listed in `options:` must either be a `- radio: [...]` or a `- checkbox: ...`.
 
@@ -201,7 +203,8 @@ As of version `0.1.9`, it is a requirement to explicitly write out all possible 
 combinations. However, this might change in the future.
 
 Possible action values include `copr:...`, `enable_yum_repo:...`, `rpm:...`, `shell:...`,
-`flatpak:...`, or a semicolon (`;`)-separated list of the above values, or `todo`.
+`flatpak:...`, or a semicolon (`;`)-separated list of the above values for running multiple
+actions, or `todo`.
 
 #### Catalogue App Icons and Screenshots
 
@@ -224,7 +227,7 @@ the categories, in `/com/fyralabs/Taidan/icons/symbolic/actions/`.
 
 
 [^1]: quote the readme file: "This script will be deprecated in the future when we implement our
-      own OOBE (probably 41.) For now, it's a stopgap in our transitional OOBE (Readymade install
+      own OOBE (probably 41). For now, it's a stopgap in our transitional OOBE (Readymade install
       -> Anaconda/DE OOBE -> Stellar)".
 
 [Taidan]: https://github.com/Ultramarine-Linux/taidan
