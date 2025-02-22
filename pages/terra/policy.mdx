@@ -128,18 +128,18 @@ Version:  %{latest_stable_version}^%{commit_date}git%{shortcommit}
 Version:  %{unreleased_version}~%{commit_date}git%{shortcommit}
 ```
 
-`git` SHOULD be replaced with the correct _VCS identifier_ for (b) and (c) as listed on the right.
+`git` SHOULD be replaced with the correct _VCS identifier_ for **(b)** and **(c)** as listed on the right.
 
-(b) and (c) MUST be used with `labels { nightly = 1 }{:hcl}` in `anda.hcl`, since they rely on the
-assumption that there is 1 `%shortcommit` for each `%commit_date` and vice versa.
+**(b)** and **(c)** MUST be used with `labels { nightly = 1 }{:hcl}` in `anda.hcl` unless there is no `update.rhai`,
+as they rely on the assumption that there is 1 `%shortcommit` for each `%commit_date` (and vice versa).
 
 `%unreleased_version` refers to the expected version number for the next stable (or a more stable tag than `nightly`) release,
 while `%latest_stable_version` refers to the current latest released version number, preferably stable.
 
-(c) SHOULD be preferred over (b) if possible, since having a `%unreleased_version` can indicate to users
+**(c)** SHOULD be preferred over **(b)** if possible, since having a `%unreleased_version` can indicate to users
 breaking changes / new features depending on the versioning system (usually SemVer).
 
-If upstream does not provide a version, use (c) and treat `%unreleased_version` as `0`.
+If upstream does not provide a version, use **(c)** and treat `%unreleased_version` as `0`.
 
 ### Release Field
 
@@ -151,17 +151,39 @@ The release number SHOULD be incremented if changes are made to the package, unl
 
 ### Development and Shared Libraries
 
-todo.
+Shared library packages SHOULD be suffixed with `-libs`.
+These packages SHOULD NOT contain anything **except**:
+
+```rpmspec
+%_libdir/*.so.*
+%doc …
+%license …
+```
+
+Development library packages SHOULD be suffixed with `-devel`.
+These packages SHOULD NOT contain anything **except**:
+
+```rpmspec
+%files
+%doc …
+%license …
+%_includedir/*
+# ^ source files, depending on the language, could be in other locations
+%_libdir/*.so
+%_libdir/pkgconfig/%{name}.pc
+# and other development files (.vapi, .typelib, .gir, …)
+```
 
 ### Naming
 
 Prefix/Suffix the packages in the following order
 (that means nightly fonts should end with `-fonts%.nightly`)
 
-- Fonts must end with `-fonts`.
-- Libraries should preferably start with `lib`.
-- Packages with names that would conflict with Fedora's packages should be prefixed with `terra-`. This is usually used for packages that are severely outdated or poorly maintained in Fedora.
-- Postfix a tag (e.g. `%.nightly`)
+- Fonts MUST be suffixed with `-fonts`.
+- Shared libraries SHOULD be either suffixed with `-libs` or prefixed with `lib`.
+- Development libraries SHOULD be suffixed with `-devel`.
+- If necessary, suffix `-bash-completion` (or other shells) and `-doc`.
+- Postfix a tag if necessary (e.g. `%.nightly`).
 
 ## Security Policy
 
