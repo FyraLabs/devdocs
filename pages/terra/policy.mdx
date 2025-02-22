@@ -17,7 +17,7 @@ This document outlines all policies and guidelines specific to Terra and its sub
   [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
 </Callout>
 
-Packagers MUST follow the policies and SHOULD follow the guidelines listed in this document.
+Packagers and maintainers MUST follow the policies and guidelines listed in this document.
 
 ## Submission Policy
 
@@ -36,21 +36,17 @@ Packagers MUST follow the policies and SHOULD follow the guidelines listed in th
     | Libraries required to build or use the aforementioned packages | These libraries are required to build or use the aforementioned packages, and are usually not sandboxed. |
     
     Other applications that are not specified here may be allowed on a case-by-case basis.
-    
-
-
-
-- You must have the rights or permission to redistribute the packaged software. Besides that, there is no prohibition on proprietary licenses.
+- You MUST have the rights or permission to redistribute the packaged software. Besides that, there is no prohibition on proprietary licenses.
 - Submissions must be maintained. We will reject submissions of unmaintained software.
-- Submissions must not be malicious.
+- Submissions MUST NOT be malicious.
 - Submissions that may introduce breaking changes must be included in "Terra Extra" instead via the `extra = 1` label in `anda.hcl`.
   - Example: `terra-mesa` should be in extra as the dependency solver will resolve this package for matching "provides" (such as `mesa-libEGL(x86-64)`).
   - Example: `libadwaita-nightly` should be in extra since it provides `pkgconfig(libadwaita-1)`, which is required by existing packages as a build dependency.
   - Example: `yt-dlp-nightly` **can be included normally** because it has no common provides with Fedora's `yt-dlp`.
   - If you are in doubt whether your submission should be in extra instead, ask and we will decide.
-- Submissions should include an auto-update script.
-- Submissions should be placed in the corresponding directory in `anda/`.
-  - Each folder should only contain 1 spec file (recursively).
+- Submissions SHOULD include an auto-update script (`update.rhai`).
+- Submissions SHOULD be placed in the corresponding directory in `anda/`.
+  - Each folder MUST either contain folders and no source files (other files are exempted), or contain multiple files and no folders.
   - The following directories have a higher priority. Categorize your new package in the following order:
     1. `fonts/`
     2. `system/` (bootloaders, kernels, drivers, ...)
@@ -62,13 +58,13 @@ Packagers MUST follow the policies and SHOULD follow the guidelines listed in th
     8. `desktops/` (applications specific to a Desktop Environment)
     9. `apps/` (GUI applications)
     10. `langs/` (software written in/for a specific programming language)
-- Packages must follow our packaging guidelines. When not specified, refer to [Fedora's packaging guidelines](https://docs.fedoraproject.org/en-US/packaging-guidelines).
+- When there are ambiguous or unspecified parts in our policies/guidelines, you SHOULD refer to [Fedora's packaging guidelines](https://docs.fedoraproject.org/en-US/packaging-guidelines).
 - Low-quality contributions will be declined at the team's discretion.
 - Do not include work-in-progress code or untested patches. See https://dont-ship.it/.
 
 ## Maintenance Policy
 
-- Anyone may make a PR to an already existing package, when doing so, please refer to the submission policies above.
+- Anyone MAY make a PR (pull request) to an already existing package.
 - Unmaintained packages may be removed at any time. Before doing so, we will create a GitHub issue to gauge community interest.
 - Terra will only support the latest version of Fedora, if a package doesn't build on the next version of Fedora, we might hold it back.
 
@@ -79,12 +75,12 @@ This section describes the guidelines for naming and versioning packages correct
 ### Tags
 
 First of all, the term "_tag_" is used to refer to different versions of the same software, as in their release schedule / model.
-For example, the `zed` package has 3 tags: stable, preview and nightly. (Some packages use `tip` instead of `nightly`.)
-Tags may be named after git branches from upstream.
+For example, the `zed` package has 3 _tags_: stable, preview and nightly. (Some packages use `tip` instead of `nightly`.)
+_Tags_ may be named after git branches from upstream.
 
-Having a different tag of the same software warrants a separate package,
+Having a different _tag_ of the same software warrants a separate package,
 i.e., they MUST have separate spec files with separate `Name:{:rpmspec}`s.
-The tag SHOULD be specified in `Name:{:rpmspec}` using the format **`%{rawname}%.%{tag}`**
+The _tag_ SHOULD be specified in `Name:{:rpmspec}` using the format **`%{rawname}%.%{tag}`**
 e.g. `ghostty%.tip`, `zed%.preview`, and `kf6-kio%.switcheroo`, unless:
 
 - the package contains a `.desktop` file or an appstream metadata file
@@ -97,7 +93,7 @@ Name:     %{rawname}-%{tag}
 Provides: %{rawname}%.%{tag} = %{?epoch:%epoch:}%version-%release
 ```
 
-Packages without their tags specified in `Name:{:rpmspec}` MUST be regarded as stable.
+Packages without their _tags_ specified in `Name:{:rpmspec}` MUST be regarded as stable.
 
 ### Versioning
 
@@ -133,7 +129,7 @@ Version:  %{unreleased_version}~%{commit_date}git%{shortcommit}
 **(b)** and **(c)** MUST be used with `labels { nightly = 1 }{:hcl}` in `anda.hcl` unless there is no `update.rhai`,
 as they rely on the assumption that there is 1 `%shortcommit` for each `%commit_date` (and vice versa).
 
-`%unreleased_version` refers to the expected version number for the next stable (or a more stable tag than `nightly`) release,
+`%unreleased_version` refers to the expected version number for the next stable (or a more stable _tag_ than `nightly`) release,
 while `%latest_stable_version` refers to the current latest released version number, preferably stable.
 
 **(c)** SHOULD be preferred over **(b)** if possible, since having a `%unreleased_version` can indicate to users
@@ -144,7 +140,7 @@ If upstream does not provide a version, use **(c)** and treat `%unreleased_versi
 ### Release Field
 
 The `Release:{:rpmspec}` preamble MUST NOT contain information regarding upstream versioning,
-including but not limited to commit dates, commit SHAs, software versions, tags, etc.
+including but not limited to commit dates, commit SHAs, software versions, _tags_, etc.
 Without approval from the team, packages MUST use the format `Release: 1%?dist{:rpmspec}` (or `1%{?dist}{:rpmspec}`).
 
 The release number SHOULD be incremented if changes are made to the package, unless the `Version:{:rpmspec}` changes.
@@ -164,7 +160,6 @@ Development library packages SHOULD be suffixed with `-devel`.
 These packages SHOULD NOT contain anything **except**:
 
 ```rpmspec
-%files
 %doc …
 %license …
 %_includedir/*
@@ -183,7 +178,7 @@ Prefix/Suffix the packages in the following order
 - Shared libraries SHOULD be either suffixed with `-libs` or prefixed with `lib`.
 - Development libraries SHOULD be suffixed with `-devel`.
 - If necessary, suffix `-bash-completion` (or other shells) and `-doc`.
-- Postfix a tag if necessary (e.g. `%.nightly`).
+- Postfix a _tag_ if necessary (e.g. `%.nightly`).
 
 ## Security Policy
 
@@ -225,9 +220,9 @@ You can disable `mold` in the following languages by using `%bcond_with mold`.
 
 #### Rust
 
-- Do not use the tradtional Fedora `%cargo_prep` macro. Use `%cargo_prep_online` from `anda-srpm-macros` instead, and do not use the `%generate_buildrequires` macro, as it is useless.
-- It is encouraged to use `%cargo_license_online` and `%cargo_license_summary_online`, although they are not a strict requirement.
-- Avoid using both `%cargo_build` and `%cargo_install` in the same spec file as `cargo install` might cause a rebuild due to a bug. You should only include either one of them. In most cases, you can just omit `%cargo_build` entirely and it will just build fine.
+- You SHOULD NOT use the tradtional Fedora `%cargo_prep` macro. Use `%cargo_prep_online` from `anda-srpm-macros` instead, and you SHOULD remove the `%generate_buildrequires` macro, as it is useless.
+- It is RECOMMENDED to use `%cargo_license_online` and `%cargo_license_summary_online`, although they are not a strict requirement.
+- You SHOULD NOT use both `%cargo_build` and `%cargo_install` in the same spec file as `cargo install` might cause a rebuild due to a bug. You SHOULD only include either one of them. In most cases, you can just omit `%cargo_build` entirely and it will just build fine.
 
 Example:
 ```
