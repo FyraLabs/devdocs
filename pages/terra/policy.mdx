@@ -93,7 +93,7 @@ Name:     %{rawname}-%{tag}
 Provides: %{rawname}%.%{tag} = %{?epoch:%epoch:}%version-%release
 ```
 
-Packages without their _tags_ specified in `Name:{:rpmspec}` MUST be regarded as stable.
+Packages without any _tags_ specified in `Name:{:rpmspec}` MUST be regarded as stable.
 
 ### Versioning
 
@@ -126,8 +126,8 @@ Version:  %{unreleased_version}~%{commit_date}git%{shortcommit}
 
 `git` SHOULD be replaced with the correct _VCS identifier_ for **(b)** and **(c)** as listed on the right.
 
-**(b)** and **(c)** MUST be used with `labels { nightly = 1 }{:hcl}` in `anda.hcl` unless there is no `update.rhai`,
-as they rely on the assumption that there is 1 `%shortcommit` for each `%commit_date` (and vice versa).
+If one of **(b)** and **(c)** is used, you MUST also include `labels { nightly = 1 }{:hcl}` in `anda.hcl` unless there is no `update.rhai`,
+as these 2 formats rely on the assumption that there is 1 `%shortcommit` for each `%commit_date` (and vice versa).
 
 `%unreleased_version` refers to the expected version number for the next stable (or a more stable _tag_ than `nightly`) release,
 while `%latest_stable_version` refers to the current latest released version number, preferably stable.
@@ -165,6 +165,7 @@ These packages SHOULD NOT contain anything **except**:
 %_includedir/*
 # ^ source files, depending on the language, could be in other locations
 %_libdir/*.so
+%_libdir/*.a
 %_libdir/pkgconfig/%{name}.pc
 # and other development files (.vapi, .typelib, .gir, …)
 ```
@@ -225,7 +226,8 @@ You can disable `mold` in the following languages by using `%bcond_with mold`.
 - You SHOULD NOT use both `%cargo_build` and `%cargo_install` in the same spec file as `cargo install` might cause a rebuild due to a bug. You SHOULD only include either one of them. In most cases, you can just omit `%cargo_build` entirely and it will just build fine.
 
 Example:
-```
+
+```rpmspec
 %prep
 %autosetup -n %{crate}-%{version} -p1
 %cargo_prep_online
@@ -241,7 +243,8 @@ Example:
 
 Use the `go` compiler directly instead of using Fedora's Go macros, as this will generate offline dependencies that we do not want to package.
 Alternatively, use the `_online` macro variants:
-```
+
+```rpmspec
 %prep
 %goprep
 %autopatch -p1
