@@ -80,8 +80,8 @@ _Tags_ may be named after git branches from upstream.
 
 Having a different _tag_ of the same software warrants a separate package,
 i.e., they MUST have separate spec files with separate `Name:{:rpmspec}`s.
-The _tag_ SHOULD be specified in `Name:{:rpmspec}` using the format **`%{rawname}%.%{tag}`**
-e.g. `ghostty%.tip`, `zed%.preview`, and `kf6-kio%.switcheroo`, unless:
+The _tag_ SHOULD be specified in `Name:{:rpmspec}` using the format **`%{rawname}.%{tag}`**
+e.g. `ghostty.tip`, `zed.preview`, and `kf6-kio.switcheroo`, unless:
 
 - the package contains a `.desktop` file or an appstream metadata file
 - the package provides an application, regardless of whether it is graphical or not
@@ -90,7 +90,7 @@ Packages that satisfy one of the above conditions MAY instead specify:
 
 ```rpmspec
 Name:     %{rawname}-%{tag}
-Provides: %{rawname}%.%{tag} = %{?epoch:%epoch:}%version-%release
+Provides: %{rawname}.%{tag} = %{?epoch:%epoch:}%version-%release
 ```
 
 Packages without any _tags_ specified in `Name:{:rpmspec}` MUST be regarded as stable.
@@ -119,9 +119,9 @@ Packages SHOULD follow one of the version formats below:
 ## (a)
 Version:  %{latest_stable_version}
 ## (b)
-Version:  %{latest_stable_version}^%{commit_date}git%{shortcommit}
+Version:  %{latest_stable_version}^%{commit_date}git.%{shortcommit}
 ## (c)
-Version:  %{unreleased_version}~%{commit_date}git%{shortcommit}
+Version:  %{unreleased_version}~%{commit_date}git.%{shortcommit}
 ```
 
 `git` SHOULD be replaced with the correct _VCS identifier_ for **(b)** and **(c)** as listed on the right.
@@ -173,13 +173,13 @@ These packages SHOULD NOT contain anything **except**:
 ### Naming
 
 Prefix/Suffix the packages in the following order
-(that means nightly fonts should end with `-fonts%.nightly`)
+(that means nightly fonts should end with `-fonts.nightly`)
 
 - Fonts MUST be suffixed with `-fonts`.
 - Shared libraries SHOULD be either suffixed with `-libs` or prefixed with `lib`.
 - Development libraries SHOULD be suffixed with `-devel`.
 - If necessary, suffix `-bash-completion` (or other shells) and `-doc`.
-- Postfix a _tag_ if necessary (e.g. `%.nightly`).
+- Postfix a _tag_ if necessary (e.g. `.nightly`).
 
 ## Security Policy
 
