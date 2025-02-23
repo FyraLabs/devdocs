@@ -74,7 +74,7 @@ This section describes the guidelines for naming and versioning packages correct
 
 ### Tags
 
-First of all, the term "_tag_" is used to refer to different versions of the same software, as in their release schedule / model.
+First of all, the term "_tag_" is used to refer to different versions of the same software, as in their release schedule/model.
 For example, the `zed` package has 3 _tags_: stable, preview and nightly. (Some packages use `tip` instead of `nightly`.)
 _Tags_ may be named after git branches from upstream.
 
@@ -133,7 +133,7 @@ as they rely on the assumption that there is 1 `%shortcommit` for each `%commit_
 while `%latest_stable_version` refers to the current latest released version number, preferably stable.
 
 **(c)** SHOULD be preferred over **(b)** if possible, since having a `%unreleased_version` can indicate to users
-breaking changes / new features depending on the versioning system (usually SemVer).
+breaking changes/new features depending on the versioning system (usually SemVer).
 
 If upstream does not provide a version, use **(c)** and treat `%unreleased_version` as `0`.
 
@@ -206,13 +206,13 @@ Dependencies must also be packaged separately if they are required for runtime.
 
 ### Statically compiled languages
 
-As Terra does not strictly follow Fedora's reproducibility requirements, and we do not want large amounts of development library languages for them, packagers **should** vendor dependencies on build time.
+As Terra does not strictly follow Fedora's reproducibility requirements, and we do not want large amounts of development libraries for them, packagers **should** vendor dependencies on build time.
 
 Terra's mock sandbox has networking enabled, so builders can download the dependencies directly on build time.
 
 #### Usages of the `mold` linker
 
-We encourage the use of `mold`, which may speed up build times especially in large projects. You may enable it in C/++ projects by adding `-fuse-ld=mold` in `CFLAGS`/`CXXFLAGS`.
+We encourage the use of [`mold`](https://github.com/rui314/mold), which may speed up build times especially in large projects. You may enable it in C/++ projects by adding `-fuse-ld=mold` in `CFLAGS`/`CXXFLAGS`.
 
 The `%with_mold` flag is enabled by default in `anda-srpm-macros`. `mold` is also preinstalled in the builders.
 
@@ -240,7 +240,7 @@ Example:
 #### Go
 
 Use the `go` compiler directly instead of using Fedora's Go macros, as this will generate offline dependencies that we do not want to package.
-Alternative, use the `_online` macro variants:
+Alternatively, use the `_online` macro variants:
 ```
 %prep
 %goprep
