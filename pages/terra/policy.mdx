@@ -81,36 +81,28 @@ _Tags_ may be named after git branches from upstream.
 Having a different _tag_ of the same software warrants a separate package,
 i.e., they MUST have separate spec files with separate `Name:{:rpmspec}`s.
 The _tag_ SHOULD be specified in `Name:{:rpmspec}` using the format **`%{rawname}.%{tag}`**
-e.g. `ghostty.tip`, `zed.preview`, and `kf6-kio.switcheroo`, unless:
-
-- the package contains a `.desktop` file or an appstream metadata file
-- the package provides an application, regardless of whether it is graphical or not
-
-Packages that satisfy one of the above conditions MAY instead specify:
-
-```rpmspec
-Name:     %{rawname}-%{tag}
-Provides: %{rawname}.%{tag} = %{?epoch:%epoch:}%version-%release
-```
+e.g. `ghostty.tip`, `zed.preview`, and `kf6-kio.switcheroo`.
 
 Packages without any _tags_ specified in `Name:{:rpmspec}` MUST be regarded as stable.
+
+For UX reasons, some packages MAY consider specifying `Provides: %{rawname}-%{tag}{:rpmspec}`.
 
 ### Versioning
 
 {/* https://github.com/terrapkg/packages/issues/1907 */}
 <div style={{ float: "right", margin: "1em" }}>
-  |VCS| ID |
-  |-----|-------|
-  |Git| `git`|
-  |SVN| `svn`|
-  |CVS| `cvs`|
-  |Bazaar| `bzr`|
-  |Mercurial| `hg`|
-  |Perforce (Helix)| `p4`|
-  |Pijul| `pjl` |
-  |Azure DevOps| `tfs` |
-  |darcs| `darc`|
-  |Fossil|`fsl`|
+  | VCS              | ID    |
+  |------------------|-------|
+  | Git              | `git` |
+  | SVN              | `svn` |
+  | CVS              | `cvs` |
+  | Bazaar           | `bzr` |
+  | Mercurial        | `hg`  |
+  | Perforce (Helix) | `p4`  |
+  | Pijul            | `pjl` |
+  | Azure DevOps     | `tfs` |
+  | darcs            | `drc` |
+  | Fossil           | `fsl` |
 </div>
 
 Packages SHOULD follow one of the version formats below:
@@ -176,26 +168,44 @@ Prefix/Suffix the packages in the following order
 (that means nightly fonts should end with `-fonts.nightly`)
 
 - Fonts MUST be suffixed with `-fonts`.
-- Shared libraries SHOULD be either suffixed with `-libs` or prefixed with `lib`.
+- Shared libraries SHOULD be either suffixed with `-libs`.
+  - Alternatively, the `lib` prefix is also allowed, but they SHOULD still provide `-libs`.
 - Development libraries SHOULD be suffixed with `-devel`.
 - If necessary, suffix `-bash-completion` (or other shells) and `-doc`.
 - Postfix a _tag_ if necessary (e.g. `.nightly`).
 
-## Security Policy
+## Miscellaneous Terra Policies
+
+### Security Policy
 
 Our security policy is documented in the [SECURITY.md file](https://github.com/terrapkg/packages/blob/frawhide/SECURITY.md).
 
-## Code of Conduct
+### Code of Conduct
 
 Our code of conduct is documented in the [CODE_OF_CONDUCT.md file](https://github.com/terrapkg/packages/blob/frawhide/CODE_OF_CONDUCT.md).
 
-## Lifecycle Policy
+### Lifecycle Policy
 
 Our support lifecycle is documented in the [lifecycle page](/terra/lifecycle).
 
-## Packaging Guidelines
+## Miscellaneous Packaging Guidelines
 
-Terra uses a slightly different packaging guideline for packages from Fedora's. This article is to outline the specific different guidelines in Terra.
+### Packager Field
+
+The package maintainer of a package SHOULD be added to the `Packager:{:rpmspec}` preamble as follows:
+
+```rpmspec
+Packager: Raboneko <raboneko@fyralabs.com>
+```
+
+### Usages of the `mold` linker
+
+We encourage the use of [`mold`](https://github.com/rui314/mold), which may speed up build times especially in large projects.
+You MAY enable it in C/++ projects by adding `-fuse-ld=mold` in `CFLAGS`/`CXXFLAGS`.
+
+The `%with_mold` flag is enabled by default in `anda-srpm-macros`. `mold` is also preinstalled in the builders.
+
+You can disable `mold` for Rust and Nim by using `%bcond_with mold`.
 
 ### Interpreted Languages (Python, Ruby, etc.)
 
@@ -203,24 +213,17 @@ All packages using interpreted languages follow the traditional Fedora guideline
 
 ### Dynamically compiled languages (C, C++, Vala)
 
-Dependencies must also be packaged separately if they are required for runtime.
+Dependencies required for runtime MUST be packaged separately.
 
 ### Statically compiled languages
 
-As Terra does not strictly follow Fedora's reproducibility requirements, and we do not want large amounts of development libraries for them, packagers **should** vendor dependencies on build time.
+As Terra does not strictly follow Fedora's reproducibility requirements, and we do not want large amounts of development libraries for them, packagers SHOULD vendor dependencies on build time.
 
 Terra's mock sandbox has networking enabled, so builders can download the dependencies directly on build time.
 
-#### Usages of the `mold` linker
-
-We encourage the use of [`mold`](https://github.com/rui314/mold), which may speed up build times especially in large projects. You may enable it in C/++ projects by adding `-fuse-ld=mold` in `CFLAGS`/`CXXFLAGS`.
-
-The `%with_mold` flag is enabled by default in `anda-srpm-macros`. `mold` is also preinstalled in the builders.
-
-You can disable `mold` in the following languages by using `%bcond_with mold`.
-
 #### Rust
 
+- Generate the spec file using `rust2rpm`.
 - You SHOULD NOT use the tradtional Fedora `%cargo_prep` macro. Use `%cargo_prep_online` from `anda-srpm-macros` instead, and you SHOULD remove the `%generate_buildrequires` macro, as it is useless.
 - It is RECOMMENDED to use `%cargo_license_online` and `%cargo_license_summary_online`, although they are not a strict requirement.
 - You SHOULD NOT use both `%cargo_build` and `%cargo_install` in the same spec file as `cargo install` might cause a rebuild due to a bug. You SHOULD only include either one of them. In most cases, you can just omit `%cargo_build` entirely and it will just build fine.
@@ -240,6 +243,9 @@ Example:
 ```
 
 #### Go
+
+You SHOULD NOT use the default naming (but you MAY `Provides:{:rpmspec}`) generated from `go2rpm` (except non-leaf packages),
+as an unnecessarily long package name with unnecessary information is bad for UX.
 
 Use the `go` compiler directly instead of using Fedora's Go macros, as this will generate offline dependencies that we do not want to package.
 Alternatively, use the `_online` macro variants:
