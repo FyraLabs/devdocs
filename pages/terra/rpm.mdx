@@ -190,7 +190,7 @@ Expand all macros in the body, then evaluate the body as an [expression].
   3
   ```
 
-#### `%{expand:…}` 🔦🛠️
+#### `%{expand:…}` 🛠️
 
   Double-expand the macro.
 
@@ -266,10 +266,115 @@ $ rpm -E '%macrobody dist'
 %{?distprefix}.um41%{?with_bootstrap:~bootstrap}
 ```
 
+#### `%{quote:…}` 🔦🛠️
+
+Does nothing. You heard me, this macro literally does nothing.
+
+But because of that it's very useful.
+This can be used to pass arguments with spaces to parameterized macros:
+
+<Split>
+  <Split.Left>
+    ```rpmspec filename="example.spec"
+    echo %gsub %{quote:hello hello} %{quote:^hello} bye
+    ```
+  </Split.Left>
+  <Split.Right>
+    ```rpmspec filename="expand.spec"
+    echo bye hello
+    ```
+  </Split.Right>
+</Split>
+
+
+### String operations
+
+#### `%gsub …` 🔢🔦🛠️
+
+Equivalent to `%{lua: string.gsub("%1", "%2", %3, %?4)}`,
+where `%n` represents the n-th argument to `%gsub`.
+
+In short, this replaces `%?4` occurrences of `%2` in `%1` to `%3`.
+`%4` is optional and defaults to infinity.
+
+`%2` is treated as a [lua pattern](https://www.lua.org/pil/20.2.html).
+
+<Split>
+  <Split.Left>
+    ```rpmspec filename="example.spec"
+    echo %gsub %{quote:hello hello} %{quote:^hello} bye
+    ```
+  </Split.Left>
+  <Split.Right>
+    ```rpmspec filename="expand.spec"
+    echo bye hello
+    ```
+  </Split.Right>
+</Split>
+
+#### `%{len:…}`
+
+Obtains the length of the given text.
+
+<Split>
+  <Split.Left>
+    ```rpmspec filename="example.spec"
+    %define foo meow now!
+    echo %{len:%foo}
+    ```
+  </Split.Left>
+  <Split.Right>
+    ```rpmspec filename="expand.spec"
+    echo 9
+    ```
+  </Split.Right>
+</Split>
+
+#### `%{lower:…}`
+
+Turn the input into ASCII-lowercase.
+
+#### `%{upper:…}`
+
+ASCII-uppercase.
+
+#### `%rep …` 🔢🔦
+
+Repeat the first input (`%1`) `n`-times, `n` given by `%2` (lua `string.rep()`).
+
+#### `%{reverse:…}`
+
+#### `%sub …` 🔢🔰
+
+Expand to substring (lua `string.sub()`).
+
+```sh
+$ rpm -E '%sub abc 2 3' 
+bc
+```
+
+#### `%{shescape:…}`
+
+Wrap the input with single quotes and also escape preexisting single-quotes correctly,
+so that the input can be safely passed as arguments to shell commands.
+
+```sh
+$ rpm -E "echo %{shescape:this is some 'text'}"
+echo 'this is some '\''text'\'''
+
+$ rpm -E "%(echo %{shescape:this is some 'text'})"
+this is some 'text'
+```
+
+#### `%{shrink:…}`
+
+Trim leading and trailing ASCII-whitespace, and reduce intermediate whitespace to a single space.
+
+
 ## RPM Expression
 
 RPM expressions is a "sublanguage" in RPM.
-From the [RPM manual](https://github.com/rpm-software-management/rpm/blob/b043604b9eb684dc761aeacf55a784632ca0ebcd/docs/manual/macros.md#expression-expansion),
+From the [RPM manual],
 
 > Expression expansion can be performed using `%[expression]`.  An
 > expression consists of terms that can be combined using
@@ -313,14 +418,14 @@ First, a (way simpler) Rust declarative implementation is available
 
 <Callout type="info">
   The following section uses the following symbols:
-  - 🟰: for unary operators, the inputs must be of the same type.
+  - 🟰: 2 inputs must be of the same type.
   - 🟩: not fallible (i.e. never produces an error), given 🟰 is satisfied.
 </Callout>
 
 Second, there are 4 unary, 10 binary, and 1 tertiary operators:
-- `-val`: negate a numerical value.
+- `-a`: negate a numerical value.
   - Err when used on non-numerical values.
-- `!val`: negate the value, return either 1 or 0. 🟩
+- `!a`: negate the value, return either 1 or 0. 🟩
   - Non-zero numbers when negated produce `0`.
   - Non-empty texts/strings when negated produce `0`.
   - Other values (including versions) produce `1`.
@@ -353,6 +458,7 @@ Second, there are 4 unary, 10 binary, and 1 tertiary operators:
 - `a ? b : c` 🟩
   - `b`, `c` 🟰
   - If `!!a` produces `1`, evaluate to `b`.
-  - Otherwise, evalute to `c`.
+  - Otherwise, evaluate to `c`.
 
 [expression]: #rpm-expression
+[RPM manual]: https://github.com/rpm-software-management/rpm/blob/b043604b9eb684dc761aeacf55a784632ca0ebcd/docs/manual/macros.md
