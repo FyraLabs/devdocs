@@ -40,7 +40,7 @@ function Split({ children }: React.PropsWithChildren) {
             <>
               {/* Divider */}
               <div
-                className="w-1 group cursor-col-resize flex"
+                className="w-1 group cursor-col-resize flex mt-3 mb-7"
                 onMouseDown={handleMouseDown}
               >
                 <div className="flex-1 border-l border-l-white/0 h-full w-0" />
