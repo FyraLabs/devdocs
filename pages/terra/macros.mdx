@@ -1,0 +1,211 @@
+---
+title: RPM Macros
+description: "Documentations on most RPM Macros."
+---
+
+import { Callout } from "nextra/components";
+import { Split } from "../../components/split";
+
+# RPM Macros
+
+This document documents most if not all useful RPM macros.
+
+## Foreword
+
+We understand that RPM, as one of the components in the Fedora / RedHat ecosystem,
+is one of the most undocumented packaging systems, and we would like to change that.
+We believe by thoroughly documenting Fedora-specific and other RPM macros, we could
+make packaging easier to get started for everyone.
+Providing the most up-to-date RPM documentations on the Internet could benefit everyone
+in the ecosystem, which is why we made this lengthy list of macros.
+
+We provided this document pretty without any restrictions, i.e. you have the freedom
+to do whatever you want. However, we would really appreciate if you could also give back
+to Terra, packaging a few apps you find possibly useful to other people using Fedora into Terra.
+
+We hope you find this document useful.
+
+## Legend
+
+- 🔢 : Parameterized macro.
+- 🔦 : Relatively uncommon.
+- 🔰 : Relatively common.
+- 🚸 : Not recommended in Terra.
+- 🛠️ : Advanced.
+
+## RPM Internal Macros
+
+<Callout type="info">
+  This list is obtained from [rpmspec-rs](https://github.com/rpm-rs/rpmspec-rs/blob/464c8caab5d451517691cc2885bd77912aa53190/src/macros.rs),
+  which is obtained from [RPM docs](https://github.com/rpm-software-management/rpm/blob/b043604b9eb684dc761aeacf55a784632ca0ebcd/docs/manual/macros.md#builtin-macros).
+</Callout>
+
+- **`%define`** 🔰
+
+  Defines a macro locally.
+
+  Macros defined with `%define` will not last to another RPM section.
+  For example, if used in preamble section, the macro will be automatically undefined in `%prep`.
+
+  To make sure a macro lasts for the entire spec file, use `%global` instead.
+
+  <Split>
+    <Split.Left>
+      ```rpmspec filename="example.spec"
+      %build
+      %define my_macro Hello, World!
+      echo %my_macro
+
+      %install
+      echo %my_macro
+      ```
+    </Split.Left>
+    <Split.Right>
+      ```rpmspec filename="expand.spec"
+      %build
+      echo Hello, World!
+
+      %install
+      echo %my_macro
+      ```
+    </Split.Right>
+  </Split>
+
+- **`%global`** 🔰
+
+  Defines a macro globally.
+
+  As oppose to `%define`, macros defined with `%global` will last for the entire spec file.
+
+  <Split>
+    <Split.Left>
+      ```rpmspec filename="example.spec"
+      %global cat Meow!!!
+
+      %prep
+      echo nya %cat
+
+      %build
+      echo %cat
+      ```
+    </Split.Left>
+    <Split.Right>
+      ```rpmspec filename="expand.spec"
+      %prep
+      echo nya Meow!!!
+
+      %build
+      echo Meow!!!
+      ```
+    </Split.Right>
+  </Split>
+
+- **`%undefine`** 🔦
+
+  Undefine a macro.
+
+  Technically this does not always undefine the macro specified.
+  Instead, this pops the latest definition from the macro stack.
+
+  <Split>
+    <Split.Left>
+      ```rpmspec filename="example.spec"
+      %global cat Meow!
+
+      %prep
+      %global cat Nyaa!
+      echo %cat
+
+      %build
+      %undefine cat
+      echo %cat
+
+      %install
+      %undefine cat
+      echo %cat
+      ```
+    </Split.Left>
+    <Split.Right>
+      ```rpmspec filename="expand.spec"
+      %prep
+      echo Nyaa!
+
+      %build
+      echo Meow!
+
+      %install
+      echo %cat
+      ```
+    </Split.Right>
+  </Split>
+
+- **`%dnl`** 🔰
+
+  Comments.
+
+  Similar to `# …`, this can comment out anything in `%{dnl:…}` or after `%dnl …`.
+  The difference with `# …` is that `%dnl` prevents macro expansions,
+  while macros in `# …` are actually expanded.
+
+  <Split>
+    <Split.Left>
+      ```rpmspec filename="example.spec"
+      %define meow a
+      # comment %meow
+      %dnl comment %meow
+      ```
+    </Split.Left>
+    <Split.Right>
+      ```rpmspec filename="expand.spec"
+      # comment a
+      ```
+    </Split.Right>
+  </Split>
+
+- **`%{load:…}`** 🔦🚸
+
+  Load a macro file.
+
+- **`%{expand:…}`** 🔦🛠️
+
+  Double-expand the macro.
+`
+  <Split>
+    <Split.Left>
+      ```rpmspec filename="example.spec"
+      %define nya foo
+      %define meow %{expand:%%nya}
+    
+      echo %meow
+      ```
+    </Split.Left>
+    <Split.Right>
+      ```rpmspec filename="expand.spec"
+      echo foo
+      ```
+    </Split.Right>
+  </Split>
+
+- **`%{lua:…}`** 🛠️
+
+  Embed lua code.
+
+  <Callout type="warning">
+    Since RPM expands macros when the source RPM (SRPM) is created,
+    the lua code is executed during that stage.
+
+    This means that the lua code is executed not during the stage it is defined in, but
+    way before even `%prep`.
+  </Callout>
+  <Callout type="warning">
+    Do NOT comment out lua using `# …`, `%dnl …` or `%{dnl:…}`.
+
+    Lua comments must start with `-- …`.
+
+    In unstable (i.e. older) versions of `rpmspec-rs`, a space must be present after `--`.
+  </Callout>
+  <Callout type="info">
+    Documentations for the embedded Lua interpreter, including specific functions available,
+    are available at https://rpm-software-management.github.io/rpm/manual/lua.html.
+  </Callout>
+
