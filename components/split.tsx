@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function Split({ children }) {
+function Split({ children }: React.PropsWithChildren) {
   const [leftWidth, setLeftWidth] = useState(50); // Initial width of the left pane (percentage)
 
   const handleMouseDown = (e) => {
@@ -27,20 +27,25 @@ function Split({ children }) {
     document.addEventListener("mouseup", handleMouseUp);
   };
 
+  // FIXME: I have no idea why it is not visible ;;
+  // -- mado
   return (
     <div className="flex">
-      {React.Children.map(children, (child) => {
-        if (child.classList.contains("split-left")) {
+      {React.Children.map(children, (child: React.ReactElement) => {
+        if (child.type == Split.Left) {
           return React.cloneElement(child, { width: leftWidth });
         }
-        if (child.classList.contains("split-right")) {
+        if (child.type == Split.Right) {
           return (
             <>
               {/* Divider */}
               <div
-                className="w-1 bg-sky-300 cursor-col-resize"
+                className="w-1 group cursor-col-resize flex"
                 onMouseDown={handleMouseDown}
-              />
+              >
+                <div className="flex-1 border-l border-l-white/0 h-full w-0" />
+                <div className="flex-1 border-l group-hover:border-l-white border-l-white/50 h-full w-0" />
+              </div>
               {React.cloneElement(child, { width: 100 - leftWidth })}
             </>
           );
