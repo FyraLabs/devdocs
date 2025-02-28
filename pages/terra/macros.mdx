@@ -169,7 +169,7 @@ We hope you find this document useful.
 - **`%{expand:…}`** 🔦🛠️
 
   Double-expand the macro.
-`
+
   <Split>
     <Split.Left>
       ```rpmspec filename="example.spec"
@@ -198,7 +198,7 @@ We hope you find this document useful.
     way before even `%prep`.
   </Callout>
   <Callout type="warning">
-    Do NOT comment out lua using `# …`, `%dnl …` or `%{dnl:…}`.
+    Do NOT comment out lua code using `# …`, `%dnl …` or `%{dnl:…}`.
 
     Lua comments must start with `-- …`.
 
@@ -209,3 +209,23 @@ We hope you find this document useful.
     are available at https://rpm-software-management.github.io/rpm/manual/lua.html.
   </Callout>
 
+  <Split>
+    <Split.Left>
+      ```rpmspec filename="example.spec"
+      %global my_macro Hello
+      %{lua:
+        -- this lua block expands to the input
+        -- to all `print()` statements
+        print("%prep\necho " ..
+          rpm.expand("%my_macro from lua!") ..
+          "\n")
+      }
+      ```
+    </Split.Left>
+    <Split.Right>
+      ```rpmspec filename="expand.spec"
+      %prep
+      echo Hello from lua!
+      ```
+    </Split.Right>
+  </Split>
