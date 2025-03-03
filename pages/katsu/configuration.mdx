@@ -73,6 +73,14 @@ A list of script IDs that must be run before this script (optional)
 
 A name for the script, used for logging (optional)
 
+#### `scripts.*.[].chroot`
+
+Whether to run the script in a sandboxed chroot environment (optional)
+
+By default, this value will be assumed true. If set to false, the script will be run in the host environment.
+
+The `$CHROOT` environment variable will be exported for use in the script.
+
 ---
 
 Files should be placed in the same directory as the manifest file that loads it.
