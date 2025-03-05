@@ -25,6 +25,86 @@ to Terra, packaging a few apps you find possibly useful to other people using Fe
 
 We hope you find this document useful.
 
+## Sections and Steps
+
+### Preamble
+
+The preamble section is the "default" section of an RPM spec file. All spec files begin with a preamble
+section that stretches from the top until a new section (e.g. `%description`) is reached.
+
+In Fedora, a preamble is also referred to as a "tag" or a "field".[^1]
+
+Here is a non-exclusive (but nearly exclusive) list of preambles available:
+
+```rpmspec
+## these fields MUST be present in a spec file
+
+Name:           pkgname
+Version:        1.2.3
+Release:        1%?dist
+Summary:        Package summary (usually do not add period at the end)
+# As opposed to the guidelines given by RPM, we (and also Fedora!) strongly
+# recommend using SPDX identifiers.
+License:        MIT
+URL:            https://terra.fyralabs.com/
+
+## terra also enforces the following preamble:
+
+Packager:       username <email@example.com>
+
+## these fields are optional and have default values
+
+Epoch:          0
+AutoReqProv:    1
+AutoReq:        1
+AutoProv:       1
+
+## these fields are optional
+
+SourceLicense:
+BugURL:
+ModularityLabel:
+DistTag:
+VCS:
+Distribution:
+Copyright:
+Vendor:
+ExcludeArch:
+ExclusiveArch:
+ExcludeOS:
+ExclusiveOS:
+BuildArch:
+BuildArchitectures:
+BuildRequires:
+
+Group:
+Provides:
+Obsoletes:
+Conflicts:
+Suggests:
+Recommends:
+Enhances:
+Supplements:
+
+OrderWithRequires:
+BuildConflicts:
+Prefix:
+Prefixes:
+Docdir:
+RemovePathPostFixes:
+
+BuildSystem:
+BuildOption:
+```
+
+<Callout type="warning">
+  If you want to add comments, use `%{dnl:…}` or start a new line.
+  Adding `# …` at the end of a line does not work.
+</Callout>
+
+`BuildSystem:{:rpmspec}` is a relatively new RPM feature.[^2]
+
+
 ## RPM Macros
 
 Technically, there are 3 types of "macros":
@@ -87,7 +167,7 @@ To make sure a macro lasts for the entire spec file, use `%global` instead.
 
 Defines a macro globally.
 
-As oppose to `%define`, macros defined with `%global` will last for the entire spec file.
+As oppose to [`%define`](#define-), macros defined with `%global` will last for the entire spec file.
 
 <Split>
   <Split.Left>
@@ -228,7 +308,7 @@ Embed lua code.
 
   Lua comments must start with `-- …`.
 
-  In unstable (i.e. older) versions of `rpmspec-rs`, a space must be present after `--`.
+  In `rpmspec-rs`, a space must be present after `--`.
 </Callout>
 <Callout type="info">
   Documentations for the embedded Lua interpreter, including specific functions available,
@@ -258,7 +338,7 @@ Embed lua code.
 
 ##### `%{macrobody:…}` 🔩
 
-Expand to the definition of the given macro
+Expand to the definition of the given macro.
 
 ```sh
 $ rpm -E '%dist'
@@ -402,6 +482,70 @@ Trim leading and trailing ASCII-whitespace, and reduce intermediate whitespace t
 This macro is used in [`%setup …`](#setup--) for uncompressing source files.
 
 
+#### Environment info
+
+##### `%{getncpus:…}`
+
+When used as `%{getncpus}` with no arguments, expand to the number of available CPU cores.
+
+Also accept extra arguments:
+
+> accepts arguments `total`, `proc` and `thread`, additionally accounting for available memory (e.g. address space limitations for threads)
+
+However, `%getncpus total`, `%getncpus proc` and `%getncpus thread` produce the same results as far as
+concerned. It is suspected that the arguments in most cases have no effect to the output.
+
+##### `%getconfdir` 🔦
+
+> expand to rpm "home" directory (typically /usr/lib/rpm)
+
+##### `%{getenv:...}` 🔦
+
+> getenv(3) macro analogue
+
+##### `%rpmversion` 🔦
+
+> expand to running rpm version
+
+#### Output
+
+##### `%{echo:…}` 🔦
+
+> print ... to stdout
+
+<Callout type="warning">
+  The printing happens when the macro is evaluated and expanded, not at the section/position it is written.
+</Callout>
+
+##### `%{warn:…}` 🔦
+
+> print warning: ... to stderr 	
+
+Produce an RPM warning, which is immediately shown in console stderr,
+and displayed again at the end of the `rpmbuild` execution (after `Executing(rmbuild)`).
+
+<Callout type="warning">
+  The printing happens when the macro is evaluated and expanded, not at the section/position it is written.
+</Callout>
+
+##### `%{error:…}` 🔦
+
+> print error: ... to stderr and return an error 	
+
+Produce an RPM warning, which is immediately shown in console stderr, then immediately
+perform `Executing(rmbuild)` and exit with a summary of all warnings and errors.
+
+<Callout type="warning">
+  The printing happens when the macro is evaluated and expanded, not at the section/position it is written.
+</Callout>
+
+##### `%{verbose:…}` 🔦
+
+> `%verbose`: expand to 1 if rpm is in verbose mode, 0 if not 	
+>
+> `%{verbose:...}`: expand to ... if rpm is in verbose mode, the empty string if not
+
+
 ## RPM Expression
 
 RPM expressions is a "sublanguage" in RPM.
@@ -493,3 +637,5 @@ Second, there are 4 unary, 10 binary, and 1 tertiary operators:
 
 [expression]: #rpm-expression
 [RPM manual]: https://github.com/rpm-software-management/rpm/blob/b043604b9eb684dc761aeacf55a784632ca0ebcd/docs/manual/macros.md
+[^1]: https://docs.fedoraproject.org/en-US/legal/license-field/
+[^2]: https://rpm-software-management.github.io/rpm/manual/buildsystem.html
