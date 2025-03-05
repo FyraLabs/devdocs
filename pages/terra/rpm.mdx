@@ -43,14 +43,16 @@ This section only covers the first type.
 - 🛠️ : Advanced.
 - 🔩 : Usually used with `rpm -E` but not in spec files.
 
-### RPM Internal Macros
+### RPM Built-in Macros
+
+#### Macro Manipulation
 
 <Callout type="info">
   This list is obtained from [rpmspec-rs](https://github.com/rpm-rs/rpmspec-rs/blob/464c8caab5d451517691cc2885bd77912aa53190/src/macros.rs),
   which is obtained from [RPM docs](https://github.com/rpm-software-management/rpm/blob/b043604b9eb684dc761aeacf55a784632ca0ebcd/docs/manual/macros.md#builtin-macros).
 </Callout>
 
-#### `%define` 🔰
+##### `%define` 🔰
 
 Defines a macro locally.
 
@@ -81,7 +83,7 @@ To make sure a macro lasts for the entire spec file, use `%global` instead.
   </Split.Right>
 </Split>
 
-#### `%global` 🔰
+##### `%global` 🔰
 
 Defines a macro globally.
 
@@ -110,7 +112,7 @@ As oppose to `%define`, macros defined with `%global` will last for the entire s
   </Split.Right>
 </Split>
 
-#### `%undefine` 🔦
+##### `%undefine` 🔦
 
 Undefine a macro.
 
@@ -149,7 +151,7 @@ Instead, this pops the latest definition from the macro stack.
   </Split.Right>
 </Split>
 
-#### `%dnl` 🔰
+##### `%dnl` 🔰
 
 Comments.
 
@@ -172,11 +174,11 @@ while macros in `# …` are actually expanded.
   </Split.Right>
 </Split>
 
-#### `%{load:…}` 🔦🚸
+##### `%{load:…}` 🔦🚸
 
 Load a macro file.
 
-#### `%{expr:…}` 🔦
+##### `%{expr:…}` 🔦
 
 Expand all macros in the body, then evaluate the body as an [expression].
 
@@ -190,7 +192,7 @@ Expand all macros in the body, then evaluate the body as an [expression].
   3
   ```
 
-#### `%{expand:…}` 🛠️
+##### `%{expand:…}` 🛠️
 
   Double-expand the macro.
 
@@ -210,7 +212,7 @@ Expand all macros in the body, then evaluate the body as an [expression].
     </Split.Right>
   </Split>
 
-#### `%{lua:…}` 🛠️
+##### `%{lua:…}` 🛠️
 
 Embed lua code.
 
@@ -254,7 +256,7 @@ Embed lua code.
   </Split.Right>
 </Split>
 
-#### `%{macrobody:…}` 🔩
+##### `%{macrobody:…}` 🔩
 
 Expand to the definition of the given macro
 
@@ -266,7 +268,7 @@ $ rpm -E '%macrobody dist'
 %{?distprefix}.um41%{?with_bootstrap:~bootstrap}
 ```
 
-#### `%{quote:…}` 🔦🛠️
+##### `%{quote:…}` 🔦🛠️
 
 Does nothing. You heard me, this macro literally does nothing.
 
@@ -287,9 +289,9 @@ This can be used to pass arguments with spaces to parameterized macros:
 </Split>
 
 
-### String operations
+#### String Operations
 
-#### `%gsub …` 🔢🔦🛠️
+##### `%gsub …` 🔢🔦🛠️
 
 Equivalent to `%{lua: string.gsub("%1", "%2", %3, %?4)}`,
 where `%n` represents the n-th argument to `%gsub`.
@@ -312,7 +314,7 @@ In short, this replaces `%?4` occurrences of `%2` in `%1` to `%3`.
   </Split.Right>
 </Split>
 
-#### `%{len:…}`
+##### `%{len:…}`
 
 Obtains the length of the given text.
 
@@ -330,21 +332,21 @@ Obtains the length of the given text.
   </Split.Right>
 </Split>
 
-#### `%{lower:…}`
+##### `%{lower:…}`
 
 Turn the input into ASCII-lowercase.
 
-#### `%{upper:…}`
+##### `%{upper:…}`
 
 ASCII-uppercase.
 
-#### `%rep …` 🔢🔦
+##### `%rep …` 🔢🔦
 
 Repeat the first input (`%1`) `n`-times, `n` given by `%2` (lua `string.rep()`).
 
-#### `%{reverse:…}`
+##### `%{reverse:…}`
 
-#### `%sub …` 🔢🔰
+##### `%sub …` 🔢🔰
 
 Expand to substring (lua `string.sub()`).
 
@@ -353,7 +355,7 @@ $ rpm -E '%sub abc 2 3'
 bc
 ```
 
-#### `%{shescape:…}`
+##### `%{shescape:…}`
 
 Wrap the input with single quotes and also escape preexisting single-quotes correctly,
 so that the input can be safely passed as arguments to shell commands.
@@ -366,9 +368,38 @@ $ rpm -E "%(echo %{shescape:this is some 'text'})"
 this is some 'text'
 ```
 
-#### `%{shrink:…}`
+##### `%{shrink:…}`
 
 Trim leading and trailing ASCII-whitespace, and reduce intermediate whitespace to a single space.
+
+
+#### File and Path Operations
+
+##### `%{basename:…}` 🔦
+
+> basename(1) macro analogue
+
+##### `%{dirname:…}` 🔦
+
+> dirname(1) macro analogue
+
+##### `%{exists:…}` 🔦
+
+> test file existence, expands to 1/0
+
+##### `%{suffix:…}` 🔦
+
+> expand to suffix part of a file name
+
+##### `%{url2path:…}` 🔦
+
+> convert url to a local path
+
+##### `%{uncompress:…}`
+
+> expand to a command for outputting argument file to stdout, uncompressing as needed
+
+This macro is used in [`%setup …`](#setup--) for uncompressing source files.
 
 
 ## RPM Expression
