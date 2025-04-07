@@ -4,9 +4,9 @@
 
 1. Write the Arch Linux live ISO to external media.
 
-2. Create a new 16MB partition for Submarine on the external media. If using ChromeOS, `fdisk`/`cfdisk` are installed by default.
+2. Create a new 16MB partition for Submarine on the external media. On aarch64, you need to make it 64MB instead. If using ChromeOS, `fdisk`/`cfdisk` are installed by default.
 
-3. In ChromeOS, set the necessary flags for the Submarine partition with `cgpt add -i <partition number> -t kernel -P 15 -T 1 -S 1 /dev/sdX`, substituting &lt;partition number&gt; for the number of the Submarine partition and `/dev/sdX` for the block device of your external media.
+3. Set the necessary flags for the Submarine partition with `cgpt add -i <partition number> -t kernel -P 15 -T 1 -S 1 /dev/sdX`, substituting &lt;partition number&gt; for the number of the Submarine partition and `/dev/sdX` for the block device of your external media.
 
 4. Write `submarine-x86_64.kpart` to the Submarine partition created in step 2.
 
@@ -22,7 +22,7 @@ sudo enable_dev_usb_boot
 
 1. After booting the Arch Linux live ISO with Submarine, proceed with the regular manual installation of Arch Linux.
 
-2. When partitioning the internal disk, again create a 16MB partition for Submarine. You do not need to create a EFI system partition (ESP) as Submarine does not use UEFI.
+2. When partitioning the internal disk, again create a 16MB/64MB partition for Submarine. You do not need to create a EFI system partition (ESP) as Submarine does not use UEFI.
 
 ## Installing
 

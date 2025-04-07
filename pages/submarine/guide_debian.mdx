@@ -8,13 +8,13 @@ import { Callout } from 'nextra/components';
 
 Ensure that your disk uses a GPT partition table.
 
-1. Create a 16 MB partition to store Submarine.
+1. Create a 16MB partition to store Submarine. If you're on aarch64, make it 64MB instead.
   
 2. Add the necessary flags by using `cgpt add -i <partition number> -t kernel -P 15 -T 1 -S 1 /dev/sdX`, don't forget to change the partition number and block device for your disk.
 
 3. Flash `submarine-<arch>.kpart` to the partition you just made.
 
-4. Create a second partition to store GRUB, this can be from 64 MB to 256 MB.
+4. Create a second partition to store GRUB, this can be from 64 to 256 MB.
 
 5. Last, create a third partition to store the root of your system. It needs to be at least 10 GB, but it would be most logical to fill up the rest of the disk with it.
 
