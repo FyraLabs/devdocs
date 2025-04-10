@@ -3,6 +3,8 @@ title: Configuration
 description: Learn how to write Katsu manifests
 ---
 
+import { Callout } from "nextra/components";
+
 # Configuration
 
 Katsu images are defined using "Manifests".
@@ -17,11 +19,15 @@ by a manifest that will be used as an entrypoint so the image can be functional.
 
 ### `builder`
 
-The `builder` section defines the image that will be used to build the image. This is currently limited to only DNF
-based images.
+The `builder` section defines the builder module that will be used to build the image. Currently this supports `dnf` and `bootc`
+
+<Callout type="info">
+  The bootc builder is only supported in Katsu 0.10.0 and later.
+  The DNF builder is the default and is used if this section is not defined.
+</Callout>
 
 ```yaml
-builder: dnf
+builder: dnf # or bootc
 ```
 
 ### `distro`
@@ -89,6 +95,72 @@ So if the manifest that loads `hello-world-file` is in `modules/hello.yaml`, the
 ---
 
 The best practice is to create a separate folder for each module, and place the required files in that folder.
+
+### `bootc`
+
+This section configures how Katsu will build the image based on bootc.
+
+```yaml
+bootc:
+  image: ghcr.io/you/your-image:latest
+  derivation: /path/to/Containerfile
+  context: . # OCI build context for copying files from outside the container (optional)
+  embed_image: true # This is set to true by default, injects the original image into the final image's Podman storage
+```
+
+[bootc](https://bootc-dev.github.io/bootc/) is an image-based paradigm for transactional OS updates, based on [OCI](https://opencontainers.org/) images.
+You can build an entire OS image and pack them into a Docker/OCI image, which can then be deployed into a bootable image, and updated the same way you
+would pull a Docker image.
+The `bootc` section is used to configure how Katsu will build the image based on bootc.
+
+#### `bootc.image`
+The base image tag to use for this build. This image must be a bootc-compatible image.
+
+#### `bootc.derivation`
+The path to the `Containerfile` that will be used to build a special derivation made just for this build,
+Relative to the current working directory.
+
+Katsu calls `podman build` with the extra build argument `DERIVE_FROM` with the value of the base image (`bootc.image`), this can be used to dynamically
+specify the base image in the `Containerfile`.
+
+
+An example Containerfile to be consumed by Katsu bootc mode would look like this:
+
+```dockerfile
+ARG DERIVE_FROM
+FROM $DERIVE_FROM
+
+# Touch grass
+RUN touch /grass
+
+# You can do whatever you want here, as you would a normal Docker layer image
+# This will be the final image Katsu will export as the root filesystem
+
+```
+
+This image will be tagged with the name of the base image, with the `:katsu_deriv` tag instead of whatever tag the base image has.
+This is done to prevent the image from being overwritten by the base image, and to allow Podman to cache this build for later use.
+
+#### `bootc.context`
+The OCI build context for copying files from outside the container. This is the same as the `--context` (or the standard positional) argument to `podman build`.
+
+This is useful for copying files from the host into the container, such as scripts or files that are needed for the build.
+
+#### `bootc.embed_image`
+
+Whether to embed the original image into the final image's Podman storage. This is set to `true` by default.
+This is useful for creating self-installing images, as the original image will be embedded into the final image's Podman storage.
+
+The image that will be embedded is the one specified in `bootc.image`, and will be used as the base image for the final image, not the one specified in `bootc.derivation`.
+
+#### bootc Notes
+
+To create self-installer images, you may need to deal with some quirks of the bootc runtime.
+
+1. You may require [fuse-overlayfs](http://github.com/containers/fuse-overlayfs) to be installed on the final image,
+   as Podman and most other container runtimes cannot nest kernel-based overlayfs mounts, requiring FUSE to be used for nested overlayfs.
+2. You may need to symlink `/var/tmp` to `/tmp` in the final image, as bootc uses `/var/tmp` for its temporary files,
+   This is a bootc implementation detail, and is not a Katsu issue.
 
 ### `dnf`
 
