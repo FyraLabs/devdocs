@@ -108,7 +108,7 @@ Terra contains 2 additional sub-streams included in the extras package:
 After installing `terra-release-extras`, you can then enable the Mesa stream:
 
 ```sh
-$ sudo dnf config-manager setopt terra-mesa.enabled 1
+$ sudo dnf config-manager setopt terra-mesa.enabled=1
 ```
 
 ### NVIDIA Stream
@@ -117,5 +117,5 @@ Terra also provides an additional stream for NVIDIA drivers, based on the [Negat
 To enable the NVIDIA stream, run:
 
 ```sh
-$ sudo dnf config-manager setopt terra-nvidia.enabled 1
+$ sudo dnf config-manager setopt terra-nvidia.enabled=1
 ```
