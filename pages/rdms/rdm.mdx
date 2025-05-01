@@ -55,6 +55,9 @@ Configurations are read from `/etc/readymade.toml`, or a path specified by the `
 
 Some example configuration files for Ultramarine are in `templates/`.
 
+The Universal Blue configurations are available here:
+https://github.com/ublue-os/bluefin/blob/3c75eac59184afbe89250f2a4eaaf4c748b23ec8/iso_files/configure_iso.sh#L21-L53
+
 ## Running
 
 There are also extra PolicyKit rules to skip password prompts for `pkexec` to escalate the process as root.
@@ -79,6 +82,8 @@ sudo losetup --partscan --show -f test.img # Attach the file to a free loop devi
 ```
 
 Note how loop devices become valid install targets within debug builds, select the one corresponding to the device noted in the prior commands.
+
+The above commands are available as scripts in the `scripts/` directory.
 
 ## Debugging
 
@@ -112,6 +117,33 @@ sudo REPART_COPY_SOURCE=/mnt/rootfs readymade
 
 You may translate Readymade to your language by visiting the [Fyra Labs Weblate](https://weblate.fyralabs.com/projects/tauOS/readymade/) instance.
 
+Other distros can customize the install progress page (`pages/installation.rs`) by providing `/usr/share/readymade/resources/*.gresource`, and
+providing fluent translation files in `/usr/share/readymade/bento/po/`.
+
+## Postinstall modules
+
+The following postinstall modules are available:
+
+- SELinux
+- Dracut
+- ReinstallKernel
+- GRUB2
+- CleanupBoot
+- PrepareFedora
+- EfiStub
+- InitialSetup
+- Language
+- CryptSetup
+- Script
+
+To enable a module, add this to the toml configuration file:
+
+```toml
+[[postinstall]]
+module = "Script" # replace Script with the module name
+```
+
+Readymade will execute the modules in the order specified in the configuration.
 
 [Readymade]: https://github.com/FyraLabs/readymade
 [libhelium]: https://github.com/tau-OS/libhelium
