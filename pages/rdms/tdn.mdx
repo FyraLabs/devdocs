@@ -45,6 +45,48 @@ catalogue files are documented below.
 In order to gather a list of keymaps, `/usr/share/X11/xkb/rules/evdev.lst` is read during
 **compile-time**.
 
+In addition, the language list is also generated during **compile-time**.
+
+### Runtime Fluent Loader
+
+Fluent is the only supported i18n framework. Distributions may choose to provide custom translations
+in `/usr/share/taidan/po/`. These translations are preferred over the compile-time ones.
+
+### Tweaks
+
+Taidan allows customisations of tweaks. For the most up-to-date documentation, visit the source
+file at `src/backend/tweaks.rs`.
+
+Tweaks are distro-specific settings read during runtime, which MUST be stored in TWEAKS_DIR, i.e.
+`/usr/share/taidan/tweaks`. Here is an example of the file hierarchy:
+
+```
+/usr/share/taidan/tweaks/ (TWEAKS_DIR)
+┣╸my_tweak/
+┃ ├╴tweak.toml (optional)
+┃ └╴up (required, MUST be executable)
+┗╸other_tweak/
+  ├╴tweak.toml
+  └╴up
+```
+
+The ID of a tweak is determined by the directory name (`my_tweak`, `other_tweak`).
+
+The `tweak.toml` file, if present, MUST specify the following two fields:
+- `ftl_name` (alias `name`): the fluent ID for the name of the tweak
+  - fallback: `<id>-name`
+- `ftl_desc` (alias `desc`): the fluent ID for the description of the tweak
+  - fallback: `<id>-desc`
+
+The distribution SHOULD provide the translation texts, see [Runtime Fluent Loader](#runtime-fluent-loader).
+
+If either one of the above fields are not provided, or the TOML file cannot be parsed, or the file does not exist,
+Taidan will instead use the aforementioned fallback values.
+
+The `up` executable will be given a single argument of either 1 or 0, denoting whether the user enables this tweak.
+
+In addition, the `Settings` struct is serialized as JSON and fed to the executable via stdin.
+
 ### Catalogue Customisations
 
 Here is an example of the catalogue yml configuration file (taken
