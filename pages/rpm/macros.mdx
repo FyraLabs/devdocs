@@ -37,7 +37,7 @@ This document only covers the first type.
   docs](https://github.com/rpm-software-management/rpm/blob/b043604b9eb684dc761aeacf55a784632ca0ebcd/docs/manual/macros.md#builtin-macros).
 </Callout>
 
-#### `%define` 🔰
+#### `%define` 🔰 [#define]
 
 Defines a macro locally.
 
@@ -74,7 +74,7 @@ To make sure a macro lasts for the entire spec file, use `%global` instead.
 
 Defines a macro globally.
 
-As oppose to [`%define`](#define-), macros defined with `%global` will last for the entire spec file.
+As oppose to [`%define`](#define), macros defined with `%global` will last for the entire spec file.
 
 <Split>
   <Split.Left>
@@ -390,7 +390,7 @@ Trim leading and trailing ASCII-whitespace, and reduce intermediate whitespace t
 
 > expand to a command for outputting argument file to stdout, uncompressing as needed
 
-This macro is used in [`%setup …`](#setup--) for uncompressing source files.
+This macro is used in [`%setup …`](#setup) for uncompressing source files.
 
 ### Environment info
 
@@ -523,7 +523,7 @@ Or you can just use `less` instead of `grep`.
 
 ### In `%prep`
 
-#### `%autosetup …` 🔢🔰
+#### `%autosetup …` 🔢🔰 [#autosetup]
 
 Uncompress the specified sources. By default, uncompress `%{SOURCE0}` (i.e. [`%{S:0}`](#s)).
 
@@ -544,7 +544,7 @@ This is actually a wrapper around [`%setup`](#setup) and [`%autopatch …`](#aut
 
 If you need to unpack multiple sources, see: http://ftp.rpm.org/max-rpm/s1-rpm-inside-macros.html
 
-#### `%setup …` 🔢
+#### `%setup …` 🔢 [#setup]
 
 Uncompress the specified sources. By default, uncompress `%{SOURCE0}` (i.e. [`%{S:0}`](#s)).
 
