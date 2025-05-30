@@ -458,4 +458,121 @@ perform `Executing(rmbuild)` and exit with a summary of all warnings and errors.
 >
 > `%{verbose:...}`: expand to ... if rpm is in verbose mode, the empty string if not
 
+### Spec-specific Macros
+
+#### `%{S:…}`
+
+> expand ... to &lt;source&gt; file name
+
+Expand to the path to the source file. This is just a fancy macro that transforms `%{S:123}` to `%SOURCE123`.
+
+	<Split>
+		<Split.Left>
+			```rpmspec filename="example.spec"
+			Source0: https://repos.fyralabs.com/um42/comps.xml
+			
+			%prep
+			cat %{S:0}
+			echo %{S:1}
+			```
+		</Split.Left>
+		<Split.Right>
+			```rpmspec filename="expand.spec"
+			Source0: https://repos.fyralabs.com/um42/comps.xml
+			
+			%prep
+			cat %{_sourcedir}/comps.xml
+			echo %SOURCE1
+			```
+		</Split.Right>
+	</Split>
+
+#### `%{P:…}`
+
+> expand ... to &lt;patch&gt; file name
+
+As you may have guessed, this is basically the `Patch:` version of [`%{S:…}`](#s).
+
+### Diagnostics
+
+#### `%trace` 🔦🛠️
+
+> toggle print of debugging information before/after expansion
+
+#### `%dump` 🔩
+
+> print the active (i.e. non-covered) macro table
+
+When you want to find a macro that has the string `x86_64_v3`, you can run:
+
+```sh
+rpm -E '%dump' 2>&1 | grep x86_64_v3
+```
+
+Or you can just use `less` instead of `grep`.
+
+#### `%__file_name` 🔦
+
+> current file (if parsing a file)
+
+#### `%__file_lineno` 🔦
+
+> line number in current file (if parsing a file)
+
+## Common Macros
+
+### In `%prep`
+
+#### `%autosetup …` 🔢🔰
+
+Uncompress the specified sources. By default, uncompress `%{SOURCE0}` (i.e. [`%{S:0}`](#s)).
+
+Parameterized as `%autosetup(a:b:cCDn:TvNS:p:)`:
+- `-n …`: specify the top-level directory (i.e. root folder) name in the archive (default `%{name}-%{version}`)
+- `-p n`: specify the `-p n` argument to [`%autopatch …`](#autopatch)
+- `-a n`: unpack `%{S:n}` after changing directory
+- `-b n`: unpack `%{S:n}` before changing directory
+- `-c`: create directory, `cd` into it, then unpack the source (useful if archive lacks top-level directory)
+- `-C`: I've no idea what this does! — Mado
+- `-D`: do not delete folder before unpacking sources
+- `-T`: disable unpacking `%SOURCE0`
+- `-v`: verbose. If specified, `%autosetup` will omit the `-q` argument to [`%setup`](#setup)
+- `-S …`: specify the SCM, equivalent to `%global __scm …` then `%__scm_setup_git` (replace `git` with the argument). With this argument, the specified SCM will be set up in the uncompressed directory
+- `-N`: do not run [`%autopatch …`](#autopatch)
+
+This is actually a wrapper around [`%setup`](#setup) and [`%autopatch …`](#autopatch).
+
+If you need to unpack multiple sources, see: http://ftp.rpm.org/max-rpm/s1-rpm-inside-macros.html
+
+#### `%setup …` 🔢
+
+Uncompress the specified sources. By default, uncompress `%{SOURCE0}` (i.e. [`%{S:0}`](#s)).
+
+In most cases you should use [`%autosetup …`](#autosetup) instead. If you would like to use `%setup …`,
+we recommend adding the `-q` flag.
+
+Parameterized as `%setup(a:b:cCDn:Tq)`: (need confirmation)
+- `-n …`: specify the top-level directory (i.e. root folder) name in the archive (default `%{name}-%{version}`)
+- `-a n`: unpack `%{S:n}` after changing directory
+- `-b n`: unpack `%{S:n}` before changing directory
+- `-c`: create directory, `cd` into it, then unpack the source (useful if archive lacks top-level directory)
+- `-C`: I've no idea what this does! — Mado
+- `-D`: do not delete folder before unpacking sources
+- `-T`: disable unpacking `%SOURCE0`
+- `-q`: quiet, because by default `%setup …` is verbose
+
+If you need to unpack multiple sources, see: http://ftp.rpm.org/max-rpm/s1-rpm-inside-macros.html
+
+The `%setup …` macro does 3 things:
+- prepare the destination
+	- `%global %{buildsubdir}` to the argument given in `-n …`
+	- `mkdir -p %{builddir}`
+		- note: `%{builddir}` is defined only during `rpmbuild`
+		- see [`%{_builddir}`](#_builddir)
+	- `cd %{builddir}`
+- uncompress the archive
+  - internally uses [`%{uncompress:…}`](#uncompress)
+- `cd %{?buildsubdir}`
+
+
 [expression]: ../expr
