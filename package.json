@@ -18,7 +18,7 @@
   },
   "homepage": "https://developer.fyralabs.com",
   "dependencies": {
-    "next": "^14.2.15",
+    "next": "^14.2.29",
     "nextra": "^2.13.4",
     "nextra-theme-docs": "^2.13.4",
     "react": "^18.3.1",
@@ -30,10 +30,10 @@
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@types/node": "22.13.8",
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.5.3",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.4",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5.8.2",
-    "webpack-livereload-plugin": "1"
+    "typescript": "^5.8.3",
+    "webpack-livereload-plugin": "^1.2.0"
   }
 }
