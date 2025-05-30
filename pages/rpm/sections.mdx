@@ -1,11 +1,10 @@
 ---
 title: Sections
 description: "Documentations for different RPM sections, steps and preambles."
-# vi: ft=markdown noet ci pi sts=0 sw=2 ts=2
+# vi: noet ci pi sts=0 sw=2 ts=2
 ---
 
 import { Callout } from "nextra/components";
-import { Split } from "../../components/split";
 
 # Sections and Steps
 
@@ -41,8 +40,11 @@ Packager:       username <email@example.com>
 ## these fields are optional and have default values
 
 Epoch:          0
+# automatic `Requires:` and `Provides:` generation
 AutoReqProv:    1
+# automatic `Requires:` generation
 AutoReq:        1
+# automatic `Provides:` generation
 AutoProv:       1
 
 ## these fields are optional
@@ -90,10 +92,57 @@ BuildOption:
 
 `BuildSystem:{:rpmspec}` is a relatively new RPM feature.[^2]
 
+If you are a usual package maintainer, you would instantly notice one very important preamble is
+missing: `Requires:`. `Requires:` is quite special because it can be further divided into:
+
+```rpmspec
+Requires:
+Requires(pre):
+Requires(post):
+Requires(preun):
+Requires(postun):
+Requires(pretrans):
+Requires(posttrans):
+Requires(verify):
+Requires(interp):
+Requires(meta):
+```
+
+the latter ones refer to packages required during `%pre{:rpmspec}`, `%post{:rpmspec}`, …
+
 <Callout>
   The spec file (include sections and preambles) is parsed only after all macros
   are expanded. This means you may expand preambles from macros too.
 </Callout>
+
+
+### Specifying (Build) Dependencies
+
+`Requires:{:rpmspec}` or `BuildRequires:{:rpmspec}` must be followed by a space-separated
+(comma-separated is accepted but not recommended) list of "query". A "query" (term used here specifically!)
+is in the format of `x = y` (other comparators including `>=` are accepted) or simply `x`. RPM will resolve
+a "query" by finding a best package that provides the requirement of the query. For example, given the package
+`gtk4-devel` with the following provides:
+
+```rpmspec
+Provides: gtk4-devel                  = 0:4.18.2-1.fc42
+Provides: pkgconfig(gtk4)             = 0:4.18.2
+Provides: pkgconfig(gtk4-atspi)       = 0:4.18.2
+Provides: pkgconfig(gtk4-broadway)    = 0:4.18.2
+Provides: pkgconfig(gtk4-unix-print)  = 0:4.18.2
+Provides: pkgconfig(gtk4-wayland)     = 0:4.18.2
+Provides: pkgconfig(gtk4-x11)         = 0:4.18.2
+```
+Then each of the followings may be used to pull in `gtk4-devel` as a build dependency.
+```rpmspec
+BuildRequires: gtk4-devel
+BuildRequires: pkgconfig(gtk4)
+BuildRequires: pkgconfig(gtk4) >= 4.18.0
+BuildRequires: (pkgconfig(gtk4) with pkgconfig(gtk4-wayland))
+```
+
+For more information about the last query, read the official RPM documentation for
+[boolean dependencies].
 
 ## `%description`
 
@@ -103,7 +152,7 @@ Specify the description of a package.
 
 If `-n subpkg`, specify the description of the subpackage with the name `subpkg` instead.
 
-If `subpkg` is given without `-n`, specify the description of the subpackage `%name-subpkg` instead.
+If `subpkg` is given without `-n`, specify the description of the subpackage `%{name}-subpkg` instead.
 
 `%description{:rpmspec}` (without args) must be specified exactly once in a spec file.
 
@@ -116,7 +165,7 @@ Not a step. Optional. `%package [-n] subpkg{:rpmspec}`
 Specify the preambles for a subpackage. The name of the subpackage is
 
 - `subpkg` if `-n` is given; and
-- `%name-subpkg` otherwise.
+- `%{name}-subpkg` otherwise.
 
 ## `%mkbuilddir`
 
@@ -134,6 +183,13 @@ This prepares sources by extracting them to the build directory.
 
 Unlike Fedora which does not provide Internet access during `rpmbuild -bb`,
 Terra also allows downloads during this stage.
+
+The most common body of `%prep` is simply:
+
+```rpmspec
+%prep
+%autosetup
+```
 
 ## `%generate_buildrequires`
 
@@ -227,13 +283,14 @@ This is automatically generated and you should never need to specify this.
 
 ## `%files`
 
-Not a step. Required (practically). `%files [-f langfile] [[-n] subpkg]{:rpmspec}`.
+Not a step. Required (practically). `%files [-f file] [[-n] subpkg]{:rpmspec}`.
 
 This specify all files that the package (or the subpackage) contains.
 
-`-f` can be used in combination with [`%find_lang`](#find_lang-).
+`-f` can be used in combination with [`%find_lang`](../macros#find_lang-). Or rather, it just needs to be a
+file with a list of line-separated paths that should be included into the final RPM package.
 
-RPM generates debug packages (`%name-debuginfo` and `%name-debugsource`) automatically. When you did not
+RPM generates debug packages (`%{name}-debuginfo` and `%{name}-debugsource`) automatically. When you did not
 compile your software with debug symbols, you might see the following error:
 
 ```ansi
@@ -271,11 +328,8 @@ The following is an exhaustive list of file attributes available:
 
 [expression]: #rpm-expression
 [RPM manual]: https://github.com/rpm-software-management/rpm/blob/b043604b9eb684dc761aeacf55a784632ca0ebcd/docs/manual/macros.md
-
+[boolean dependencies]: https://rpm-software-management.github.io/rpm/manual/boolean_dependencies.html
 [^1]: https://docs.fedoraproject.org/en-US/legal/license-field/
-
 [^2]: https://rpm-software-management.github.io/rpm/manual/buildsystem.html
-
 [^3]: https://rpm-software-management.github.io/rpm/manual/spec.html#virtual-file-attributes
-
 [^4]: http://ftp.rpm.org/max-rpm/s1-rpm-inside-files-list-directives.html

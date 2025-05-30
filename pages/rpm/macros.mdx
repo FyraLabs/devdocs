@@ -1,7 +1,7 @@
 ---
 title: Macros
 description: "Documentations for different RPM macros."
-# vi: ft=markdown noet ci pi sts=0 sw=2 ts=2
+# vi: noet ci pi sts=0 sw=2 ts=2
 ---
 
 import { Callout } from "nextra/components";
@@ -15,7 +15,7 @@ Technically, there are 3 types of "macros":
 - `%(echo "hi" | sed 's/hi/hello/')`: Shell macros that expands to the output of the commands
 - `%[v"1.2.3~1" < v"1.2.3"]`: RPM [expression]
 
-This section only covers the first type.
+This document only covers the first type.
 
 ## Legend
 
@@ -152,10 +152,17 @@ while macros in `# …` are actually expanded.
 
 <Split>
   <Split.Left>
-    ```rpmspec filename="example.spec" %define meow a # comment %meow %dnl
-    comment %meow ```
+    ```rpmspec filename="example.spec"
+		%define meow a
+		# comment %meow
+		%dnl comment %meow
+		```
   </Split.Left>
-  <Split.Right>```rpmspec filename="expand.spec" # comment a ```</Split.Right>
+  <Split.Right>
+		```rpmspec filename="expand.spec"
+    # comment a
+		```
+	</Split.Right>
 </Split>
 
 #### `%{load:…}` 🔦🚸
