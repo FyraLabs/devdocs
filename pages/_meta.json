@@ -28,5 +28,11 @@
     "title": "Submarine",
     "type": "page",
     "display": "hidden"
+  },
+
+  "rpm": {
+    "title": "RPM",
+    "type": "page",
+    "display": "hidden"
   }
 }

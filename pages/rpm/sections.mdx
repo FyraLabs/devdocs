@@ -1,0 +1,281 @@
+---
+title: Sections
+description: "Documentations for different RPM sections, steps and preambles."
+# vi: ft=markdown noet ci pi sts=0 sw=2 ts=2
+---
+
+import { Callout } from "nextra/components";
+import { Split } from "../../components/split";
+
+# Sections and Steps
+
+<Callout type="info">
+  This section of the document lists out steps in their actual execution order.
+</Callout>
+
+## Preamble
+
+The preamble section is the "default" section of an RPM spec file. All spec files begin with a preamble
+section that stretches from the top until a new section (e.g. `%description`) is reached.
+
+In Fedora, a preamble is also referred to as a "tag" or a "field".[^1]
+
+Here is a non-exclusive (but nearly exclusive) list of preambles available:
+
+```rpmspec
+## these fields MUST be present in a spec file
+
+Name:           pkgname
+Version:        1.2.3
+Release:        1%?dist
+Summary:        Package summary (usually do not add period at the end)
+# As opposed to the guidelines given by RPM, we (and also Fedora!) strongly
+# recommend using SPDX identifiers.
+License:        MIT
+URL:            https://terra.fyralabs.com/
+
+## terra also enforces the following preamble:
+
+Packager:       username <email@example.com>
+
+## these fields are optional and have default values
+
+Epoch:          0
+AutoReqProv:    1
+AutoReq:        1
+AutoProv:       1
+
+## these fields are optional
+
+SourceLicense:
+BugURL:
+ModularityLabel:
+DistTag:
+VCS:
+Distribution:
+Copyright:
+Vendor:
+ExcludeArch:
+ExclusiveArch:
+ExcludeOS:
+ExclusiveOS:
+BuildArch:
+BuildArchitectures:
+BuildRequires:
+
+Group:
+Provides:
+Obsoletes:
+Conflicts:
+Suggests:
+Recommends:
+Enhances:
+Supplements:
+
+OrderWithRequires:
+BuildConflicts:
+Prefix:
+Prefixes:
+Docdir:
+RemovePathPostFixes:
+
+BuildSystem:
+BuildOption:
+```
+
+<Callout type="warning">
+  If you want to add comments, use `%{dnl:…}` or start a new line.
+  Adding `# …` at the end of a line does not work.
+</Callout>
+
+`BuildSystem:{:rpmspec}` is a relatively new RPM feature.[^2]
+
+<Callout>
+  The spec file (include sections and preambles) is parsed only after all macros
+  are expanded. This means you may expand preambles from macros too.
+</Callout>
+
+## `%description`
+
+Not a step. `%description [[-n] subpkg]{:rpmspec}`
+
+Specify the description of a package.
+
+If `-n subpkg`, specify the description of the subpackage with the name `subpkg` instead.
+
+If `subpkg` is given without `-n`, specify the description of the subpackage `%name-subpkg` instead.
+
+`%description{:rpmspec}` (without args) must be specified exactly once in a spec file.
+
+Each subpackage requires its own `%description{:rpmspec}` too.
+
+## `%package`
+
+Not a step. Optional. `%package [-n] subpkg{:rpmspec}`
+
+Specify the preambles for a subpackage. The name of the subpackage is
+
+- `subpkg` if `-n` is given; and
+- `%name-subpkg` otherwise.
+
+## `%mkbuilddir`
+
+Step `Executing(%mkbuilddir)`. Optional.
+
+As the name suggests, this step creates the build directory.
+
+This is automatically generated and you should never need to specify this.
+
+## `%prep`
+
+Step `Executing(%prep)`. Required.
+
+This prepares sources by extracting them to the build directory.
+
+Unlike Fedora which does not provide Internet access during `rpmbuild -bb`,
+Terra also allows downloads during this stage.
+
+## `%generate_buildrequires`
+
+Step `Executing(%generate_buildrequires)`. Optional. Since `rpm >= 4.15`.
+
+The stdout is intercepted during this step. The output should be a newline (`\n`)-separated list of
+RPM build dependencies that should be installed.
+
+Once this stage finishes, `rpmbuild` will attempt to install the list of dependencies. This implies
+that you may generate a dynamic dependency list that will be available by the time `%build{:rpmspec}`
+executes, usually by calling the package manager (e.g. `dnf`) with Internet access.
+
+> This optional script can be used to determine BuildRequires dynamically. If present it is executed after `%prep` and can though access the unpacked and patched sources. The script must print the found build dependencies to stdout in the same syntax as used after `BuildRequires:{:rpmspec}` one dependency per line.
+>
+> `rpmbuild` will then check if the dependencies are met before continuing the build. If some dependencies are missing a package with the `.buildreqs.nosrc.rpm` postfix is created, that - as the name suggests - contains the found build requires but no sources. It can be used to install the build requires and restart the build.
+>
+> On success the found build dependencies are also added to the source package. As always they depend on the exact circumstance of the build and may be different when bulding based on other packages or even another architecture.
+
+## `%conf`
+
+Step `Executing(%conf)`. Optional. Since `rpm >= 4.18`.
+
+> In `%conf{:rpmspec}`, the unpacked sources are configured for building.
+>
+> Different build- and language ecosystems come with their own helper macros, but rpm has helpers for autotools based builds such as itself which typically look like this:
+>
+> ```rpmspec
+> %conf
+> %configure
+> ```
+
+When in doubt, you can always put `%configure{:rpmspec}` and other commands at the start of
+`%build{:rpmspec}` instead.
+
+## `%build`
+
+Step `Executing(%build)`. Optional.
+
+> In `%build`, the unpacked (and configured) sources are compiled to binaries.
+>
+> Different build- and language ecosystems come with their own helper macros, but rpm has helpers for autotools based builds such as itself which typically look like this:
+>
+> ```rpmspec
+> %build
+> %make_build
+> ```
+
+## `%install`
+
+Step `Executing(%install)`. Required.
+
+> In `%install`, the software installation layout is prepared by creating the necessary directory structure into an initially empty “build root” directory and copying the just-built software in there to appropriate places. For many simple packages this is just:
+>
+> ```rpmspec
+> %install
+> %make_install
+> ```
+>
+> `%install` [is] required for creating packages that contain any files.
+
+## `%doc`
+
+Step `Executing(%doc)`. **Not a section**. See [`%files{:rpmspec}`](#files).
+
+## `%license`
+
+Step `Executing(%license)`. **Not a section**. See [`%files{:rpmspec}`](#files).
+
+## `%check`
+
+Step `Executing(%check)`. Optional.
+
+> If the packaged software has accomppanying tests, this is where they should be executed.
+
+If you would like to make sure the software actually works properly, you may optionally
+choose to execute unit tests here.
+
+## `%clean`
+
+Step `Executing(%clean)`. Optional. **Obsolete**.
+
+> Packages should place all their temporaries inside their designated `%builddir`, which rpm will automatically clean up. Needing a package specific `%clean` section generally suggests flaws in the spec.
+
+## `%rmbuild`
+
+Step `Executing(%rmbuild)`. Optional.
+
+As the name suggests, this basically removes the `%builddir` with `rm -rf`.
+
+This is automatically generated and you should never need to specify this.
+
+## `%files`
+
+Not a step. Required (practically). `%files [-f langfile] [[-n] subpkg]{:rpmspec}`.
+
+This specify all files that the package (or the subpackage) contains.
+
+`-f` can be used in combination with [`%find_lang`](#find_lang-).
+
+RPM generates debug packages (`%name-debuginfo` and `%name-debugsource`) automatically. When you did not
+compile your software with debug symbols, you might see the following error:
+
+```ansi
+error: Empty %files file [1;3m%_builddir[0m/[1;3m%buildsubdir[0m/debugsourcefiles.list
+```
+
+In this case, you should make sure you've applied the correct compiler flags.
+
+Alternatively, disable `debuginfo` and `debugsource` packages by:
+
+```rpmspec
+%define debug_package %nil
+```
+
+Files can be specified with globs (`*` and `?`).
+
+### File derivatives
+
+Files can be specified with optionally an attribute[^3] (aka. a file directive[^4]).
+The following is an exhaustive list of file attributes available:
+
+```rpmspec
+%artifact …
+%config(…) …
+%dir …
+%doc …
+%docdir
+%ghost …
+%license …
+%verify(…) …
+# special:
+%attr(…) …
+%defattr(…)
+```
+
+[expression]: #rpm-expression
+[RPM manual]: https://github.com/rpm-software-management/rpm/blob/b043604b9eb684dc761aeacf55a784632ca0ebcd/docs/manual/macros.md
+
+[^1]: https://docs.fedoraproject.org/en-US/legal/license-field/
+
+[^2]: https://rpm-software-management.github.io/rpm/manual/buildsystem.html
+
+[^3]: https://rpm-software-management.github.io/rpm/manual/spec.html#virtual-file-attributes
+
+[^4]: http://ftp.rpm.org/max-rpm/s1-rpm-inside-files-list-directives.html

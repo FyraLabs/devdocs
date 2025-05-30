@@ -1,0 +1,96 @@
+---
+title: RPM Expresssion
+description: "Documentations for RPM Expression."
+# vi: ft=markdown noet ci pi sts=0 sw=2 ts=2
+---
+
+# RPM Expression
+
+RPM expressions is a "sublanguage" in RPM.
+From the [RPM manual],
+
+> Expression expansion can be performed using `%[expression]`.  An
+> expression consists of terms that can be combined using
+> operators.  Rpm supports three kinds of terms, numbers made up
+> from digits, strings enclosed in double quotes (eg `"somestring"`) and
+> versions enclosed in double quotes preceded by v (eg `v"3:1.2-1"`).
+> Rpm will expand macros when evaluating terms.
+> 
+> You can use the standard operators to combine terms: logical
+> operators `&&`, `||`, `!`, relational operators `!=`, `==`, `<`,
+> `>`, `<=`, `>=`, arithmetic operators `+`, `-`, `/`, `*`,
+> the ternary operator `? :`, and parentheses.
+> For example, `%[ 3 + 4 * (1 + %two) ]` will expand
+> to "15" if `%two` expands to "2". Version terms are compared using
+> rpm version ([epoch:]version[-release]) comparison algorithm,
+> rather than regular string comparison.
+> 
+> Note that the `%[expression]` expansion is different to the
+> `%{expr:expression}` macro.  With the latter, the macros in the
+> expression are expanded first and then the expression is
+> evaluated (without re-expanding the terms).  Thus
+> 
+> ```sh
+> rpm --define 'foo 1 + 2' --eval '%{expr:%foo}'
+> ```
+> 
+> will print "3".  Using `%[%foo]` instead will result in the
+> error that "1 + 2" is not a number.
+> 
+> Doing the macro expansion when evaluating the terms has two
+> advantages.  First, it allows rpm to do correct short-circuit
+> processing when evaluation logical operators.  Second, the
+> expansion result does not influence the expression parsing,
+> e.g. `%["%file"]` will even work if the `%file` macro expands
+> to a string that contains a double quote.
+
+This section digs into more of the advanced and technical details.
+
+First, a (way simpler) Rust declarative implementation is available
+[in `rpmspec-rs`](https://github.com/rpm-rs/rpmspec-rs/blob/master/rpmexpr/src/lib.rs).
+
+<Callout type="info">
+  The following section uses the following symbols:
+  - 🟰: 2 inputs must be of the same type.
+  - 🟩: not fallible (i.e. never produces an error), given 🟰 is satisfied.
+</Callout>
+
+Second, there are 4 unary, 10 binary, and 1 tertiary operators:
+- `-a`: negate a numerical value.
+  - Err when used on non-numerical values.
+- `!a`: negate the value, return either 1 or 0. 🟩
+  - Non-zero numbers when negated produce `0`.
+  - Non-empty texts/strings when negated produce `0`.
+  - Other values (including versions) produce `1`.
+- `a && b`: the "and" operator. 🟰🟩
+  - Num: `0` unless both values are non-zero.
+  - Text: `0` unless both values are not empty.
+  - Ver: always produce `a`.
+- `a || b`: the "or" operator. 🟰🟩
+  - Num: `1` unless both values are zero.
+  - Text: `1` unless both values are empty.
+  - Ver: always produce `b`.
+- `a != b` 🟰🟩
+- `a == b` 🟰🟩
+- `a < b` 🟰🟩
+- `a > b` 🟰🟩
+- `a <= b` 🟰🟩
+- `a >= b` 🟰🟩
+- `a + b` 🟰
+  - Num: Addition of 2 numbers
+  - Text: Joining 2 texts together (without spaces in the middle)
+  - Ver: Err
+- `a - b` 🟰
+  - The same as `a + (-b)`
+- `a / b` 🟰
+  - Num: if `b != 0`, performs division.
+  - Otherwise err.
+- `a * b`
+  - Num: performs multiplication.
+  - Otherwise err.
+- `a ? b : c` 🟩
+  - `b`, `c` 🟰
+  - If `!!a` produces `1`, evaluate to `b`.
+  - Otherwise, evaluate to `c`.
+
+[RPM manual]: https://github.com/rpm-software-management/rpm/blob/b043604b9eb684dc761aeacf55a784632ca0ebcd/docs/manual/macros.md

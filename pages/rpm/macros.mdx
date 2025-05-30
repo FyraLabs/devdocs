@@ -1,0 +1,454 @@
+---
+title: Macros
+description: "Documentations for different RPM macros."
+# vi: ft=markdown noet ci pi sts=0 sw=2 ts=2
+---
+
+import { Callout } from "nextra/components";
+import { Split } from "../../components/split";
+
+# RPM Macros
+
+Technically, there are 3 types of "macros":
+
+- `%{rpm_macro}`: Normal RPM macros
+- `%(echo "hi" | sed 's/hi/hello/')`: Shell macros that expands to the output of the commands
+- `%[v"1.2.3~1" < v"1.2.3"]`: RPM [expression]
+
+This section only covers the first type.
+
+## Legend
+
+- 🔢 : Parameterized macro.
+- 🔦 : Relatively uncommon.
+- 🔰 : Relatively common.
+- 🚸 : Not recommended in Terra.
+- 🛠️ : Advanced.
+- 🔩 : Usually used with `rpm -E` but not in spec files.
+
+## RPM Built-in Macros
+
+### Macro Manipulation
+
+<Callout type="info">
+  This list is obtained from
+  [rpmspec-rs](https://github.com/rpm-rs/rpmspec-rs/blob/464c8caab5d451517691cc2885bd77912aa53190/src/macros.rs),
+  which is obtained from [RPM
+  docs](https://github.com/rpm-software-management/rpm/blob/b043604b9eb684dc761aeacf55a784632ca0ebcd/docs/manual/macros.md#builtin-macros).
+</Callout>
+
+#### `%define` 🔰
+
+Defines a macro locally.
+
+Macros defined with `%define` will not last to another RPM section.
+For example, if used in preamble section, the macro will be automatically undefined in `%prep`.
+
+To make sure a macro lasts for the entire spec file, use `%global` instead.
+
+<Split>
+  <Split.Left>
+    ```rpmspec filename="example.spec"
+    %build
+    %define my_macro Hello, World!
+    echo %my_macro
+
+    %install
+    echo %my_macro
+    ```
+
+  </Split.Left>
+  <Split.Right>
+    ```rpmspec filename="expand.spec"
+    %build
+    echo Hello, World!
+
+    %install
+    echo %my_macro
+    ```
+
+  </Split.Right>
+</Split>
+
+#### `%global` 🔰
+
+Defines a macro globally.
+
+As oppose to [`%define`](#define-), macros defined with `%global` will last for the entire spec file.
+
+<Split>
+  <Split.Left>
+    ```rpmspec filename="example.spec"
+    %global cat Meow!!!
+
+    %prep
+    echo nya %cat
+
+    %build
+    echo %cat
+    ```
+
+  </Split.Left>
+  <Split.Right>
+    ```rpmspec filename="expand.spec"
+    %prep
+    echo nya Meow!!!
+
+    %build
+    echo Meow!!!
+    ```
+
+  </Split.Right>
+</Split>
+
+#### `%undefine` 🔦
+
+Undefine a macro.
+
+Technically this does not always undefine the macro specified.
+Instead, this pops the latest definition from the macro stack.
+
+<Split>
+  <Split.Left>
+    ```rpmspec filename="example.spec"
+    %global cat Meow!
+
+    %prep
+    %global cat Nyaa!
+    echo %cat
+
+    %build
+    %undefine cat
+    echo %cat
+
+    %install
+    %undefine cat
+    echo %cat
+    ```
+
+  </Split.Left>
+  <Split.Right>
+    ```rpmspec filename="expand.spec"
+    %prep
+    echo Nyaa!
+
+    %build
+    echo Meow!
+
+    %install
+    echo %cat
+    ```
+
+  </Split.Right>
+</Split>
+
+#### `%dnl` 🔰
+
+Comments.
+
+Similar to `# …`, this can comment out anything in `%{dnl:…}` or after `%dnl …`.
+The difference with `# …` is that `%dnl` prevents macro expansions,
+while macros in `# …` are actually expanded.
+
+<Split>
+  <Split.Left>
+    ```rpmspec filename="example.spec" %define meow a # comment %meow %dnl
+    comment %meow ```
+  </Split.Left>
+  <Split.Right>```rpmspec filename="expand.spec" # comment a ```</Split.Right>
+</Split>
+
+#### `%{load:…}` 🔦🚸
+
+Load a macro file.
+
+#### `%{expr:…}` 🔦
+
+Expand all macros in the body, then evaluate the body as an [expression].
+
+```sh
+$ rpm -D 'foo 1 + 2' -E '%[%foo]'
+error: macro expansion did not return an integer: %foo
+error:                                            ^
+error: expanded string: 1 + 2
+
+$ rpm -D 'foo 1 + 2' -E '%{expr:%foo}'
+3
+```
+
+#### `%{expand:…}` 🛠️
+
+Double-expand the macro.
+
+  <Split>
+    <Split.Left>
+      ```rpmspec filename="example.spec"
+      %define nya foo
+      %define meow %{expand:%%nya}
+    
+      echo %meow
+      ```
+    </Split.Left>
+    <Split.Right>
+      ```rpmspec filename="expand.spec"
+      echo foo
+      ```
+    </Split.Right>
+  </Split>
+
+#### `%{lua:…}` 🛠️
+
+Embed lua code.
+
+<Callout type="warning">
+  Since RPM expands macros when the source RPM (SRPM) is created,
+  the lua code is executed during that stage.
+
+This means that the lua code is executed not during the stage it is defined in, but
+way before even `%prep`.
+
+</Callout>
+<Callout type="warning">
+  Do NOT comment out lua code using `# …`, `%dnl …` or `%{dnl:…}`.
+
+Lua comments must start with `-- …`.
+
+In `rpmspec-rs`, a space must be present after `--`.
+
+</Callout>
+<Callout type="info">
+  Documentations for the embedded Lua interpreter, including specific functions available,
+  are available at https://rpm-software-management.github.io/rpm/manual/lua.html.
+</Callout>
+
+<Split>
+  <Split.Left>
+    ```rpmspec filename="example.spec"
+    %global my_macro Hello
+    %{lua:
+      -- this lua block expands to the input
+      -- to all `print()` statements
+      print("%prep\necho " ..
+        rpm.expand("%my_macro from lua!") ..
+        "\n")
+    }
+    ```
+  </Split.Left>
+  <Split.Right>
+    ```rpmspec filename="expand.spec"
+    %prep
+    echo Hello from lua!
+    ```
+  </Split.Right>
+</Split>
+
+#### `%{macrobody:…}` 🔩
+
+Expand to the definition of the given macro.
+
+```sh
+$ rpm -E '%dist'
+.um41
+
+$ rpm -E '%macrobody dist'
+%{?distprefix}.um41%{?with_bootstrap:~bootstrap}
+```
+
+#### `%{quote:…}` 🔦🛠️
+
+Does nothing. You heard me, this macro literally does nothing.
+
+But because of that it's very useful.
+This can be used to pass arguments with spaces to parameterized macros:
+
+<Split>
+  <Split.Left>
+    ```rpmspec filename="example.spec"
+    echo %gsub %{quote:hello hello} %{quote:^hello} bye
+    ```
+  </Split.Left>
+  <Split.Right>
+    ```rpmspec filename="expand.spec"
+    echo bye hello
+    ```
+  </Split.Right>
+</Split>
+
+### String Operations
+
+#### `%gsub …` 🔢🔦🛠️
+
+Equivalent to `%{lua: string.gsub("%1", "%2", %3, %?4)}`,
+where `%n` represents the n-th argument to `%gsub`.
+
+In short, this replaces `%?4` occurrences of `%2` in `%1` to `%3`.
+`%4` is optional and defaults to infinity.
+
+`%2` is treated as a [lua pattern](https://www.lua.org/pil/20.2.html).
+
+<Split>
+  <Split.Left>
+    ```rpmspec filename="example.spec"
+    echo %gsub %{quote:hello hello} %{quote:^hello} bye
+    ```
+  </Split.Left>
+  <Split.Right>
+    ```rpmspec filename="expand.spec"
+    echo bye hello
+    ```
+  </Split.Right>
+</Split>
+
+#### `%{len:…}`
+
+Obtains the length of the given text.
+
+<Split>
+  <Split.Left>
+    ```rpmspec filename="example.spec"
+    %define foo meow now!
+    echo %{len:%foo}
+    ```
+  </Split.Left>
+  <Split.Right>
+    ```rpmspec filename="expand.spec"
+    echo 9
+    ```
+  </Split.Right>
+</Split>
+
+#### `%{lower:…}`
+
+Turn the input into ASCII-lowercase.
+
+#### `%{upper:…}`
+
+ASCII-uppercase.
+
+#### `%rep …` 🔢🔦
+
+Repeat the first input (`%1`) `n`-times, `n` given by `%2` (lua `string.rep()`).
+
+#### `%{reverse:…}`
+
+#### `%sub …` 🔢🔰
+
+Expand to substring (lua `string.sub()`).
+
+```sh
+$ rpm -E '%sub abc 2 3'
+bc
+```
+
+#### `%{shescape:…}`
+
+Wrap the input with single quotes and also escape preexisting single-quotes correctly,
+so that the input can be safely passed as arguments to shell commands.
+
+```sh
+$ rpm -E "echo %{shescape:this is some 'text'}"
+echo 'this is some '\''text'\'''
+
+$ rpm -E "%(echo %{shescape:this is some 'text'})"
+this is some 'text'
+```
+
+#### `%{shrink:…}`
+
+Trim leading and trailing ASCII-whitespace, and reduce intermediate whitespace to a single space.
+
+### File and Path Operations
+
+#### `%{basename:…}` 🔦
+
+> basename(1) macro analogue
+
+#### `%{dirname:…}` 🔦
+
+> dirname(1) macro analogue
+
+#### `%{exists:…}` 🔦
+
+> test file existence, expands to 1/0
+
+#### `%{suffix:…}` 🔦
+
+> expand to suffix part of a file name
+
+#### `%{url2path:…}` 🔦
+
+> convert url to a local path
+
+#### `%{uncompress:…}`
+
+> expand to a command for outputting argument file to stdout, uncompressing as needed
+
+This macro is used in [`%setup …`](#setup--) for uncompressing source files.
+
+### Environment info
+
+#### `%{getncpus:…}`
+
+When used as `%{getncpus}` with no arguments, expand to the number of available CPU cores.
+
+Also accept extra arguments:
+
+> accepts arguments `total`, `proc` and `thread`, additionally accounting for available memory (e.g. address space limitations for threads)
+
+However, `%getncpus total`, `%getncpus proc` and `%getncpus thread` produce the same results as far as
+concerned. It is suspected that the arguments in most cases have no effect to the output.
+
+#### `%getconfdir` 🔦
+
+> expand to rpm "home" directory (typically /usr/lib/rpm)
+
+#### `%{getenv:...}` 🔦
+
+> getenv(3) macro analogue
+
+#### `%rpmversion` 🔦
+
+> expand to running rpm version
+
+### Output
+
+#### `%{echo:…}` 🔦
+
+> print ... to stdout
+
+<Callout type="warning">
+  The printing happens when the macro is evaluated and expanded, not at the
+  section/position it is written.
+</Callout>
+
+#### `%{warn:…}` 🔦
+
+> print warning: ... to stderr
+
+Produce an RPM warning, which is immediately shown in console stderr,
+and displayed again at the end of the `rpmbuild` execution (after `Executing(rmbuild)`).
+
+<Callout type="warning">
+  The printing happens when the macro is evaluated and expanded, not at the
+  section/position it is written.
+</Callout>
+
+#### `%{error:…}` 🔦
+
+> print error: ... to stderr and return an error
+
+Produce an RPM warning, which is immediately shown in console stderr, then immediately
+perform `Executing(rmbuild)` and exit with a summary of all warnings and errors.
+
+<Callout type="warning">
+  The printing happens when the macro is evaluated and expanded, not at the
+  section/position it is written.
+</Callout>
+
+#### `%{verbose:…}` 🔦
+
+> `%verbose`: expand to 1 if rpm is in verbose mode, 0 if not
+>
+> `%{verbose:...}`: expand to ... if rpm is in verbose mode, the empty string if not
+
+[expression]: ../expr
