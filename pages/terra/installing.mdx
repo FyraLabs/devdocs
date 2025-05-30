@@ -80,3 +80,42 @@ $ sudo dnf upgrade
 (or)
 $ sudo dnf upgrade package-name another-package
 ```
+
+## Extra Streams
+
+<Callout type="warning">
+  Extra streams are designed to provide additional packages that may conflict with your distribution's default packages i.e Fedora.
+
+  If you are not sure what you are doing, it is recommended to not enable the extra streams as it may break your system if not handled properly.
+</Callout>
+
+<Callout type="info">
+  Extra streams are only available for Fedora 41, EL10 (CentOS Stream 10, RHEL 10), and later.
+</Callout>
+
+Terra provides extra streams (repositories) for some additional packages. To enable them, run:
+
+```sh
+$ sudo dnf install terra-release-extras
+```
+
+After installing the extras package, you can then install additional packages that may conflict with Fedora's packages.
+
+Terra contains 2 additional sub-streams included in the extras package:
+
+### Mesa Stream
+
+After installing `terra-release-extras`, you can then enable the Mesa stream:
+
+```sh
+$ sudo dnf config-manager setopt terra-mesa.enabled=1
+```
+
+### NVIDIA Stream
+
+Terra also provides an additional stream for NVIDIA drivers, based on the [Negativo17](https://negativo17.org/) builds.
+To enable the NVIDIA stream, run:
+
+```sh
+$ sudo dnf config-manager setopt terra-nvidia.enabled=1
+```
