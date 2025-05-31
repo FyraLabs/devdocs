@@ -76,7 +76,7 @@ To make sure a macro lasts for the entire spec file, use `%global` instead.
   </Split.Right>
 </Split>
 
-#### `%global` 🔰
+#### `%global` 🔰 [#global]
 
 Defines a macro globally.
 
@@ -175,7 +175,7 @@ while macros in `# …` are actually expanded.
 
 Load a macro file.
 
-#### `%{expr:…}` 🔦
+#### `%{expr:…}` 🔦 [#expr]
 
 Expand all macros in the body, then evaluate the body as an [expression].
 
@@ -189,7 +189,7 @@ $ rpm -D 'foo 1 + 2' -E '%{expr:%foo}'
 3
 ```
 
-#### `%{expand:…}` 🛠️
+#### `%{expand:…}` 🛠️ [#expand]
 
 Double-expand the macro.
 
@@ -209,7 +209,7 @@ Double-expand the macro.
     </Split.Right>
   </Split>
 
-#### `%{lua:…}` 🛠️
+#### `%{lua:…}` 🛠️ [#lua]
 
 Embed lua code.
 
