@@ -548,6 +548,10 @@ If you need to unpack multiple sources, see: http://ftp.rpm.org/max-rpm/s1-rpm-i
 
 Uncompress the specified sources. By default, uncompress `%{SOURCE0}` (i.e. [`%{S:0}`](#s)).
 
+<Callout type="warning">
+  Only available in a spec file.
+</Callout>
+
 In most cases you should use [`%autosetup …`](#autosetup) instead. If you would like to use `%setup …`,
 we recommend adding the `-q` flag.
 
@@ -573,6 +577,169 @@ The `%setup …` macro does 3 things:
 - uncompress the archive
   - internally uses [`%{uncompress:…}`](#uncompress)
 - `cd %{?buildsubdir}`
+
+#### `%autopatch …` 🔢 [#autopatch]
+
+Apply patches.
+
+Wrapper around `%__apply_patch`. No, this does not wrap around [`%patch`](#patch)!
+
+Parameterized as `%autopatch(vqp:m:M:)`:
+- `-v`: verbose
+- `-q`: don’t warn if there are no matching patches
+- `-p n`: number of top-level path components to strip (default 0) \
+	For example, if the patch uses the path `a/b/hello.txt`,
+	passing in `-p1` will strip it to `b/hello.txt`,
+	and passing in `-p2` will strip it to just `hello.txt`.
+- `-m n`: apply patches starting from `n` (default 0)
+- `-M n`: apply patches up to `n` (default to the last patch number for `Patch:`)
+
+Examples:
+- `%autopatch -m 100`: apply patches with number &gt;= 100
+- `%autopatch -M 400`: apply patches with number &lt;= 400
+- `%autopatch -m 80 -M 99`: apply patches 80 to 99 inclusive
+- `%autopatch 1 4 6`: apply patches 1, 4 and 6
+
+Reference: https://rpm-software-management.github.io/rpm/manual/autosetup.html#autopatch
+
+#### `%patch …` 🔢 [#patch]
+
+Apply a patch.
+
+<Callout type="warning">
+  Only available in a spec file.
+</Callout>
+
+We recommend [`%autopatch`](#autopatch) over this.
+
+### Paths 🔰
+
+This list is NOT exhaustive.
+
+```
+/
+┣╸boot
+┃ ┗╸efi
+┃   ┗╸EFI             ⇒ %{efi_esp_efi}
+┃     ┗╸fedora        ⇒ %{efi_esp_dir}
+┣╸etc                 ⇒ %{_sysconfdir}
+┃ ┣╸fonts             ⇒ %{_fontconfig_masterdir}
+┃ ┃ ┗╸conf.d          ⇒ %{_fontconfig_confdir}
+┃ ┣╸java              ⇒ %{_javaconfdir}
+┃ ┣╸jvm-common        ⇒ %{_jvmcommonsysconfdir}
+┃ ┣╸jvm               ⇒ %{_jvmsysconfdir}
+┃ ┣╸pam.d             ⇒ %{_pam_confdir}
+┃ ┣╸rc.d
+┃ ┃ ┗╸init.d          ⇒ %{_initddir} %{_initrddir}
+┃ ┗╸security          ⇒ %{_pam_secconfdir}
+┣╸run                 ⇒ %{_rundir} %{_runstatedir}
+┣╸usr                 ⇒ %{_prefix} %{_exec_prefix}
+┃ ┣╸bin               ⇒ %{_bindir} (%{fedora}>=42: %{_sbindir})
+┃ ┣╸sbin              ⇒ %{_sbindir} (older fedora versions)
+┃ ┣╸include           ⇒ %{_includedir} %{_oldincludedir}
+┃ ┃ ┗╸d               ⇒ %{_d_includedir}
+┃ ┣╸lib64             ⇒ %{_libdir} %{_pam_libdir}
+┃ ┃ ┣╸gfortran
+┃ ┃ ┃ ┗╸modules       ⇒ %{_fmoddir}
+┃ ┃ ┣╸lua
+┃ ┃ ┃ ┗╸%{lua_version} ⇒ %{lua_libdir}
+┃ ┃ ┣╸ocaml           ⇒ %{ocamldir}
+┃ ┃ ┗╸security        ⇒ %{_pam_moduledir}
+┃ ┣╸lib               ⇒ %{_libdir} ONLY ON `noarch` OR 32-BIT PLATFORMS
+┃ ┃ ┣╸binfmt.d        ⇒ %{_binfmtdir}
+┃ ┃ ┣╸clang
+┃ ┃ ┃ ┗╸%{clang_major_version} ⇒ %{clang_resource_dir}
+┃ ┃ ┣╸environment.d   ⇒ %{_environmentdir}
+┃ ┃ ┣╸java            ⇒ %{_jnidir}
+┃ ┃ ┣╸jvm             ⇒ %{_jvmdir} %{_jvmlibdir}
+┃ ┃ ┣╸jvm-common      ⇒ %{_jvmcommonlibdir}
+┃ ┃ ┣╸jvm-private     ⇒ %{_jvmprivdir}
+┃ ┃ ┣╸kernel
+┃ ┃ ┃ ┗╸install.d     ⇒ %{_kernel_install_dir}
+┃ ┃ ┣╸modprobe.d      ⇒ %{_modprobedir}
+┃ ┃ ┣╸modules-load.d  ⇒ %{_modulesloaddir}
+┃ ┃ ┣╸mono            ⇒ %{_monodir}
+┃ ┃ ┃ ┗╸gac           ⇒ %{_monogacdir}
+┃ ┃ ┣╸rpm             ⇒ %{_rpmconfigdir} %{getconfdir}
+┃ ┃ ┃ ┣╸fileattrs     ⇒ %{_fileattrsdir}
+┃ ┃ ┃ ┣╸lua           ⇒ %{_rpmluadir}
+┃ ┃ ┃ ┗╸macros.d      ⇒ %{_rpmmacrodir} %{rpmmacrodir}
+┃ ┃ ┣╸sysctl.d        ⇒ %{_sysctldir}
+┃ ┃ ┣╸sysusers.d      ⇒ %{_sysusersdir}
+┃ ┃ ┣╸swidtag
+┃ ┃ ┃ ┗╸fedoraproject.org ⇒ %{_swidtagdir}
+┃ ┃ ┣╸systemd         ⇒ %{_systemd_util_dir}
+┃ ┃ ┃ ┣╸catalog       ⇒ %{_journalcatalogdir}
+┃ ┃ ┃ ┣╸user          ⇒ %{_userunitdir}
+┃ ┃ ┃ ┣╸user-preset   ⇒ %{_userpresetdir}
+┃ ┃ ┃ ┣╸user-generators   ⇒ %{_systemdusergeneratordir}
+┃ ┃ ┃ ┣╸system        ⇒ %{_unitdir}
+┃ ┃ ┃ ┣╸system-environment-generators ⇒ %{_systemd_system_env_generator_dir}
+┃ ┃ ┃ ┣╸user-environment-generators   ⇒ %{_systemd_user_env_generator_dir}
+┃ ┃ ┃ ┣╸system-generators ⇒ %{_systemdgeneratordir}
+┃ ┃ ┃ ┗╸system-preset ⇒ %{_presetdir}
+┃ ┃ ┣╸tmpfiles.d      ⇒ %{_tmpfilesdir}
+┃ ┃ ┗╸udev
+┃ ┃   ┣╸hwdb.d        ⇒ %{_udevhwdbdir}
+┃ ┃   ┗╸rules.d       ⇒ %{_udevrulesdir}
+┃ ┣╸libexec           ⇒ %{_libexecdir}
+┃ ┃ ┗╸perl5-tests     ⇒ %{perl_testdir}
+┃ ┗╸share             ⇒ %{_datadir} %{_datarootdir}
+┃   ┣╸bash-completion
+┃   ┃ ┗╸completions   ⇒ %{bash_completions_dir}
+┃   ┣╸cargo
+┃   ┃ ┗╸registry      ⇒ %{cargo_registry}
+┃   ┃   ┗╸%{crate}-%{version_no_tilde} ⇒ %{crate_instdir}
+┃   ┣╸color           ⇒ %{_colordir} %{_syscolordir}
+┃   ┃ ┣╸cmms          ⇒ %{_cmmscolordir}
+┃   ┃ ┣╸icc           ⇒ %{_icccolordir}
+┃   ┃ ┗╸settings      ⇒ %{_settingscolordir}
+┃   ┣╸doc             ⇒ %{_docdir} %{_defaultdocdir}
+┃   ┃ ┗╸%{name}       ⇒ %{_pkgdocdir}
+┃   ┣╸elvish
+┃   ┃ ┗╸lib
+┃   ┃   ┗╸completions ⇒ %{elvish_completions_dir}
+┃   ┣╸fish
+┃   ┃ ┗╸vendor_completions.d ⇒ %{fish_completions_dir}
+┃   ┣╸fonts           ⇒ %{_fontbasedir}
+┃   ┣╸fontconfig
+┃   ┃ ┗╸conf.avail    ⇒ %{_fontconfig_templatedir}
+┃   ┣╸icons           ⇒ %{_iconsdir}
+┃   ┣╸info            ⇒ %{_infodir}
+┃   ┣╸ivy-xmls        ⇒ %{_ivyxmldir}
+┃   ┣╸java            ⇒ %{_javadir}
+┃   ┣╸javadoc         ⇒ %{_javadocdir}
+┃   ┣╸jvm             ⇒ %{_jvmdatadir}
+┃   ┣╸jvm-common      ⇒ %{_jvmcommondatadir}
+┃   ┣╸licenses        ⇒ %{_defaultlicensedir}
+┃   ┣╸lua
+┃   ┃ ┗╸%{lua_version} ⇒ %{lua_pkgdir}
+┃   ┣╸man             ⇒ %{_mandir}
+┃   ┣╸maven-poms      ⇒ %{_mavenpomdir}
+┃   ┣╸metainfo        ⇒ %{_metainfodir}
+┃   ┣╸pam.d           ⇒ %{_pam_vendordir}
+┃   ┣╸pkgconfig
+┃   ┃ ┗╸personality.d ⇒ %{pkgconfig_personalitydir}
+┃   ┣╸systemtap
+┃   ┃ ┗╸tapset        ⇒ %{_systemtap_tapsetdir}
+┃   ┣╸user-tmpfiles.d ⇒ %{_user_tmpfilesdir}
+┃   ┣╸zsh
+┃   ┃ ┗╸site-functions ⇒ %{zsh_completions_dir}
+┃   ┗╸%{python_wheel_pkg_prefix}-wheels ⇒ %{python_wheel_dir}
+┗╸var                 ⇒ %{_localstatedir}
+  ┗╸lib               ⇒ %{_sharedstatedir}
+```
+```
+/home/mado/rpmbuild   ⇒ %{_topdir}
+┣╸BUILD               ⇒ %{_builddir}
+┃ ┗╸%{buildsubdir}
+┃   ┣╸.pyproject-builddir%{_pyproject_files_pkgversion} ⇒ %{_pyproject_builddir}
+┃   ┗╸pyproject-wheeldir%{_pyproject_files_pkgversion}  ⇒ %{_pyproject_wheeldir}
+┣╸RPMS                ⇒ %{_rpmdir}
+┣╸SOURCES             ⇒ %{_sourcedir}
+┣╸SPECS               ⇒ %{_specdir}
+┗╸SRPMS               ⇒ %{_srcrpmdir}
+```
 
 
 [expression]: ../expr
