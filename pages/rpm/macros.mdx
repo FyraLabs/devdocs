@@ -544,7 +544,7 @@ This is actually a wrapper around [`%setup`](#setup) and [`%autopatch …`](#aut
 
 If you need to unpack multiple sources, see: http://ftp.rpm.org/max-rpm/s1-rpm-inside-macros.html
 
-#### `%setup …` 🔢 [#setup]
+#### `%setup …` 🔢🚸 [#setup]
 
 Uncompress the specified sources. By default, uncompress `%{SOURCE0}` (i.e. [`%{S:0}`](#s)).
 
@@ -602,7 +602,7 @@ Examples:
 
 Reference: https://rpm-software-management.github.io/rpm/manual/autosetup.html#autopatch
 
-#### `%patch …` 🔢 [#patch]
+#### `%patch …` 🔢🚸 [#patch]
 
 Apply a patch.
 
@@ -746,7 +746,7 @@ machine does not come with them, try `dnf install 'rpm_macro(macro_name)'{:sh}`.
 ┗╸SRPMS               ⇒ %{_srcrpmdir}
 ```
 
-#### Common Paths 🔰
+#### Common Paths 🔰 [#common-paths]
 
 ```
 /etc                                   ⇒ %{_sysconfdir}
@@ -781,5 +781,96 @@ machine does not come with them, try `dnf install 'rpm_macro(macro_name)'{:sh}`.
 /usr/share/zsh/site-functions          ⇒ %{zsh_completions_dir}
 ```
 
+### In `%install`
+
+#### `%buildroot` 🔰 [#buildroot]
+
+<Callout type="warning">
+  Only available in a spec file.
+</Callout>
+
+Path to a specific directory where files, that get packaged into the final RPM, should live.
+This is the same as `$pkgdir` in Arch Linux PKGBUILDs.
+
+#### `%find_lang` 🔰 [#find_lang]
+
+From `/usr/lib/rpm/find-lang.sh`:
+> ```
+> automagically generate list of language specific files
+> for inclusion in an rpm spec file.
+> This does assume that the *.mo files are under .../locale/...
+> ```
+
+Expand to exactly `/usr/lib/rpm/find-lang.sh %{buildroot}`.
+Used with the `-f` flag for `%files`.
+Useful for packaging `/usr/share/locale/*/LC_MESSAGES/%{app_id}.mo` files.
+
+```
+$ /usr/lib/rpm/find-lang.sh
+
+Usage: /usr/lib/rpm/find-lang.sh TOP_DIR PACKAGE_NAME [prefix]
+
+where TOP_DIR is
+the top of the tree containing the files to be processed--should be
+$RPM_BUILD_ROOT usually. TOP_DIR gets sed'd out of the output list.
+PACKAGE_NAME is the %{name} of the package. This should also be
+the basename of the .mo files.  the output is written to
+PACKAGE_NAME.lang unless $3 is given in which case output is written
+to $3.
+Additional options:
+  --with-gnome          find GNOME help files
+  --with-mate           find MATE help files
+  --with-kde            find KDE help files
+  --with-qt             find Qt translation files
+  --with-html           find HTML files
+  --with-man            find localized man pages
+  --all-name            match all package/domain names
+  --without-mo          do not find locale files
+  --generate-subpackages move language files in one sub package per language
+```
+
+```rpmspec filename="example.spec" {7,9} /%find_lang/ /-f mugshot.lang/
+# https://github.com/terrapkg/packages/blob/2635988e63fa5a05bd2c42d34c893d9e2bb13580/anda/apps/mugshot/mugshot.spec#L41-L46
+%install
+%pyproject_install
+%pyproject_save_files -L 'mugshot*'
+install -Dm644 data/glib-2.0/schemas/%{lower:%app}.gschema.xml %buildroot%_datadir/glib-2.0/schemas/
+
+%find_lang mugshot
+
+%files -f %{pyproject_files} -f mugshot.lang
+%doc README.md NEWS
+…
+```
+
+#### `%fdupes …` 🔢 [#fdupes]
+
+Hard-link (or symlink) files to save space.
+
+Parameterized as `%fdupes(s)`:
+- `-s`: use symlinks instead of hard links
+
+Take in exactly 1 argument: a glob path that lists out files to be deduplicated.
+
+```rpmspec filename="example.spec" {2,12}
+# https://github.com/terrapkg/packages/blob/2635988e63fa5a05bd2c42d34c893d9e2bb13580/anda/themes/fluent-theme/fluent-theme.spec#L31
+BuildRequires:  fdupes
+# or BuildRequires:  rpm_macro(fdupes)
+
+…
+
+%install
+mkdir -p %{buildroot}%{_datadir}/themes
+./install.sh -i simple -t all -d %{buildroot}%{_datadir}/themes
+./install.sh -i simple -t all --tweaks round float -d %{buildroot}%{_datadir}/themes
+
+%fdupes %buildroot%_datadir
+
+%files
+%license COPYING
+%doc README.md
+
+%{_datadir}/themes/Fluent*/
+```
 
 [expression]: ../expr
