@@ -1,0 +1,111 @@
+---
+title: Macro Syntax
+description: "Documentations for how macro expansion works."
+# vi: noet ci pi sts=0 sw=2 ts=2
+---
+
+import { Callout } from "nextra/components";
+import { Split } from "../../components/split";
+
+# Macro Syntax
+
+RPM is a very powerful packaging system. One very reason is its macro support.
+
+A macro is a piece of "shorthand" identifier that expands to some content. Arguments can be fed
+into macros to obtain different desired results. It is similar to "functions" or "procedures"
+in programming terms.
+
+Macros in RPM are denoted by a `%` (U+0025 PERCENT SIGN) prefix, and can be further
+split into 3 separate categories:
+
+1. `%{rpm_macro}`: normal RPM macros. When someone says "macro", they probably are referring
+   to this.
+2. `%(echo "hi" | sed 's/hi/hello/')`: shell macros that expands to the output of the commands.
+3. `%[v"1.2.3~1" < v"1.2.3"]`: RPM [expression](./expr).
+
+[For the first type, here is a list of the documented macros](./macros).
+
+The second type is pretty straightforward: by writing shell expressions wrapped around `%(…)`,
+it expands to the output (stdout).
+
+[The third type is documented here](./expr).
+
+The `%` character can be escaped. If you want to say `echo %hello` without expanding the `%hello`
+macro, you are looking for `echo %%hello`.
+
+## Referring to Macros
+
+Let's look at an example:
+```rpmspec
+%{_bindir}
+```
+
+Normally this expands to `/usr/bin`. In many cases, you don't actually need the `{}`:
+
+```rpmspec
+%_bindir
+```
+
+This also expands to `/usr/bin`. When dealing with normal unparameterized macros,
+unless the next character matches the regex `[a-zA-Z0-9_]`, i.e. the next character is
+a valid character in a macro identifier, the macro may be written with or without `{}`.
+Otherwise, `{}` must be used to avoid ambiguity.
+
+## Defining Macros
+
+When running `rpm --eval '…'{:sh}` or `rpm -E '…'{:sh}`, you may want to define a macro
+valid only for that command. In that case, use `--define 'macro_name macro_body'`, or
+`-D 'macro_name macro_body'`.
+
+If you are writing a macro definition in a spec file, use one of:
+```rpmspec
+%define macro_name macro_body
+%global macro_name macro_body
+```
+
+See documentations for [`%define`](./macros#define) and [`%global`](./macros#global).
+
+If you are writing a macro definition in `%_rpmmacrodir` (⇒ `/usr/lib/rpm/macros.d`):
+
+```rpmspec
+%macro_name macro_body
+%macro_name(-) macro_body
+```
+
+When the macro body spans multiple lines, an unescaped `\` is needed at the end of each
+line except the last line of the macro body. To write the character `\`, use `\\`. 
+Since the same shell command when spanned multiple lines requires the same mechanism,
+in many cases you will need to use `\\\`:
+<Split>
+	<Split.Left>
+		```rpmspec filename="/usr/lib/rpm/macros.d/macros.example"
+		%say_hello echo \\\
+		Hello, World! && \\\
+		echo This is from the %%say_hello macro! \
+		echo This is a second line of shell command. && \\\
+		echo Pretty cool.
+		```
+	</Split.Left>
+	<Split.Right>
+		```sh
+		$ rpm -E '%say_hello'
+		echo \
+		Hello, World! && \
+		echo This is from the %say_hello macro!
+		echo This is a second line of shell command. && \
+		echo Pretty cool.
+		```
+	</Split.Right>
+</Split>
+
+## Macro Name
+
+The macro name (i.e. the identifier of the macro) must match the regex
+```ts
+/[a-zA-Z_][a-zA-Z0-9_]*/
+```
+
+There are exceptions to this rule, but as far as macros defined by the users (packagers),
+this MUST be followed. Of course, this document will mention all exceptions.
+
+
