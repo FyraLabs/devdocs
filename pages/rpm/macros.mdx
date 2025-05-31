@@ -612,9 +612,12 @@ Apply a patch.
 
 We recommend [`%autopatch`](#autopatch) over this.
 
-### Paths 🔰
+Parameterized as `%patch(b:p:P:REz:)`.
 
-This list is NOT exhaustive.
+### Paths
+
+This list is NOT exhaustive. Some macros are not built-in. If your
+machine does not come with them, try `dnf install 'rpm_macro(macro_name)'{:sh}`.
 
 ```
 /
@@ -633,12 +636,14 @@ This list is NOT exhaustive.
 ┃ ┃ ┗╸init.d          ⇒ %{_initddir} %{_initrddir}
 ┃ ┗╸security          ⇒ %{_pam_secconfdir}
 ┣╸run                 ⇒ %{_rundir} %{_runstatedir}
-┣╸usr                 ⇒ %{_prefix} %{_exec_prefix}
+┣╸usr                 ⇒ %{_usr} %{_prefix} %{_exec_prefix}
 ┃ ┣╸bin               ⇒ %{_bindir} (%{fedora}>=42: %{_sbindir})
 ┃ ┣╸sbin              ⇒ %{_sbindir} (older fedora versions)
+┃ ┣╸src               ⇒ %{_usrsrc}
+┃ ┣╸tmp               ⇒ %{_tmppath}
 ┃ ┣╸include           ⇒ %{_includedir} %{_oldincludedir}
 ┃ ┃ ┗╸d               ⇒ %{_d_includedir}
-┃ ┣╸lib64             ⇒ %{_libdir} %{_pam_libdir}
+┃ ┣╸lib64             ⇒ %{_libdir} %{_pam_libdir} %{_usr}/%{_lib}
 ┃ ┃ ┣╸gfortran
 ┃ ┃ ┃ ┗╸modules       ⇒ %{_fmoddir}
 ┃ ┃ ┣╸lua
@@ -671,11 +676,11 @@ This list is NOT exhaustive.
 ┃ ┃ ┣╸systemd         ⇒ %{_systemd_util_dir}
 ┃ ┃ ┃ ┣╸catalog       ⇒ %{_journalcatalogdir}
 ┃ ┃ ┃ ┣╸user          ⇒ %{_userunitdir}
+┃ ┃ ┃ ┣╸user-environment-generators   ⇒ %{_systemd_user_env_generator_dir}
 ┃ ┃ ┃ ┣╸user-preset   ⇒ %{_userpresetdir}
 ┃ ┃ ┃ ┣╸user-generators   ⇒ %{_systemdusergeneratordir}
 ┃ ┃ ┃ ┣╸system        ⇒ %{_unitdir}
 ┃ ┃ ┃ ┣╸system-environment-generators ⇒ %{_systemd_system_env_generator_dir}
-┃ ┃ ┃ ┣╸user-environment-generators   ⇒ %{_systemd_user_env_generator_dir}
 ┃ ┃ ┃ ┣╸system-generators ⇒ %{_systemdgeneratordir}
 ┃ ┃ ┃ ┗╸system-preset ⇒ %{_presetdir}
 ┃ ┃ ┣╸tmpfiles.d      ⇒ %{_tmpfilesdir}
@@ -695,7 +700,7 @@ This list is NOT exhaustive.
 ┃   ┃ ┣╸icc           ⇒ %{_icccolordir}
 ┃   ┃ ┗╸settings      ⇒ %{_settingscolordir}
 ┃   ┣╸doc             ⇒ %{_docdir} %{_defaultdocdir}
-┃   ┃ ┗╸%{name}       ⇒ %{_pkgdocdir}
+┃   ┃ ┗╸%{name}      ⇒ %{_pkgdocdir}
 ┃   ┣╸elvish
 ┃   ┃ ┗╸lib
 ┃   ┃   ┗╸completions ⇒ %{elvish_completions_dir}
@@ -726,7 +731,7 @@ This list is NOT exhaustive.
 ┃   ┣╸zsh
 ┃   ┃ ┗╸site-functions ⇒ %{zsh_completions_dir}
 ┃   ┗╸%{python_wheel_pkg_prefix}-wheels ⇒ %{python_wheel_dir}
-┗╸var                 ⇒ %{_localstatedir}
+┗╸var                 ⇒ %{_var} %{_localstatedir}
   ┗╸lib               ⇒ %{_sharedstatedir}
 ```
 ```
@@ -739,6 +744,41 @@ This list is NOT exhaustive.
 ┣╸SOURCES             ⇒ %{_sourcedir}
 ┣╸SPECS               ⇒ %{_specdir}
 ┗╸SRPMS               ⇒ %{_srcrpmdir}
+```
+
+#### Common Paths 🔰
+
+```
+/etc                                   ⇒ %{_sysconfdir}
+/run                                   ⇒ %{_rundir}
+/usr                                   ⇒ %{_usr}
+/usr/bin                               ⇒ %{_bindir}
+/usr/sbin                              ⇒ %{_sbindir} maybe?
+/usr/src                               ⇒ %{_usrsrc}
+/usr/include                           ⇒ %{_includedir}
+/usr/lib64                             ⇒ %{_libdir}
+/usr/lib                               ⇒ %{_libdir} if `noarch` or 32-bit platforms
+/usr/lib/sysctl.d                      ⇒ %{_sysctldir}
+/usr/lib/sysusers.d                    ⇒ %{_sysusersdir}
+/usr/lib/systemd/user                  ⇒ %{_userunitdir}
+/usr/lib/systemd/user-preset           ⇒ %{_userpresetdir}
+/usr/lib/systemd/system                ⇒ %{_unitdir}
+/usr/lib/systemd/system-preset         ⇒ %{_presetdir}
+/usr/libexec                           ⇒ %{_libexecdir}
+/usr/share                             ⇒ %{_datadir}
+/usr/share/doc                         ⇒ %{_docdir}
+/usr/share/icons                       ⇒ %{_iconsdir}
+/usr/share/info                        ⇒ %{_infodir}
+/usr/share/licenses                    ⇒ %{_defaultlicensedir}
+/usr/share/man                         ⇒ %{_mandir}
+/usr/share/metainfo                    ⇒ %{_metainfodir}
+/var                                   ⇒ %{_var}
+/var/lib                               ⇒ %{_sharedstatedir}
+
+/usr/share/bash-completion/completions ⇒ %{bash_completions_dir}
+/usr/share/elvish/lib/completions      ⇒ %{elvish_completions_dir} (Terra only)
+/usr/share/fish/vendor_completions.d   ⇒ %{fish_completions_dir}
+/usr/share/zsh/site-functions          ⇒ %{zsh_completions_dir}
 ```
 
 
