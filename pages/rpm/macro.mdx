@@ -64,9 +64,27 @@ Normally this expands to `/usr/bin`. In many cases, you don't actually need the 
 ```
 
 This also expands to `/usr/bin`. When dealing with normal unparameterized macros,
-unless the next character matches the regex `[a-zA-Z0-9_]`, i.e. the next character is
-a valid character in a macro identifier, the macro may be written with or without `{}`.
-Otherwise, `{}` must be used to avoid ambiguity.
+if the next character matches the regex `[a-zA-Z0-9_]` (i.e. the next character is
+a valid character in a macro identifier), `{}` must be used to avoid ambiguity.
+In other cases, the macro may be written with or without `{}`.
+
+In cases where it is necessary to pass arguments in a macro invocation in an inline context,
+there are two different ways:
+```sh
+$ rpm -D 'x(p) %1' -E '%{x:123 -p a b}' # using a colon
+123 -x a b
+
+$ rpm -D 'x(p) %1' -E '%{x 123 -p a b}' # using a space
+123
+
+$ rpm -D 'x(p) %1' -E '%{x:-p}'
+%1
+```
+
+Using a `:` means you are passing everything afterwards as one single argument,
+as if you are using [`%{quote:…}`](#quote). Meanwhile, using a space (at least for
+[parameterized macros](#parameterized-macros)) is equivalent to invoking it
+normally — the arguments are processed as expected.
 
 ## Defining Macros
 
@@ -133,11 +151,8 @@ in many cases you will need to use `\\\`:
 	<Split.Right>
 		```sh
 		$ rpm -E '%say_hello'
-		echo \
-		Hello, World! && \
-		echo This is from the %say_hello macro!
-		echo This is a second line of shell command. && \
-		echo Pretty cool.
+		echo 'Hello, World!'
+		echo 'from %say_hello using %{lua:…}!'
 		```
 	</Split.Right>
 </Split>
