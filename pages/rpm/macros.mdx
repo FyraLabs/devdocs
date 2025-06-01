@@ -107,7 +107,7 @@ As oppose to [`%define`](#define), macros defined with `%global` will last for t
   </Split.Right>
 </Split>
 
-#### `%undefine` 🔦
+#### `%undefine` 🔦 [#undefine]
 
 Undefine a macro.
 
@@ -148,7 +148,7 @@ Instead, this pops the latest definition from the macro stack.
   </Split.Right>
 </Split>
 
-#### `%dnl` 🔰
+#### `%dnl` 🔰 [#dnl]
 
 Comments.
 
@@ -171,7 +171,7 @@ while macros in `# …` are actually expanded.
 	</Split.Right>
 </Split>
 
-#### `%{load:…}` 🔦🚸
+#### `%{load:…}` 🔦🚸 [#load]
 
 Load a macro file.
 
@@ -255,7 +255,7 @@ In `rpmspec-rs`, a space must be present after `--`.
   </Split.Right>
 </Split>
 
-#### `%{macrobody:…}` 🔩
+#### `%{macrobody:…}` 🔩 [#macrobody]
 
 Expand to the definition of the given macro.
 
@@ -289,7 +289,7 @@ This can be used to pass arguments with spaces to parameterized macros:
 
 ### String Operations
 
-#### `%gsub …` 🔢🔦🛠️
+#### `%gsub …` 🔢🔦🛠️ [#gsub]
 
 Equivalent to `%{lua: string.gsub("%1", "%2", %3, %?4)}`,
 where `%n` represents the n-th argument to `%gsub`.
@@ -312,7 +312,7 @@ In short, this replaces `%?4` occurrences of `%2` in `%1` to `%3`.
   </Split.Right>
 </Split>
 
-#### `%{len:…}`
+#### `%{len:…}` [#len]
 
 Obtains the length of the given text.
 
@@ -330,21 +330,21 @@ Obtains the length of the given text.
   </Split.Right>
 </Split>
 
-#### `%{lower:…}`
+#### `%{lower:…}` [#lower]
 
 Turn the input into ASCII-lowercase.
 
-#### `%{upper:…}`
+#### `%{upper:…}` [#upper]
 
 ASCII-uppercase.
 
-#### `%rep …` 🔢🔦
+#### `%rep …` 🔢🔦 [#rep]
 
 Repeat the first input (`%1`) `n`-times, `n` given by `%2` (lua `string.rep()`).
 
-#### `%{reverse:…}`
+#### `%{reverse:…}` [#reverse]
 
-#### `%sub …` 🔢🔰
+#### `%sub …` 🔢🔰 [#sub]
 
 Expand to substring (lua `string.sub()`).
 
@@ -353,7 +353,7 @@ $ rpm -E '%sub abc 2 3'
 bc
 ```
 
-#### `%{shescape:…}`
+#### `%{shescape:…}` [#shescape]
 
 Wrap the input with single quotes and also escape preexisting single-quotes correctly,
 so that the input can be safely passed as arguments to shell commands.
@@ -366,33 +366,33 @@ $ rpm -E "%(echo %{shescape:this is some 'text'})"
 this is some 'text'
 ```
 
-#### `%{shrink:…}`
+#### `%{shrink:…}` [#shrink]
 
 Trim leading and trailing ASCII-whitespace, and reduce intermediate whitespace to a single space.
 
 ### File and Path Operations
 
-#### `%{basename:…}` 🔦
+#### `%{basename:…}` 🔦 [#basename]
 
 > basename(1) macro analogue
 
-#### `%{dirname:…}` 🔦
+#### `%{dirname:…}` 🔦 [#dirname]
 
 > dirname(1) macro analogue
 
-#### `%{exists:…}` 🔦
+#### `%{exists:…}` 🔦 [#exists]
 
 > test file existence, expands to 1/0
 
-#### `%{suffix:…}` 🔦
+#### `%{suffix:…}` 🔦 [#suffi]
 
 > expand to suffix part of a file name
 
-#### `%{url2path:…}` 🔦
+#### `%{url2path:…}` 🔦 [#url2path]
 
 > convert url to a local path
 
-#### `%{uncompress:…}`
+#### `%{uncompress:…}` [#uncompress]
 
 > expand to a command for outputting argument file to stdout, uncompressing as needed
 
@@ -400,7 +400,7 @@ This macro is used in [`%setup …`](#setup) for uncompressing source files.
 
 ### Environment info
 
-#### `%{getncpus:…}`
+#### `%{getncpus:…}` [#getncpus]
 
 When used as `%{getncpus}` with no arguments, expand to the number of available CPU cores.
 
@@ -411,21 +411,21 @@ Also accept extra arguments:
 However, `%getncpus total`, `%getncpus proc` and `%getncpus thread` produce the same results as far as
 concerned. It is suspected that the arguments in most cases have no effect to the output.
 
-#### `%getconfdir` 🔦
+#### `%getconfdir` 🔦 [#getconfdir]
 
 > expand to rpm "home" directory (typically /usr/lib/rpm)
 
-#### `%{getenv:...}` 🔦
+#### `%{getenv:...}` 🔦 [#getenv]
 
 > getenv(3) macro analogue
 
-#### `%rpmversion` 🔦
+#### `%rpmversion` 🔦 [#rpmversion]
 
 > expand to running rpm version
 
 ### Output
 
-#### `%{echo:…}` 🔦
+#### `%{echo:…}` 🔦 [#echo]
 
 > print ... to stdout
 
@@ -434,7 +434,7 @@ concerned. It is suspected that the arguments in most cases have no effect to th
   section/position it is written.
 </Callout>
 
-#### `%{warn:…}` 🔦
+#### `%{warn:…}` 🔦 [#warn]
 
 > print warning: ... to stderr
 
@@ -446,7 +446,7 @@ and displayed again at the end of the `rpmbuild` execution (after `Executing(rmb
   section/position it is written.
 </Callout>
 
-#### `%{error:…}` 🔦
+#### `%{error:…}` 🔦 [#error]
 
 > print error: ... to stderr and return an error
 
@@ -458,7 +458,7 @@ perform `Executing(rmbuild)` and exit with a summary of all warnings and errors.
   section/position it is written.
 </Callout>
 
-#### `%{verbose:…}` 🔦
+#### `%{verbose:…}` 🔦 [#verbose]
 
 > `%verbose`: expand to 1 if rpm is in verbose mode, 0 if not
 >
@@ -466,7 +466,7 @@ perform `Executing(rmbuild)` and exit with a summary of all warnings and errors.
 
 ### Spec-specific Macros
 
-#### `%{S:…}`
+#### `%{S:…}` [#S]
 
 > expand ... to &lt;source&gt; file name
 
@@ -493,19 +493,19 @@ Expand to the path to the source file. This is just a fancy macro that transform
 		</Split.Right>
 	</Split>
 
-#### `%{P:…}`
+#### `%{P:…}` [#P]
 
 > expand ... to &lt;patch&gt; file name
 
-As you may have guessed, this is basically the `Patch:` version of [`%{S:…}`](#s).
+As you may have guessed, this is basically the `Patch:` version of [`%{S:…}`](#S).
 
 ### Diagnostics
 
-#### `%trace` 🔦🛠️
+#### `%trace` 🔦🛠️ [#trace]
 
 > toggle print of debugging information before/after expansion
 
-#### `%dump` 🔩
+#### `%dump` 🔩 [#dump]
 
 > print the active (i.e. non-covered) macro table
 
@@ -517,11 +517,11 @@ rpm -E '%dump' 2>&1 | grep x86_64_v3
 
 Or you can just use `less` instead of `grep`.
 
-#### `%__file_name` 🔦
+#### `%__file_name` 🔦 [#__file_name]
 
 > current file (if parsing a file)
 
-#### `%__file_lineno` 🔦
+#### `%__file_lineno` 🔦 [#__file_lineno]
 
 > line number in current file (if parsing a file)
 
@@ -1052,7 +1052,7 @@ and find them on the navigation rail on the left.
 
 ### C and C++
 
-#### `%configure`
+#### `%configure` [#configure]
 
 Expand to `./configure` with the correct flags and arguments.
 If you need to execute `./configure`, in most cases you should use this macro instead.
