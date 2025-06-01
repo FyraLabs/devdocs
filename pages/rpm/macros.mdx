@@ -685,6 +685,60 @@ Similarly, since `rpmbuild` automatically generates `Provides:`, you may disable
 %global __provides_exclude_from %{_datadir}/%{name}/.*\\.so
 ```
 
+#### `%__brp_mangle_shebangs_exclude_from` 🔰🏷️ [#__brp_mangle_shebangs_exclude_from]
+
+RPM tries to mangle shebangs (`#!`) by default (see
+[`%__brp_mangle_shebangs`](#__brp_mangle_shebangs)).
+If this breaks, you can ask it to exclude the files that matches a given regex.
+
+```rpmspec filename="example.spec" {6}
+# https://github.com/terrapkg/packages/blob/frawhide/anda/devs/zed/nightly/zed-nightly.spec#L9
+
+%bcond_with check
+
+# Exclude input files from mangling
+%global __brp_mangle_shebangs_exclude_from ^/usr/src/.*$
+
+%global crate zed
+%global app_id dev.zed.Zed-Nightly
+
+%global rustflags_debuginfo 0
+```
+
+#### `%__brp_mangle_shebangs_exclude` 🏷️ [#__brp_mangle_shebangs_exclude]
+
+Similar to above, but takes in regex for shebangs to exclude instead.
+
+#### `%__brp_mangle_shebangs_exclude_file` 🏷️ [#__brp_mangle_shebangs_exclude_file]
+
+Similar to above, but takes in path to file that contains the regexes.
+
+#### `%__brp_mangle_shebangs_exclude_from_file` 🏷️ [#__brp_mangle_shebangs_exclude_from_file]
+
+#### `%__brp_mangle_shebangs` 🏷️
+
+As a last resort to fixing bugs related to shebangs mangling shenanigans,
+undefine this macro. You really should try using
+[`%__brp_mangle_shebangs_exclude_from`](#__brp_mangle_shebangs_exclude_from) first though.
+
+#### `%bcond_with …` 🔢🔰 [#bcond_with]
+
+**DISABLE** a "conditional".
+
+Parameterized as `%bcond_with()`.
+Takes in 1 argument: the name of the "conditional".
+
+For more information: https://rpm-software-management.github.io/rpm/manual/conditionalbuilds.html
+
+#### `%bcond_without …` 🔢🔰 [#bcond_without]
+
+**ENABLE** a "conditional".
+
+Parameterized as `%bcond_without()`.
+Takes in 1 argument: the name of the "conditional".
+
+For more information: https://rpm-software-management.github.io/rpm/manual/conditionalbuilds.html
+
 ### In `%prep`
 
 #### `%autosetup …` 🔢🔰 [#autosetup]
@@ -1121,6 +1175,32 @@ Used in `%check{:rpmspec}`.
 
 ⇒ `%__ninja test %__ninja_common_opts{:sh}`.
 
+#### `%build_cflags` 🏷️ [#build_cflags]
+
+Flags to be passed to the C compiler.
+
+⇒ `%{__build_flags_lang_c} %{?_distro_extra_cflags}`
+
+#### `%_distro_extra_cflags` 🏷️ [#_distro_extra_cflags]
+
+For example, if the compiler is emitting errors that could be disabled with some
+`-Wno-…` flags, you can define this macro with extra flags.
+
+This macro is not defined by default on Fedora.
+
+#### `%build_cxxflags` 🏷️ [#build_cxxflags]
+
+Flags to be passed to the C++ compiler.
+
+⇒ `%{__build_flags_lang_cxx} %{?_distro_extra_cxxflags}`
+
+#### `%_distro_extra_cxxflags` 🏷️ [#_distro_extra_cxxflags]
+
+For example, if the compiler is emitting errors that could be disabled with some
+`-Wno-…` flags, you can define this macro with extra flags.
+
+This macro is not defined by default on Fedora.
+
 ### D
 
 #### `%ldc_arches` [#ldc_arches]
@@ -1137,7 +1217,7 @@ This section is only applicable to Terra (because Fedora does not ship Nim).
 
 #### `%nim_prep` [#nim_prep]
 
-Set `mold` as the builder and run `nimble setup -y`.
+Set `mold` as the linker and run `nimble setup -y`.
 
 #### `%nim_build` [#nim_build]
 
@@ -1155,5 +1235,24 @@ https://docs.fedoraproject.org/en-US/packaging-guidelines/Python/
 
 https://docs.fedoraproject.org/en-US/packaging-guidelines/Rust/
 
+#### `%rustflags_debuginfo` 🏷️ [#rustflags_debuginfo]
+
+If `gdb` crashes in `find-debuginfo`, you might want to lower the value to `1` or even `0`.
+
+The default value is `2`.
+
+```rpmspec filename="example.spec" {11}
+https://github.com/terrapkg/packages/blob/2df55dad60a58ecf5f8fbe962f877f2834bdfa25/anda/devs/zed/nightly/zed-nightly.spec#L14
+
+%bcond_with check
+
+# Exclude input files from mangling
+%global __brp_mangle_shebangs_exclude_from ^/usr/src/.*$
+
+%global crate zed
+%global app_id dev.zed.Zed-Nightly
+
+%global rustflags_debuginfo 0
+```
 
 [expression]: ./expr
