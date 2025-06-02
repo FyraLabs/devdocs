@@ -18,7 +18,7 @@
   },
   "homepage": "https://developer.fyralabs.com",
   "dependencies": {
-    "next": "^14.2.28",
+    "next": "^14.2.29",
     "nextra": "^2.13.4",
     "nextra-theme-docs": "^2.13.4",
     "react": "^18.3.1",
@@ -31,8 +31,9 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@types/node": "22.15.21",
     "autoprefixer": "^10.4.21",
-    "postcss": "^8.5.3",
+    "postcss": "^8.5.4",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "webpack-livereload-plugin": "^1.2.0"
   }
 }

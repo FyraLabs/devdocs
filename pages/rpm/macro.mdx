@@ -1,0 +1,351 @@
+---
+title: Macro Syntax
+description: "Documentations for how macro expansion works."
+# vi: noet ci pi sts=0 sw=2 ts=2
+---
+
+import { Callout } from "nextra/components";
+import { Split } from "../../components/split";
+
+# Macro Syntax
+
+RPM is a very powerful packaging system. One very reason is its macro support.
+
+A macro is a piece of "shorthand" identifier that expands to some content. Arguments can be fed
+into macros to obtain different desired results. It is similar to "functions" or "procedures"
+in programming terms.
+
+Macros in RPM are denoted by a `%` (U+0025 PERCENT SIGN) prefix, and can be further
+split into 3 separate categories:
+
+1. `%{rpm_macro}`: normal RPM macros. When someone says "macro", they probably are referring
+   to this.
+2. `%(echo "hi" | sed 's/hi/hello/')`: shell macros that expands to the output of the commands.
+3. `%[v"1.2.3~1" < v"1.2.3"]`: RPM [expression](./expr).
+
+[For the first type, here is a list of the documented macros](./macros).
+
+The second type is pretty straightforward: by writing shell expressions wrapped around `%(…)`,
+it expands to the output (stdout).
+
+[The third type is documented here](./expr).
+
+The `%` character can be escaped. If you want to say `echo %hello` without expanding the `%hello`
+macro, you are looking for `echo %%hello`.
+
+## Macro Name
+
+The macro name (i.e. the identifier of the macro) must match the regex
+```ts
+/^(?!_$)[a-zA-Z_][a-zA-Z0-9_]*$/
+```
+
+There are exceptions to this rule, but as far as macros defined by the users (packagers),
+this MUST be followed. Of course, this document [mentions all exceptions](#automatic-macros).
+
+The RPM manual claims that the name "must be at least 3 characters in length"[^1]
+but as far as concerned that is the biggest lie in the century:
+```sh
+$ rpm -D 'a 1' -E '%a'
+1
+```
+
+## Invoking Macros
+
+Let's look at an example:
+```rpmspec
+%{_bindir}
+```
+
+Normally this expands to `/usr/bin`. In many cases, you don't actually need the `{}`:
+
+```rpmspec
+%_bindir
+```
+
+This also expands to `/usr/bin`. When dealing with normal unparameterized macros,
+if the next character matches the regex `[a-zA-Z0-9_]` (i.e. the next character is
+a valid character in a macro identifier), `{}` must be used to avoid ambiguity.
+In other cases, the macro may be written with or without `{}`.
+
+In cases where it is necessary to pass arguments in a macro invocation in an inline context,
+there are two different ways:
+```sh
+$ rpm -D 'x(p) %1' -E '%{x:123 -p a b}' # using a colon
+123 -x a b
+
+$ rpm -D 'x(p) %1' -E '%{x 123 -p a b}' # using a space
+123
+
+$ rpm -D 'x(p) %1' -E '%{x:-p}'
+%1
+```
+
+Using a `:` means you are passing everything afterwards as one single argument,
+as if you are using [`%{quote:…}`](#quote). Meanwhile, using a space (at least for
+[parameterized macros](#parameterized-macros)) is equivalent to invoking it
+normally — the arguments are processed as expected.
+
+## Defining Macros
+
+When running `rpm --eval '…'{:sh}` or `rpm -E '…'{:sh}`, you may want to define a macro
+valid only for that command. In that case, use `--define 'macro_name macro_body'`, or
+`-D 'macro_name macro_body'`.
+
+If you are writing a macro definition in a spec file, use one of:
+```rpmspec
+%define macro_name    macro_body
+%global macro_name(-) macro_body
+```
+
+See documentations for [`%define`](./macros#define) and [`%global`](./macros#global).
+
+If you are writing a macro definition in `%_rpmmacrodir` (⇒ `/usr/lib/rpm/macros.d`):
+
+```rpmspec
+%macro_name    macro_body
+%macro_name(-) macro_body
+```
+
+### Escaping
+
+When the macro body spans multiple lines, an unescaped `\` may be needed at the end of each
+line except the last line of the macro body. To write the character `\`, use `\\`. 
+Since the same shell command when spanned multiple lines requires the same mechanism,
+in many cases you will need to use `\\\`:
+
+<Split>
+	<Split.Left>
+		```rpmspec filename="/usr/lib/rpm/macros.d/macros.example"
+		%say_hello echo \\\
+		Hello, World! && \\\
+		echo This is from the %%say_hello macro! \
+		echo This is a second line of shell command. && \\\
+		echo Pretty cool.
+		```
+	</Split.Left>
+	<Split.Right>
+		```sh
+		$ rpm -E '%say_hello'
+		echo \
+		Hello, World! && \
+		echo This is from the %say_hello macro!
+		echo This is a second line of shell command. && \
+		echo Pretty cool.
+		```
+	</Split.Right>
+</Split>
+
+<Split>
+	<Split.Left>
+		```rpmspec filename="/usr/lib/rpm/macros.d/macros.example"
+		%say_hello %{lua:
+			print("echo 'Hello, ")
+			-- you also need to escape backslash for the new line character in lua strings
+			print("World!'\\n")
+			-- macros in lua are not expanded by default, so %% is not needed here
+			print("echo 'from %say_hello using %{lua:…}!'")
+		}
+		```
+	</Split.Left>
+	<Split.Right>
+		```sh
+		$ rpm -E '%say_hello'
+		echo 'Hello, World!'
+		echo 'from %say_hello using %{lua:…}!'
+		```
+	</Split.Right>
+</Split>
+
+But that does not mean `\` is needed when dealing with a multi-line macro body.
+
+For definition files in `/usr/lib/rpm/macros.d/`, strictly speaking, RPM assumes
+a blank line separates different macro definitions. Therefore, no macro body may be written
+with any blank lines present. Blank lines must end with a `\`:
+
+```rpmspec filename="/usr/lib/rpm/macros.d/macros.rust-srpm" showLineNumbers {14,18,23}
+# rust_arches: list of architectures where building Rust is supported
+#
+# Since RPM itself now depends on Rust code (via its GPG backend, rpm-sequoia),
+# this list will probably always be a superset of all architectures that are
+# supported by Fedora, which is why it is no longer required to set
+# "ExclusiveArch: rust_arches" for Rust packages in Fedora.
+%rust_arches x86_64 %{ix86} armv7hl aarch64 ppc64 ppc64le riscv64 s390x
+
+# version_no_tilde: lua macro for reconstructing the original crate version
+#       from the RPM version (i.e. replace any "~" characters with "-")
+%version_no_tilde() %{lua:
+    local sep = rpm.expand('%1')
+    local ver = rpm.expand('%2')
+\
+    if sep == '%1' then
+        sep = '-'
+    end
+\
+    if ver == '%2' then
+        ver = rpm.expand('%version')
+    end
+    ver = ver:gsub('~', sep)
+\
+    print(ver)
+}
+…
+```
+
+<Callout type="info">
+  Mado: I don't know the actual complete rule for this to be honest (which is why `rpmspec-rs`
+  is so broken right now) but generally speaking if your macro body does not start with `%{lua:`,
+  you'll need `\` at the end of each line.
+</Callout>
+
+### Comments
+
+In [`%{lua:…}`](./macros#lua), comments must start with `-- ` (with the space).
+`# …` is not accepted. Note that `#` is a special operator in Lua for obtaining the length of an
+array or a string.
+
+Otherwise, `#` is fine outside of Lua code.
+
+See also: [`%{dnl:…}`](./macros#dnl)
+
+## Conditionally Expanded Macros
+
+<div style={{ float: "right", marginLeft: "1em", marginTop: "1em" }}>
+```sh
+$ rpm -E '%a'
+%a
+$ rpm -E '%!a'
+%a
+$ rpm -E '%!?a'
+
+$ rpm -E '%??a'
+
+$ rpm -E '%!!a'
+%a
+```
+</div>
+
+For any `%{macro}` invocations, you may append `!` or `?` zero to infinitely many times to the
+start of the macro name.
+
+While generally adding more than a single `?` is the same as having just one `?`, 
+the same is not true for `!` — the behavior flips for each addition of `!`.
+
+The expansion also changes slightly with or without `{}`. When in doubt,
+try testing it yourself using `rpm --eval{:sh}`.
+
+<div style={{ float: "left", marginRight: "1em", marginTop: "1em" }}>
+```sh
+$ rpm -D 'x 1' -E \
+ '%[0%?x ? "y" : "n"]'
+y
+$ rpm -E \
+ '%[0%?x ? "y" : "n"]'
+n
+```
+</div>
+
+`%{?x:content}` checks whether `%x` is defined. If so,
+it expands to the content (`%{?x}` / `%?x` is the same as `%{?x:%x}`).
+Otherwise, it reduces to nothing.
+In contrast, `!?` / `?!` always expand to nothing regardless.
+
+If you are looking for something analogous to the tertiary operator,
+use [RPM expression](./expr) as demonstrated on the left.
+
+
+| Invocation | `%x` ⇒ `1` | `%x` undefined | Explanation
+| ---------- | ---------- | -------------- | -----------
+| `%x`       | `1`        | `%x`           | undefined macros are not expanded
+| `%?x`      | `1`        | `` ``          | defined ⇒ `1`, undefined ⇒ nothing
+| `%??x`     | `1`        | `` ``          | having multiple `?` is the same
+| `%!x`      | `1`        | `%x`           | same as `%x`
+| `%{!x}`    | `1`        | `%{!x}`        | `%{!x}` is undefined ⇒ not expanded
+| `%!?x`     | `` ``      | `` ``          | expand to nothing
+| `%?!x`     | `` ``      | `` ``          | expand to nothing
+| `%!!x`     | `1`        | `%x`           | same as `%x`
+| `%?!!x`    | `1`        | `` ``          | same as `%?x`
+| `%?!!!x`   | `` ``      | `` ``          | same as `%?!x`
+| `%?!!!!x`  | `1`        | `` ``          | same as `%?!!x`
+| `%{?x:y}`  | `y`        | `` ``          | if defined ⇒ `y`
+| `%{?!x:y}` | `` ``      | `y`            | if undefined ⇒ `y`
+
+
+## Parameterized Macros
+
+<div style={{ float: "right", marginLeft: "1em", marginTop: "1em" }}>
+```rpmspec filename="greet"
+%greet(-) %{echo:Hello %*!}
+```
+```sh filename="Shell"
+rpm -E '%{load:greet}
+%greet world
+%greet Linux Torvalds'
+```
+```ansi filename="Output"
+Hello world!
+Hello Linux Torvalds!
+​
+​
+```
+</div>
+
+From the manual[^2]:
+> RPM has fully recursive spec file macros. Simple macros do straight text substitution. **Parameterized macros include an options field, and perform argc/argv processing on white space separated tokens to the next newline**. During macro expansion, both flags and arguments are available as macros which are deleted at the end of macro expansion. Macros can be used (almost) anywhere in a spec file, and, in particular, in “included file lists” (i.e. those read in using `%files -f <file>{:rpmspec}`). In addition, macros can be nested, hiding the previous definition for the duration of the expansion of the macro which contains nested macros.
+
+Parameterized macros are also known as "parametric macros":
+> **A macro which contains an `(opts)` field is called parametric**. The opts (i.e. string between parentheses) are passed exactly as is to to [`getopt(3)`] for argc/argv processing at the beginning of a macro invocation. Only short options are supported. **`--` can be used to separate options from arguments**. Since rpm >= 4.17 `-` as opts disables all option processing.
+
+### Automatic Macros
+
+While a parameterized macro is being expanded, the following special automatic macros are available:
+
+| Macro         | Description
+| ------------- | -----------
+| `%0`          | name of invoked macro
+| `%*`          | all arguments (unlike shell, excluding processed flags)
+| `%**`         | all arguments (including processed flags)
+| `%#`          | number of arguments excluding processed flags
+| `%{-f}`       | if present at invocation, the last occurence of flag f (flag and argument)
+| `%{-f*}`      | if present at invocation, the argument to the last occurence of flag f
+| `%1`, `%2`, … | arguments unattached to flags (after [`getopt(3)`] processing)
+
+With rpm >= 4.17 and disabled option processing (i.e. `%my_macro(-)`),
+the mentioned macros are defined as:
+
+| Macro         | Description 
+| -----------   | ----------- 
+| `%0`          | name of invoked macro
+| `%*`, `%**`   | all arguments
+| `%#`          | number of arguments
+| `%1`, `%2`, … | arguments themselves
+
+### The `(opts)` field [#opts]
+
+The `(opts)` field might be confusing at first but it's actually pretty simple (since RPM only accepts short flags).
+In case you are not familiar with [`getopt(3)`], there are basically 3 rules:
+- for each character in `(…)`, it represents a flag.
+	- `(ABCxyz)` means `-A`, `-B`, `-C`, `-x`, `-y`, `-z` are possible flags
+	- only ASCII characters that are not `-`, `:` and `;` are accepted
+- any of the above characters followed by a single colon `:` indicates the flag *requires* an argument.
+	- `(n:)` means the macro expects `-n …` (or the caller can just not supply any flags at all)
+- any followed by a double colon `::` indicates the flag takes in an *optional* argument.
+	- `(x::)` means `-x` or `-x …` are both accepted
+
+Special: `(-)` means no flags are processed:
+
+```sh
+$ rpm -D 'p() %**' -E '%p -o'
+p: invalid option -- 'o'
+error: Unknown option o in p()
+
+$ rpm -D 'p(-) %**' -E '%p -o'
+-o
+```
+
+---
+
+[^1]: https://github.com/rpm-software-management/rpm/blob/master/docs/manual/macros.md#defining-a-macro, permalink: https://github.com/rpm-software-management/rpm/blob/1ca57c6cfe264a211a6a93bf4fe68b463bd4861a/docs/manual/macros.md#defining-a-macro
+[^2]: https://rpm.org/docs/4.20.x/manual/macros.html
+
+[`getopt(3)`]: https://man.archlinux.org/man/getopt.3.en
