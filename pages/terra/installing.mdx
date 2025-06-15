@@ -76,29 +76,41 @@ Terra EL contains a subset of packages for RHEL 10 and its derivatives.
 
 Terra EL requires EPEL, which requires CodeReady Builder, let's start by enabling that:
 
-`sudo subscription-manager repos --enable codeready-builder-for-rhel-10-$(arch)-rpms`
+```sh
+sudo subscription-manager repos --enable codeready-builder-for-rhel-10-$(arch)-rpms
+```
 
 Then install EPEL:
 
-`sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm`
+```sh
+sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm
+```
 
 Now you can install Terra!
 
-`sudo dnf install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terrael$releasever' terra-release`
+```sh
+sudo dnf install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terrael$releasever' terra-release
+```
 
 #### AlmaLinux, CentOS Stream, and RockyLinux
 
 Start by enabling CodeReady Builder:
 
-`sudo dnf config-manager --set-enabled crb`
+```sh
+sudo dnf config-manager --set-enabled crb
+```
 
 Then install `epel-release`
 
-`sudo dnf install epel-release`
+```sh
+sudo dnf install epel-release
+```
 
 Now you can install Terra!
 
-`sudo dnf install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terrael$releasever' terra-release`
+```sh
+sudo dnf install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terrael$releasever' terra-release
+```
 
 ## Using Terra
 
