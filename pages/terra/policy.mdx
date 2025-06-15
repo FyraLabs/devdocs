@@ -278,3 +278,20 @@ Remove the `%generate_buildrequires{:rpmspec}` section, and add `%global gomodul
 #### Nim
 
 Use the `%nim_prep` and `%nim_c src/pkgname` macros.
+
+### Shell completions
+
+Shell completion files warrant their own subpackages. You may use `%pkg_completion` to automatically
+generate them. For the up-to-date documentation,
+check out [the source](https://github.com/terrapkg/srpm-macros/blob/main/macros.anda#L31C1-L39C54) directly.
+
+```sh
+# pkg_completion -Bbefz -n pkgname cmd1 cmd2 ...
+# -B: bash (but the completion file doesn't have `.bash` extension)
+# -b: bash
+# -e: elvish
+# -f: fish
+# -z: zsh
+# -n <pkgname>: name of the current package (default `%name`)
+# cmd1 ...: the commands the completion files are for
+```
