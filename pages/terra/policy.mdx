@@ -247,23 +247,7 @@ Example:
 You SHOULD NOT use the default naming (but you MAY `Provides:{:rpmspec}`) generated from `go2rpm` (except non-leaf packages),
 as an unnecessarily long package name with unnecessary information is bad for UX.
 
-Use the `go` compiler directly instead of using Fedora's Go macros, as this will generate offline dependencies that we do not want to package.
-Alternatively, use the `_online` macro variants:
-
-```rpmspec
-%prep
-%goprep
-%autopatch -p1
-%go_prep_online
-
-%build
-%go_build_online %{goipath}
-
-%install
-%gopkginstall
-install -m 0755 -vd                     %{buildroot}%{_bindir}
-install -m 0755 -vp %{gobuilddir}/bin/* %{buildroot}%{_bindir}/
-```
+Remove the `%generate_buildrequires{:rpmspec}` section, and add `%global gomodulesmode GO111MODULE=on{:rpmspec}`.
 
 #### Nim
 
