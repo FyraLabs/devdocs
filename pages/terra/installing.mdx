@@ -7,25 +7,16 @@ import { Callout } from "nextra/components";
 
 # Installing
 
-Currently (2022-11-28), Terra only supports RPM packages.
+Currently (June 2025), Terra only supports RPM packages.
 
 ## Adding Terra
 
-### Fedora Atomic Editions
-
-On Immutable editions of Fedora, run the following command:
-
-```
-curl -fsSL https://github.com/terrapkg/subatomic-repos/raw/main/terra.repo | pkexec tee /etc/yum.repos.d/terra.repo
-sudo rpm-ostree install terra-release
-```
-
-### Other Fedora Editions
+### Fedora and Derivatives
 
 Directly install `terra-release`:
 
 ```sh
-$ sudo dnf install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' terra-release
+sudo dnf install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' terra-release
 ```
 
 <Callout type="info">
@@ -38,47 +29,105 @@ $ sudo dnf install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com
 </Callout>
 
 ```sh
-$ sh <(curl https://terra.fyralabs.com/get.sh)
+sh <(curl https://terra.fyralabs.com/get.sh)
 ```
 
 If you doubt the safety of the script (which you should), curl the script to stdout first:
 
 ```sh
-$ curl https://terra.fyralabs.com/get.sh
+curl https://terra.fyralabs.com/get.sh
 ```
 
 Or, just don't use the fancy script. I guess.
 
 </Callout>
 
+### Fedora Atomic and Derivatives
+
+On Atomic editions of Fedora, run the following command:
+
+```
+curl -fsSL https://github.com/terrapkg/subatomic-repos/raw/main/terra.repo | pkexec tee /etc/yum.repos.d/terra.repo
+sudo rpm-ostree install terra-release
+```
+
+#### Bazzite and Aurora
+
+Bazzite and Aurora come with Terra out of the box, simply `rpm-ostree` away!
+
+#### Bluefin
+
+Bluefin no longer comes with Terra, and disables package layering by default.
+
+To enable layering, edit `/etc/rpm-ostreed.conf` and set `LockLayering` to `false`.
+
+<Callout type="warning">
+  Bluefin doesn't officially support this. If you're getting support, make sure
+  to mention layering is on.
+</Callout>
+
+Then follow the installation instructions for Fedora Atomic.
+
+### Enterprise Linux
+
+Terra EL contains a subset of packages for RHEL 10 and its derivatives.
+
+#### RHEL
+
+Terra EL requires EPEL, which requires CodeReady Builder, let's start by enabling that:
+
+`sudo subscription-manager repos --enable codeready-builder-for-rhel-10-$(arch)-rpms`
+
+Then install EPEL:
+
+`sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm`
+
+Now you can install Terra!
+
+`sudo dnf install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terrael$releasever' terra-release`
+
+#### AlmaLinux, CentOS Stream, and RockyLinux
+
+Start by enabling CodeReady Builder:
+
+`sudo dnf config-manager --set-enabled crb`
+
+Then install `epel-release`
+
+`sudo dnf install epel-release`
+
+Now you can install Terra!
+
+`sudo dnf install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terrael$releasever' terra-release`
+
 ## Using Terra
 
 ### Install
 
 ```sh
-$ sudo dnf install package-name another-package
+sudo dnf install package-name another-package
 ```
 
 ### Search
 
 ```sh
-$ dnf search package-name
+dnf search package-name
 (or)
-$ dnf provides package-name
+dnf provides package-name
 ```
 
 ### Remove
 
 ```sh
-$ sudo dnf remove package-name another-package
+sudo dnf remove package-name another-package
 ```
 
 ### Upgrade
 
 ```sh
-$ sudo dnf upgrade
+sudo dnf upgrade
 (or)
-$ sudo dnf upgrade package-name another-package
+sudo dnf upgrade package-name another-package
 ```
 
 ## Extra Streams
@@ -86,17 +135,18 @@ $ sudo dnf upgrade package-name another-package
 <Callout type="warning">
   Extra streams are designed to provide additional packages that may conflict with your distribution's default packages i.e Fedora.
 
-  If you are not sure what you are doing, it is recommended to not enable the extra streams as it may break your system if not handled properly.
+If you are not sure what you are doing, it is recommended to not enable the extra streams as it may break your system if not handled properly.
+
 </Callout>
 
 <Callout type="info">
-  Extra streams are only available for Fedora 41, EL10 (CentOS Stream 10, RHEL 10), and later.
+  Extra streams are only available for Fedora 41, EL10 and later.
 </Callout>
 
-Terra provides extra streams (repositories) for some additional packages. To enable them, run:
+Terra provides extra streams (repositories) for additional packages. To enable them, run:
 
 ```sh
-$ sudo dnf install terra-release-extras
+sudo dnf install terra-release-extras
 ```
 
 After installing the extras package, you can then install additional packages that may conflict with Fedora's packages.
@@ -108,7 +158,7 @@ Terra contains 2 additional sub-streams included in the extras package:
 After installing `terra-release-extras`, you can then enable the Mesa stream:
 
 ```sh
-$ sudo dnf config-manager setopt terra-mesa.enabled=1
+sudo dnf config-manager setopt terra-mesa.enabled=1
 ```
 
 ### NVIDIA Stream
@@ -117,5 +167,5 @@ Terra also provides an additional stream for NVIDIA drivers, based on the [Negat
 To enable the NVIDIA stream, run:
 
 ```sh
-$ sudo dnf config-manager setopt terra-nvidia.enabled=1
+sudo dnf config-manager setopt terra-nvidia.enabled=1
 ```
