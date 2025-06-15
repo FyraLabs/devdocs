@@ -242,6 +242,22 @@ Example:
 %cargo_install
 ```
 
+In some rare cases, you might need to use `%cargo_build` and `%crate_install_bin` instead:
+
+```rpmspec
+%prep
+%autosetup -n %{crate}-%{version} -p1
+%cargo_prep_online
+
+%build
+%{cargo_license_online} > LICENSE.dependencies
+%{cargo_build} --locked
+
+%install
+# install the binary from target/rpm/%{crate} to %buildroot%_bindir
+%crate_install_bin
+```
+
 #### Go
 
 You SHOULD NOT use the default naming (but you MAY `Provides:{:rpmspec}`) generated from `go2rpm` (except non-leaf packages),
