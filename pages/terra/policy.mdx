@@ -139,6 +139,16 @@ The release number SHOULD be incremented if changes are made to the package, unl
 
 ### Development and Shared Libraries
 
+When in doubt, try using the `%pkg_devel_files`, `%pkg_libs_files` and `%pkg_static_files` macros instead:
+
+```
+%package devel
+# generates Summary:, %description devel and the file lists
+# use -F to omit %files
+# use -n to manually specify name other than `%name-%devel`
+%pkg_devel_files
+```
+
 Shared library packages SHOULD be suffixed with `-libs`.
 These packages SHOULD NOT contain anything **except**:
 
@@ -242,29 +252,46 @@ Example:
 %cargo_install
 ```
 
+In some rare cases, you might need to use `%cargo_build` and `%crate_install_bin` instead:
+
+```rpmspec
+%prep
+%autosetup -n %{crate}-%{version} -p1
+%cargo_prep_online
+
+%build
+%{cargo_license_online} > LICENSE.dependencies
+%{cargo_build} --locked
+
+%install
+# install the binary from target/rpm/%{crate} to %buildroot%_bindir
+%crate_install_bin
+```
+
 #### Go
 
 You SHOULD NOT use the default naming (but you MAY `Provides:{:rpmspec}`) generated from `go2rpm` (except non-leaf packages),
 as an unnecessarily long package name with unnecessary information is bad for UX.
 
-Use the `go` compiler directly instead of using Fedora's Go macros, as this will generate offline dependencies that we do not want to package.
-Alternatively, use the `_online` macro variants:
-
-```rpmspec
-%prep
-%goprep
-%autopatch -p1
-%go_prep_online
-
-%build
-%go_build_online %{goipath}
-
-%install
-%gopkginstall
-install -m 0755 -vd                     %{buildroot}%{_bindir}
-install -m 0755 -vp %{gobuilddir}/bin/* %{buildroot}%{_bindir}/
-```
+Remove the `%generate_buildrequires{:rpmspec}` section, and add `%global gomodulesmode GO111MODULE=on{:rpmspec}`.
 
 #### Nim
 
 Use the `%nim_prep` and `%nim_c src/pkgname` macros.
+
+### Shell completions
+
+Shell completion files warrant their own subpackages. You may use `%pkg_completion` to automatically
+generate them. For the up-to-date documentation,
+check out [the source](https://github.com/terrapkg/srpm-macros/blob/main/macros.anda#L31C1-L39C54) directly.
+
+```sh
+# pkg_completion -Bbefz -n pkgname cmd1 cmd2 ...
+# -B: bash (but the completion file doesn't have `.bash` extension)
+# -b: bash
+# -e: elvish
+# -f: fish
+# -z: zsh
+# -n <pkgname>: name of the current package (default `%name`)
+# cmd1 ...: the commands the completion files are for
+```
