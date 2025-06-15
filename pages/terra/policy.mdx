@@ -139,6 +139,16 @@ The release number SHOULD be incremented if changes are made to the package, unl
 
 ### Development and Shared Libraries
 
+When in doubt, try using the `%pkg_devel_files`, `%pkg_libs_files` and `%pkg_static_files` macros instead:
+
+```
+%package devel
+# generates Summary:, %description devel and the file lists
+# use -F to omit %files
+# use -n to manually specify name other than `%name-%devel`
+%pkg_devel_files
+```
+
 Shared library packages SHOULD be suffixed with `-libs`.
 These packages SHOULD NOT contain anything **except**:
 
