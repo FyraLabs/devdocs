@@ -142,8 +142,8 @@ If you would like to use the `rpmbuild` mode instead (which will instead not set
 up a container), add `--rpm-builder=rpmbuild`. Remember to install the build
 dependencies using `[1;32msudo dnf[97m builddep [0;97;mpath/to/pkgname.spec{:ansi}`!
 
-- You don't need to create `pkg`. It's not supposed to exist
-- Modify the architecture to match your machine
+- You don't need to create `pkg`. It's not supposed to exist, just needs to be at the end of the build command
+- Modify the architecture to match your machine (`x86_64`, `aarch64`)
 - If the package fails to build, fix your spec file accordingly
   - Usually the actual useful error message can be found before the Python traceback (from mock).
 - The built RPM will be inside `anda-build/`

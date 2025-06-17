@@ -32,5 +32,10 @@
     "title": "Readymade Stack",
     "type": "page",
     "display": "hidden"
+  },
+  "rpm": {
+    "title": "RPM",
+    "type": "page",
+    "display": "hidden"
   }
 }

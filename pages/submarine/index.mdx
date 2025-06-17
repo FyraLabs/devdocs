@@ -8,8 +8,8 @@ description: Bootstrap a Linux system on Depthcharge with Submarine
 # Submarine
 ### Experimental bootloader for ChromeOS' Depthcharge
 
-Submarine provides a minimal Linux environment that lives in a small partition (16mb) on the disk. 
-This is used to boot into a full Linux distro using kexec.
+Submarine provides a minimal Linux environment that lives in a small partition (16MB) on the disk.
+This is used to boot into a full Linux distro through kexec.
 
 
 ## Prebuilt Images
@@ -74,7 +74,7 @@ sudo enable_dev_usb_boot
 
 For quick testing, you can flash `submarine-<arch>.bin` to an external drive. This image includes a partition table already set up for booting ChromeOS kernels.
 
-Alternatively, you can create your own partition to install submarine to. Start by creating a 16mb EXT4 partition. Next you will edit the partition flags to tell depthcharge that you can boot from that partition by running the following command:
+Alternatively, you can create your own partition to install submarine to. Start by creating an EXT4 partition (16MB for x86_64, 64MB for aarch64). Next you will edit the partition flags to tell depthcharge that you can boot from that partition by running the following command:
 
 ```bash
 cgpt add -i <partition number> -t kernel -P 15 -T 1 -S 1 /dev/sdX
