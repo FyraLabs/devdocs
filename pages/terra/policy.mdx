@@ -39,7 +39,7 @@ Packagers and maintainers MUST follow the policies and guidelines listed in this
 - You MUST have the rights or permission to redistribute the packaged software. Besides that, there is no prohibition on proprietary licenses.
 - Submissions must be maintained. We will reject submissions of unmaintained software.
 - Submissions MUST NOT be malicious.
-- Submissions that may introduce breaking changes must be included in "Terra Extra" instead via the `extra = 1` label in `anda.hcl`.
+- Submissions that may introduce breaking changes must be included in "Terra Extras" instead via the `subrepo = "extras"` label in `anda.hcl`.
   - Example: `terra-mesa` should be in extra as the dependency solver will resolve this package for matching "provides" (such as `mesa-libEGL(x86-64)`).
   - Example: `libadwaita-nightly` should be in extra since it provides `pkgconfig(libadwaita-1)`, which is required by existing packages as a build dependency.
   - Example: `yt-dlp-nightly` **can be included normally** because it has no common provides with Fedora's `yt-dlp`.
@@ -267,6 +267,8 @@ In some rare cases, you might need to use `%cargo_build` and `%crate_install_bin
 # install the binary from target/rpm/%{crate} to %buildroot%_bindir
 %crate_install_bin
 ```
+
+If Rust nightly is required, add the `%rustup_nightly` in `%prep`.
 
 #### Go
 
