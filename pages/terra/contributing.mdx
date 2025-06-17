@@ -8,7 +8,7 @@ import { Callout } from "nextra/components";
 # Contributing
 
 Thanks for contributing to Terra!
-Terra is specifically designed to be as _package-maintainer-friendly_ as possible -- you
+Terra is specifically designed to be as _package-maintainer-friendly_ as possible — you
 don't need to know everything about the infrastructure to create a package for Terra!
 See the following guide for creating a new package yourself. Quick and easy.
 
@@ -162,7 +162,7 @@ See the "book" (more like guide) for [Rhai](https://rhai.rs/book/).
 
 - Create `update.rhai` inside the package folder.
 - See references from other packages.
-- You also need to add `labels { nightly = "1" }{:hcl}` in anda.hcl for nightly packages.
+- You also need to add `labels { nightly = "1" }{:hcl}` in `anda.hcl` for nightly packages.
 
 <Callout type="info">Remember to add semicolons in Rhai scripts! (`;`)</Callout>
 <Callout type="info">
@@ -183,6 +183,10 @@ See the "book" (more like guide) for [Rhai](https://rhai.rs/book/).
 We provide SPRM macros to ease packaging and better integrate into our workflow. Please use these macros over their counterparts when possible.
 
 These are provided in the `anda-srpm-macros` package, if you use them, make sure to add `anda-srpm-macros` as a `BuildRequires` in the spec file.
+
+Note that the list is not exhaustive, you should always check the [miscellaneous packaging guidelines](./policy#miscellaneous-packaging-guidelines) for more details.
+
+For other macros available in Fedora/Terra, check out our unofficial [macros list](../rpm/macros).
 
 | Macro                           | Function                                                               |
 | ------------------------------- | ---------------------------------------------------------------------- |
