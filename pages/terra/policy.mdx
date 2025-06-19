@@ -281,7 +281,7 @@ Remove the `%generate_buildrequires{:rpmspec}` section, and add `%global gomodul
 
 Use the `%nim_prep` and `%nim_c src/pkgname` macros.
 
-### Zig
+#### Zig
 
 Many Zig projects rely on ReleaseFast (or more rarely, ReleaseSmall) builds for runtime optimization, and some Zig projects only work correctly when built for certain microarchitectures or higher (usually, this is `x86_64_v2` instead of `baseline` due to reliance on SIMD).
 
