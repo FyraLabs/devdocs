@@ -299,6 +299,8 @@ Note that `-c` also works as a fallback option to the target architecture set by
 
 Also note that ReleaseFast and especially ReleaseSmall will strip some debug info from the binaries, some Zig projects have enabled build flags to override this and those **_should_** be used if available (this will usually be `-Dstrip=false`). If they are not, you may need to disable debug packages using the global variable `%global debug_package %{nil}` if not enough debug info is preserved to strip.
 
+For projects where dynamic linking of all dependencies is simply not possible or that have no dependencies to link, you can pass the `-s` flag. You can (and should) still dynamically link compatible dependencies by using `-fsys=pkgname`.
+
 ### Shell completions
 
 Shell completion files warrant their own subpackages. You may use `%pkg_completion` to automatically
