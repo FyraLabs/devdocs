@@ -285,7 +285,7 @@ Use the `%nim_prep` and `%nim_c src/pkgname` macros.
 
 Many Zig projects rely on ReleaseFast (or more rarely, ReleaseSmall) builds for runtime optimization, and some Zig projects only work correctly when built for certain microarchitectures or higher (usually, this is `x86_64_v2` instead of `baseline` due to reliance on SIMD).
 
-If either of the above are the case for your package, you can use `%zig_build_target` with appropriate options in the `%build` section.
+If either of the above are the case for your package, you can use `%zig_build_target` with appropriate options in the `%build` or `%install` section depending on how the project is built (as some can be built directly into root by setting the `DESTDIR` variable).
 
 Example:
 
