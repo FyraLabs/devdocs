@@ -281,6 +281,24 @@ Remove the `%generate_buildrequires{:rpmspec}` section, and add `%global gomodul
 
 Use the `%nim_prep` and `%nim_c src/pkgname` macros.
 
+### Zig
+
+Many Zig projects rely on ReleaseFast (or more rarely, ReleaseSmall) builds for runtime optimization, and some Zig projects only work correctly when built for certain microarchitectures or higher (usually, this is `x86_64_v2` instead of `baseline` due to reliance on SIMD).
+
+If either of the above are the case for your package, you can use `%zig_build_target` with appropriate options in the `%build` section.
+
+Example:
+
+```rpmspec
+%build
+%{zig_build_target -r fast -c x86_64_v2} \
+  -Demit-docs
+```
+
+Note that `-c` also works as a fallback option to the target architecture set by RPM if no following argument is supplied. However, this can **_only_** be used when RPM and Zig's architecture formats are the same, otherwise the build will fail.
+
+Also note that ReleaseFast and especially ReleaseSmall will strip some debug info from the binaries, some Zig projects have enabled build flags to override this and those **_should_** be used if available (this will usually be `-Dstrip=false`). If they are not, you may need to disable debug packages using the global variable `%global debug_package %{nil}` if not enough debug info is preserved to strip.
+
 ### Shell completions
 
 Shell completion files warrant their own subpackages. You may use `%pkg_completion` to automatically
