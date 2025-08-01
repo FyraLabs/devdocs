@@ -1,0 +1,77 @@
+---
+name: SRPM Macros
+description: Documentation on the macros included in the anda-srpm-macros package
+---
+
+We provide SPRM macros to ease packaging and better integrate into our workflow. Please use these macros over their counterparts when possible.
+
+These are provided in the `anda-srpm-macros` package. If you use them, make sure to add `anda-srpm-macros` as a `BuildRequires:` in the spec file.
+
+You may need to refer to the [miscellaneous packaging guidelines](./policy#miscellaneous-packaging-guidelines) for more details.
+
+For other macros available in Fedora/Terra, check out our unofficial [macros list](../rpm/macros).
+
+| Macro                           | Function                                                               |
+| ------------------------------- | ---------------------------------------------------------------------- |
+| `%cargo_prep_online`            | Enables internet access for `cargo`. Replaces `%cargo_prep` in `%prep` |
+| `%cargo_license_online`         | Replaces `%cargo_license` in `%build`                                  |
+| `%cargo_license_summary_online` | Replaces `%cargo_license_summary` in `%build`                          |
+| `%cargo_vendor_manifest_online` | Replaces `%cargo_vendor_manifest` in `%build`                          |
+| `%crate_install_bin`            | Used to install crates that build as single binary, applicable to specs generated with rust2rpm |
+| `%rustup_nightly`               |                                                                        |
+| `%rustup_nightly`               | Uses in `%prep` for nightly `rustc`/`cargo` from `rustup`              |
+| `%nim_prep`                     | Setting up `nimble`                                                    |
+| `%nim_build` or `%nim_c`        | Builds a package. Requires an argument to `src/pkgname`                |
+| `%nim_tflags`                   |                                                                        |
+| `%nim_lflags`                   |                                                                        |
+| `%git_clone`                    | Downloads the source code via `git clone`                              |
+| `%pkg_completion`               |                                                                        |
+| `%pkg_devel_files`              |                                                                        |
+| `%pkg_static_files`             |                                                                        |
+| `%_anda_srpm_macros_dir`        | `/usr/libexec/anda-srpm-macros`                                        |
+| `%__anda_develfiles`            |                                                                        |
+| `%__anda_staticfiles`           |                                                                        |
+| `%__anda_libsfiles`             |                                                                        |
+| `%pkg_libs_files`               |                                                                        |
+| `%files_libs`                   |                                                                        |
+| `%evr`                          | `%{?epoch:%{epoch}:}%{version}-%{release}`                             |
+| `%rpmbuilddir`                  | `%{?builddir}%{?!builddir:%{_builddir}}`                               |
+| `%elvish_completions_dir`       | `%_datadir/elvish/lib/completions`                                     |
+| `%_sccache`                     | `/usr/bin/sccache`                                                     |
+| `%sccache_prep`                 | Sets up environment variables for `sccache`                            |
+| `%cargo_prep_online_sccache`    |                                                                        |
+| `%is_electron_bundled`          | Evaluation macro to expand later and a bcond for if Electron is bundled or not for meta/license macros |
+| `%electron_arches`              | `%{x86_64} %{ix86} aarch64 armv7l armv7hl armv7hnl`                    |
+| `%electron_license`             | Bundled licenses for pure electron programs                            |
+| `%electronmeta`                 |                                                                        |
+| `%npm_build`                    | npm build                                                              |
+| `%__bun`                        | `/usr/bin/env %{npm_common_vars} BUN_HOME=%{rpmbuilddir}/.bun BUN_RUNTIME_TRANSPILER_CACHE_PATH=0 /usr/bin/bun` |
+| `%bun_build`                    | bun build                                                              |
+| `%bun_audit`                    | bun audit, for use in the `%check` section                             |
+| `%vendor_pnpm`                  | If PNPM is not usable/available from repo                              |
+| `%__pnpm`                       | `/usr/bin/env %{npm_common_vars} PNPM_HOME=%{rpmbuilddir}/pnpm %{?with_vendored_pnpm:%{rpmbuilddir}/pnpm/pnpm}%{!?with_vendored_pnpm:/usr/bin/pnpm}` |
+| `%pnpm_build`                   | pnpm build                                                             |
+| `%pnpm_audit`                   | Audit pnpm if package uses bundled Node dependencies. For use in the `%check` section |
+| `%pnpm_audit_fix`               | Fix dependencies using PNPM                                            |
+| `%pnpm_approve_builds`          | Approve dependency scripts if needed                                   |
+| `%__yarn`                       | /usr/bin/env %{npm_common_vars} YARN_CACHE_FOLDER=%{rpmbuilddir}/yarn /usr/bin/yarn |
+| `%yarn_build`                   | yarn build                                                             |
+| `%yarn_audit`                   | Audit yarn if package uses bundled Node dependencies. For use in the `%check` section |
+| `%electron_install`             | Install files built from an electron project                           |
+| `%npm_common_vars`              |                                                                        |
+| `%npm_buildflags`               |                                                                        |
+| `%__npm`                        |                                                                        |
+| `%__npx`                        |                                                                        |
+| `%npm_prep`                     |                                                                        |
+| `%fetch_node_tests`             |                                                                        |
+| `%npm_install`                  |                                                                        |
+| `%npm_audit`                    |                                                                        |
+| `%npm_audit_fix`                |                                                                        |
+| `%__npm_license_checker`        |                                                                        |
+| `%npm_license_summary`          |                                                                        |
+| `%npm_license`                  |                                                                        |
+| `%node_self_test`               |                                                                        |
+| `%npm_test`                     |                                                                        |
+| `%jsmeta`                       |                                                                        |
+| `%jspkgcheck`                   |                                                                        |
+| `%zig_build_target`             |                                                                        |
