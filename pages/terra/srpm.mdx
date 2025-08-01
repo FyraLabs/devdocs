@@ -54,7 +54,7 @@ For other macros available in Fedora/Terra, check out our unofficial [macros lis
 | `%pnpm_audit`                   | Audit pnpm if package uses bundled Node dependencies. For use in the `%check` section |
 | `%pnpm_audit_fix`               | Fix dependencies using PNPM                                            |
 | `%pnpm_approve_builds`          | Approve dependency scripts if needed                                   |
-| `%__yarn`                       | /usr/bin/env %{npm_common_vars} YARN_CACHE_FOLDER=%{rpmbuilddir}/yarn /usr/bin/yarn |
+| `%__yarn`                       | `/usr/bin/env %{npm_common_vars} YARN_CACHE_FOLDER=%{rpmbuilddir}/yarn /usr/bin/yarn` |
 | `%yarn_build`                   | yarn build                                                             |
 | `%yarn_audit`                   | Audit yarn if package uses bundled Node dependencies. For use in the `%check` section |
 | `%electron_install`             | Install files built from an electron project                           |
