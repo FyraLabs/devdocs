@@ -178,25 +178,6 @@ See the "book" (more like guide) for [Rhai](https://rhai.rs/book/).
   ```
 </Callout>
 
-## SRPM Macros
-
-We provide SPRM macros to ease packaging and better integrate into our workflow. Please use these macros over their counterparts when possible.
-
-These are provided in the `anda-srpm-macros` package, if you use them, make sure to add `anda-srpm-macros` as a `BuildRequires` in the spec file.
-
-Note that the list is not exhaustive, you should always check the [miscellaneous packaging guidelines](./policy#miscellaneous-packaging-guidelines) for more details.
-
-For other macros available in Fedora/Terra, check out our unofficial [macros list](../rpm/macros).
-
-| Macro                           | Function                                                               |
-| ------------------------------- | ---------------------------------------------------------------------- |
-| `%cargo_prep_online`            | Enables internet access for `cargo`. Replaces `%cargo_prep` in `%prep` |
-| `%cargo_license_online`         | Replaces `%cargo_license` in `%build`                                  |
-| `%cargo_license_summary_online` | Replaces `%cargo_license_summary` in `%build`                          |
-| `%rustup_nightly`               | Uses in `%prep` for nightly `rustc`/`cargo` from `rustup`              |
-| `%nim_prep`                     | Setting up `nimble`                                                    |
-| `%nim_build` or `%nim_c`        | Builds a package. Requires an argument to `src/pkgname`                |
-
 [andaman]: https://github.com/FyraLabs/anda/
 [rpm packaging guide]: https://rpm-packaging-guide.github.io/
 [spec file format]: https://rpm-software-management.github.io/rpm/manual/spec.html
