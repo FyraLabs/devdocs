@@ -28,6 +28,11 @@
     "type": "page",
     "display": "hidden"
   },
+  "rdms": {
+    "title": "Readymade Stack",
+    "type": "page",
+    "display": "hidden"
+  },
   "rpm": {
     "title": "RPM",
     "type": "page",
