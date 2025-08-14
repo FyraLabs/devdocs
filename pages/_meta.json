@@ -28,6 +28,11 @@
     "type": "page",
     "display": "hidden"
   },
+  "shades": {
+    "title": "Ultramarine Shades",
+    "type": "page",
+    "display": "hidden"
+  },
   "rpm": {
     "title": "RPM",
     "type": "page",
