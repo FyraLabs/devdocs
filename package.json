@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.0.1",
-    "@fortawesome/free-solid-svg-icons": "^7.0.1",
+    "@fortawesome/free-solid-svg-icons": "^7.1.0",
     "@fortawesome/react-fontawesome": "^3.1.0",
     "@types/node": "24.5.2",
     "autoprefixer": "^10.4.21",
