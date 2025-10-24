@@ -18,14 +18,13 @@ For other macros available in Fedora/Terra, check out our unofficial [macros lis
 | `%cargo_license_summary_online` | Replaces `%cargo_license_summary` in `%build`                          |
 | `%cargo_vendor_manifest_online` | Replaces `%cargo_vendor_manifest` in `%build`                          |
 | `%crate_install_bin`            | Used to install crates that build as single binary, applicable to specs generated with rust2rpm |
-| `%rustup_nightly`               |                                                                        |
-| `%rustup_nightly`               | Uses in `%prep` for nightly `rustc`/`cargo` from `rustup`              |
+| `%rustup_nightly`               | Used in `%prep` for nightly `rustc`/`cargo` from `rustup`              |
 | `%nim_prep`                     | Setting up `nimble`                                                    |
-| `%nim_build` or `%nim_c`        | Builds a package. Requires an argument to `src/pkgname`                |
+| `%nim_build` or `%nim_c`        | Builds a nim package. Requires an argument to `src/pkgname`            |
 | `%nim_tflags`                   |                                                                        |
 | `%nim_lflags`                   |                                                                        |
-| `%git_clone`                    | Downloads the source code via `git clone`                              |
-| `%pkg_completion`               |                                                                        |
+| `%git_clone`                    | Downloads the source code via `git clone` with the `--depth=1`, `-q`, and `--recursive-submodules` flags. Should only be used when `%autosetup` can not be used. |
+| `%pkg_completion`               | Check [here](https://developer.fyralabs.com/terra/policy#shell-completions) for more details |
 | `%pkg_devel_files`              |                                                                        |
 | `%pkg_static_files`             |                                                                        |
 | `%_anda_srpm_macros_dir`        | `/usr/libexec/anda-srpm-macros`                                        |
