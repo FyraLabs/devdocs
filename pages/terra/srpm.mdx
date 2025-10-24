@@ -39,10 +39,6 @@ For other macros available in Fedora/Terra, check out our unofficial [macros lis
 | `%_sccache`                     | `/usr/bin/sccache`                                                     |
 | `%sccache_prep`                 | Sets up environment variables for `sccache`                            |
 | `%cargo_prep_online_sccache`    |                                                                        |
-| `%is_electron_bundled`          | Evaluation macro to expand later and a bcond for if Electron is bundled or not for meta/license macros |
-| `%electron_arches`              | `%{x86_64} %{ix86} aarch64 armv7l armv7hl armv7hnl`                    |
-| `%electron_license`             | Bundled licenses for pure electron programs                            |
-| `%electronmeta`                 |                                                                        |
 | `%npm_build`                    | npm build                                                              |
 | `%__bun`                        | `/usr/bin/env %{npm_common_vars} BUN_HOME=%{rpmbuilddir}/.bun BUN_RUNTIME_TRANSPILER_CACHE_PATH=0 /usr/bin/bun` |
 | `%bun_build`                    | bun build                                                              |
@@ -71,6 +67,4 @@ For other macros available in Fedora/Terra, check out our unofficial [macros lis
 | `%npm_license`                  |                                                                        |
 | `%node_self_test`               |                                                                        |
 | `%npm_test`                     |                                                                        |
-| `%jsmeta`                       |                                                                        |
-| `%jspkgcheck`                   |                                                                        |
 | `%zig_build_target`             |                                                                        |
