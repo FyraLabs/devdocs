@@ -18,7 +18,7 @@
   },
   "homepage": "https://developer.fyralabs.com",
   "dependencies": {
-    "next": "^14.2.33",
+    "next": "^16.0.0",
     "nextra": "^2.13.4",
     "nextra-theme-docs": "^2.13.4",
     "react": "^18.3.1",
