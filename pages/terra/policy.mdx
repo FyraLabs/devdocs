@@ -39,11 +39,6 @@ Packagers and maintainers MUST follow the policies and guidelines listed in this
 - You MUST have the rights or permission to redistribute the packaged software. Besides that, there is no prohibition on proprietary licenses.
 - Submissions must be maintained. We will reject submissions of unmaintained software.
 - Submissions MUST NOT be malicious.
-- Submissions that may introduce breaking changes must be included in "Terra Extras" instead via the `subrepo = "extras"` label in `anda.hcl`.
-  - Example: `terra-mesa` should be in extra as the dependency solver will resolve this package for matching "provides" (such as `mesa-libEGL(x86-64)`).
-  - Example: `libadwaita-nightly` should be in extra since it provides `pkgconfig(libadwaita-1)`, which is required by existing packages as a build dependency.
-  - Example: `yt-dlp-nightly` **can be included normally** because it has no common provides with Fedora's `yt-dlp`.
-  - If you are in doubt whether your submission should be in extra instead, ask and we will decide.
 - Submissions SHOULD include an auto-update script (`update.rhai`).
 - Submissions SHOULD be placed in the corresponding directory in `anda/`.
   - Each folder MUST either contain folders and no source files (other files are exempted), or contain multiple files and no folders.
@@ -133,7 +128,7 @@ If upstream does not provide a version, use **(c)** and treat `%unreleased_versi
 
 The `Release:{:rpmspec}` preamble MUST NOT contain information regarding upstream versioning,
 including but not limited to commit dates, commit SHAs, software versions, _tags_, etc.
-Without approval from the team, packages MUST use the format `Release: 1%?dist{:rpmspec}` (or `1%{?dist}{:rpmspec}`).
+Without approval from the team, packages MUST use the format `Release: 1%?dist{:rpmspec}`.
 
 The release number SHOULD be incremented if changes are made to the package, unless the `Version:{:rpmspec}` changes.
 
@@ -184,6 +179,28 @@ Prefix/Suffix the packages in the following order
 - If necessary, suffix `-bash-completion` (or other shells) and `-doc`.
 - Postfix a _tag_ if necessary (e.g. `.nightly`).
 
+## Subrepos
+
+For `f*` branches, submissions that may introduce breaking changes MUST be included in our subrepos instead via the `subrepo = "extras"` label in `anda.hcl`.
+Valid subrepos include `extras`, `nvidia`, `mesa`, and `multimedia` (43 and later only).
+
+For example, `terra-mesa` should be in extra as the dependency solver will resolve this package for matching "provides" (such as `mesa-libEGL(x86-64)`).
+`libadwaita-nightly` should be in extra since it provides `pkgconfig(libadwaita-1)`, which is required by existing packages as a build dependency.
+`yt-dlp-nightly` **can be included normally** because it has no common provides with Fedora's `yt-dlp`.
+
+## Appstream Metadata & Desktop Files
+
+All graphical applications that can be started by the user MUST provide a [desktop entry](https://wiki.archlinux.org/title/Desktop_entries#Application_entry) file.
+Additionally, all packages except libraries MUST provide an [appstream metadata](https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#qsr-app-example) file.
+
+## Packager Field
+
+The package maintainer of a package MUST be added to the `Packager:{:rpmspec}` preamble as follows:
+
+```rpmspec
+Packager: Raboneko <raboneko@fyralabs.com>
+```
+
 ## Miscellaneous Terra Policies
 
 ### Security Policy
@@ -199,14 +216,6 @@ Our code of conduct is documented in the [CODE_OF_CONDUCT.md file](https://githu
 Our support lifecycle is documented in the [lifecycle page](/terra/lifecycle).
 
 ## Miscellaneous Packaging Guidelines
-
-### Packager Field
-
-The package maintainer of a package MUST be added to the `Packager:{:rpmspec}` preamble as follows:
-
-```rpmspec
-Packager: Raboneko <raboneko@fyralabs.com>
-```
 
 ### Usages of the `mold` linker
 
@@ -235,7 +244,7 @@ Terra's mock sandbox has networking enabled, so builders can download the depend
 
 - Generate the spec file using `rust2rpm`.
 - You SHOULD NOT use the tradtional Fedora `%cargo_prep` macro. Use `%cargo_prep_online` from `anda-srpm-macros` instead, and you SHOULD remove the `%generate_buildrequires` macro, as it is useless.
-- It is RECOMMENDED to use `%cargo_license_online` and `%cargo_license_summary_online`, although they are not a strict requirement.
+- It is RECOMMENDED to use `%cargo_license_online` and `%cargo_license_summary_online`.
 - You SHOULD NOT use both `%cargo_build` and `%cargo_install` in the same spec file as `cargo install` might cause a rebuild due to a bug. You SHOULD only include either one of them. In most cases, you can just omit `%cargo_build` entirely and it will just build fine.
 
 Example:
@@ -279,7 +288,7 @@ Remove the `%generate_buildrequires{:rpmspec}` section, and add `%global gomodul
 
 #### Nim
 
-Use the `%nim_prep` and `%nim_c src/pkgname` macros.
+For `nimble`, use the `%nim_prep` and `%nim_c src/pkgname` macros. If `atlas` is used, run it directly.
 
 #### Zig
 
@@ -303,7 +312,7 @@ For projects where dynamic linking of all dependencies is simply not possible (s
 
 ### Shell completions
 
-Shell completion files warrant their own subpackages. You may use `%pkg_completion` to automatically
+Shell completion files warrant their own subpackages. You SHOULD use `%pkg_completion` to automatically
 generate them. For the up-to-date documentation,
 check out [the source](https://github.com/terrapkg/srpm-macros/blob/main/macros.anda#L31C1-L39C54) directly.
 
