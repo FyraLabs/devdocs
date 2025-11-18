@@ -116,6 +116,33 @@ Now you can install Terra!
 sudo dnf install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terrael$releasever' terra-release
 ```
 
+## Subrepos
+
+<Callout type="info">
+    Subrepos are only available for `f*` branches (not `el*`).
+</Callout>
+
+Terra provides additional packages in separate repositories. These packages might conflict with RPM Fusion or the Fedora repositories. Extra care and technical knowledge may be needed.
+
+The current list of subrepos are `extras`, `nvidia`, `mesa`, `multimedia` (f43+ only).
+They can be enabled by installing `terra-release-extras`, `terra-release-nvidia`, etc.
+
+### Extras
+
+The extras subrepo provides packages that conflict with Fedora but do not belong to the rest of the subrepos.
+
+### Mesa
+
+In the Mesa subrepo, the `mesa` package is provided. Unlike Fedora and RPM Fusion, this build of mesa is complete, coherent, and with most if not all features enabled. This also contains patches from Universal Blue.
+
+### NVIDIA
+
+The NVIDIA subrepo provides a different set of NVIDIA drivers based on the [Negativo17](https://negativo17.org/) builds.
+
+### Multimedia
+
+The multimedia subrepo is only available to Fedora 43 and newer releases. Multimedia-related packages, including `gstreamer1` packages, `ffmpeg`, and other codecs are shipped in this subrepo.
+
 ## Using Terra
 
 ### Install
@@ -144,41 +171,4 @@ sudo dnf remove package-name another-package
 sudo dnf upgrade
 (or)
 sudo dnf upgrade package-name another-package
-```
-
-## Extra Streams
-
-<Callout type="warning">
-  Extra streams are designed to provide additional packages that may conflict with your distribution's default packages, i.e. Fedora.
-
-If you are not sure what you are doing, it is recommended to not enable the extra streams as it may break your system if not handled properly.
-
-</Callout>
-
-Terra provides extra streams (repositories) for additional packages.
-To enable them, run:
-
-```sh
-sudo dnf install terra-release-extras
-```
-
-After installing the extras package, you can then install additional packages that may conflict with Fedora's packages.
-
-Terra contains 2 additional sub-streams included in the extras package:
-
-### Mesa Stream
-
-After installing `terra-release-extras`, you can then enable the Mesa stream:
-
-```sh
-sudo dnf config-manager setopt terra-mesa.enabled=1
-```
-
-### NVIDIA Stream
-
-Terra also provides an additional stream for NVIDIA drivers, based on the [Negativo17](https://negativo17.org/) builds.
-To enable the NVIDIA stream, run:
-
-```sh
-sudo dnf config-manager setopt terra-nvidia.enabled=1
 ```
