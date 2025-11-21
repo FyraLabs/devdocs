@@ -176,7 +176,7 @@ dependencies using `[1;32msudo dnf[97m builddep [0;97;mpath/to/pkgname.spec{:
 
 - You don't need to create `pkg`. It's not supposed to exist, just needs to be at the end of the build command
 - Modify the architecture to match your machine (`x86_64`, `i386`, `aarch64`)
-- If needed (404 errors when buildong off `rawhide`, you can also modify the version it builds on (`43`, `43`, `el10`, etc.)
+- If needed (404 errors when building off `rawhide`, you can also modify the version it builds on (`43`, `42`, `el10`, etc.)
 - If the package fails to build, fix your spec file accordingly
   - Usually the actual useful error message can be found before the Python traceback (from mock).
 - The built RPM(s) will be inside `anda-build/`
