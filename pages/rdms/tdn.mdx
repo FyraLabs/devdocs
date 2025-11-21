@@ -1,51 +1,50 @@
+import { Callout } from "nextra/components";
+
 # Taidan
 
-[Taidan] is the new [out-of-box experience (OOBE)] application for Ultramarine Linux 41 and above.
-It is written in Rust and [libhelium].
+[Taidan] is the [out-of-box experience] for Ultramarine 42 and newer.
+It's built with Rust and [libhelium].
 
-It is a replacement to rhinstaller [initial-setup]. This means that you may choose to use RDMS
-components except Taidan, or you may choose to use non-RDMS components but use Taidan to replace
-initial-setup. Components in RDMS are, in fact, components, and you (as the developer) have the
-freedom to choose to ship whatever components you prefer over rhinstaller (or other alternatives).
+Taidan is standalone from Readymade, meaning you can combine it with any installer, or even lack thereof (in the case of preinstalled images.)
 
 ## History
 
-Driver installations were previously handled by [umstellar], "a quick-and-dirty GUI post-install
-menu […] meant to only be used for Ultramarine Linux 39's Anaconda post-install menu"[^1]. However,
-due to a misconfiguration, `initial-setup` was never enabled in the final UM39/UM40 images, deeming
-the effort pretty much useless — except one part where stellar would be run in a special mode that
-checks for designated criteria and installs NVIDIA and broadcom drivers as accordingly, but only
-during the Anaconda installation under the presence of an internet connection.
+Driver installation was previously handled by [Stellar], "a quick-and-dirty GUI post-install
+menu […] meant to be used for Ultramarine Linux 39's Anaconda post-install menu"[^1].
 
-We realized there is a need to create a new OOBE application alongside an installer, which is why
-we started to work on Taidan in late Oct, 2024. The development cycle spanned less than 3 months,
-and the app was finished in early Jan, 2025.
+We messed this up, and ended up repurposing Stellar to install Nvidia and Broadcom drivers if you connected to the internet during installation.
 
-## Configurations
+We decided pretty early in Readymade's design that the system should be configured on first-boot rather than in the installer, leading to us building Taidan.
+Development spanned less than 3 months from October '24 to January '25.
 
-Taidan isn't just an app with a software catalogue (i.e. the app list), it comes with
-functionalities you would normally expect from an OOBE application:
+## Configuration
 
-- user setup
-- theming
-- keymap and input method
-- etc.
+Taidan handles a few important tasks:
 
-Most of the above are universal across distributions and there are no configurations needed to
-change the behaviours of the above sections (at least we believe so).
+- System language
+- Keyboard layout and input method
+- User creation
 
-Taidan generates part of the configurations from the `/etc/os-release` file. It requires the
-`NAME=` (distribution name) and `VARIANT_ID=` (edition name) fields to be present, otherwise the
-app panics. This behaviour will change in future versions to cater for other distributions.
+<Callout type="warning">
+  The list of keymaps and languages are generated at **compile time**!
+</Callout>
 
-Taidan also reads the `/etc/com.fyralabs.Taidan/catalogue/` folder for the software catalogue.
-This may be changed by the runtime envvar `TAIDAN_CATALOGUE_DIR`. The syntax for the yml
-catalogue files are documented below.
-
-In order to gather a list of keymaps, `/usr/share/X11/xkb/rules/evdev.lst` is read during
+Keymaps are read from `/usr/share/X11/xkb/rules/evdev.lst` at
 **compile-time**.
 
-In addition, the language list is also generated during **compile-time**.
+The basics should just work on most distributions! If you need more, Taidan can also offer:
+
+- Setting the theme and accent colour
+- Enabling scheduled screen tinting (night light)
+- System tweaks (distro-defined, e.g. swapping default Flatpaks for RPMs)
+- Provide a selection of apps for the user to pick from
+
+<Callout type="info">
+  Taidan generates part of the configurations from the `/etc/os-release` file.
+  It requires the `NAME=` and `VARIANT_ID=` fields to be present, otherwise the
+  app panics. This behavior will change in future versions to cater for other
+  distributions.
+</Callout>
 
 ### Runtime Fluent Loader
 
@@ -54,10 +53,15 @@ in `/usr/share/taidan/po/`. These translations are preferred over the compile-ti
 
 ### Tweaks
 
-Taidan allows customisations of tweaks. For the most up-to-date documentation, visit the source
+Taidan allows distributions to present "tweaks", options to be presented to the user, in Ultramarine we use
+tweaks to offer RPMs over Flatpaks for those who prefer it.
+
+Tweaks are read at runtime.
+
+For the most up-to-date documentation, visit the source
 file at `src/backend/tweaks.rs`.
 
-Tweaks are distro-specific settings read during runtime, which MUST be stored in TWEAKS_DIR, i.e.
+Tweaks MUST be stored in TWEAKS_DIR, i.e.
 `/usr/share/taidan/tweaks`. Here is an example of the file hierarchy:
 
 ```
@@ -73,14 +77,15 @@ Tweaks are distro-specific settings read during runtime, which MUST be stored in
 The ID of a tweak is determined by the directory name (`my_tweak`, `other_tweak`).
 
 The `tweak.toml` file, if present, MUST specify the following two fields:
+
 - `ftl_name` (alias `name`): the fluent ID for the name of the tweak
   - fallback: `<id>-name`
 - `ftl_desc` (alias `desc`): the fluent ID for the description of the tweak
   - fallback: `<id>-desc`
 
-The distribution SHOULD provide the translation texts, see [Runtime Fluent Loader](#runtime-fluent-loader).
+Distributions SHOULD provide translations for their tweaks, see [Runtime Fluent Loader](#runtime-fluent-loader).
 
-If either one of the above fields are not provided, or the TOML file cannot be parsed, or the file does not exist,
+If either of the fields are not provided, the TOML file cannot be parsed, or the file does not exist,
 Taidan will instead use the aforementioned fallback values.
 
 The `up` executable will be given a single argument of either 1 or 0, denoting whether the user enables this tweak.
@@ -88,6 +93,9 @@ The `up` executable will be given a single argument of either 1 or 0, denoting w
 In addition, the `Settings` struct is serialized as JSON and fed to the executable via stdin.
 
 ### Catalogue Customisations
+
+Taidan reads the `/etc/com.fyralabs.Taidan/catalogue/` folder for the software catalogue.
+This may be changed by the runtime envvar `TAIDAN_CATALOGUE_DIR`.
 
 Here is an example of the catalogue yml configuration file (taken
 [from](https://github.com/Ultramarine-Linux/taidan/blob/208612f391c0f0f2a2cf3535f3341fb5a7e664c9/catalogue/gaming.yml#L39-L48)
@@ -108,7 +116,7 @@ choices:
     description: Edge is a Chromium-based browser centered around the Microsoft ecosystem, including many convenient and AI features.
     options:
       - radio: [Edge Stable, Edge Dev, Edge Beta]
-    actions: 
+    actions:
       - shell:rpm --import https://packages.microsoft.com/keys/microsoft.asc;enable_yum_repo:https://packages.microsoft.com/yumrepos/edge/config.repo;rpm:microsoft-edge-stable
       - shell:rpm --import https://packages.microsoft.com/keys/microsoft.asc;enable_yum_repo:https://packages.microsoft.com/yumrepos/edge/config.repo;rpm:microsoft-edge-dev
       - shell:rpm --import https://packages.microsoft.com/keys/microsoft.asc;enable_yum_repo:https://packages.microsoft.com/yumrepos/edge/config.repo;rpm:microsoft-edge-beta
@@ -136,10 +144,10 @@ choices:
       - flatpak:net.lutris.Lutris
 ```
 
-Each yml file in the catalogue directory should specify the name of `category:`, gtk `icon:` id,
+Each YAML file in the catalogue directory should specify the name of `category:`, gtk `icon:` id,
 and a list of `choices:`. Each choice should contain the `name:`, `provider:`, `description:` and
 `actions:`. `editions:`, `note:` and `options:` are optional fields. `editions:` must be a list of
-strings. The app will be shown to systems with a matching edition listed in this field.
+strings. The app will be shown to systems with a matching edition (we get this from the variant field in os-release) listed in this field.
 
 An option listed in `options:` must either be a `- radio: [...]` or a `- checkbox: ...`.
 
@@ -161,77 +169,77 @@ storing the corresponding action that should be done when the corresponding choi
 Let's look at a very complicated example:
 
 ```yml
-  - name: Test
-    provider: Meow
-    description: Meow
-    options:
-      - checkbox: 1         # ← opt[0] = [nil, "1"]      │ opts_lengths[0] = 2
-      - radio: [a, b, c]    # ← opt[1] = ["a", "b", "c"] │ opts_lengths[1] = 3
-      - radio: [A, B, C]    # ← opt[2] = ["A", "B", "C"] │ opts_lengths[2] = 3
-      - checkbox: meow      # ← opt[3] = [nil, "meow"]   │ opts_lengths[3] = 2
-    actions:
-      - # when checkbox (opt[0]) not pressed
-        - # when radio (opt[1]) has "a" selected
-          - # when radio (opt[2]) has "A" selected
-            - shell:echo "no select 1, select a, select A, no select meow"
-            - shell:echo "no select 1, select a, select A, select meow"
-          - # when radio (opt[2]) has "B" selected
-            - shell:echo "no select 1, select a, select B, no select meow"
-            - shell:echo "no select 1, select a, select B, select meow"
-          - # when radio (opt[2]) has "C" selected
-            - shell:echo "no select 1, select a, select C, no select meow"
-            - shell:echo "no select 1, select a, select C, select meow"
-        - # when radio (opt[1]) has "b" selected
-          - # when radio (opt[2]) has "A" selected
-            - shell:echo "no select 1, select b, select A, no select meow"
-            - shell:echo "no select 1, select b, select A, select meow"
-          - # when radio (opt[2]) has "B" selected
-            - shell:echo "no select 1, select b, select B, no select meow"
-            - shell:echo "no select 1, select b, select B, select meow"
-          - # when radio (opt[2]) has "C" selected
-            - shell:echo "no select 1, select b, select C, no select meow"
-            - shell:echo "no select 1, select b, select C, select meow"
-        - # when radio (opt[1]) has "c" selected
-          - # when radio (opt[2]) has "A" selected
-            - shell:echo "no select 1, select c, select A, no select meow"
-            - shell:echo "no select 1, select c, select A, select meow"
-          - # when radio (opt[2]) has "B" selected
-            - shell:echo "no select 1, select c, select B, no select meow"
-            - shell:echo "no select 1, select c, select B, select meow"
-          - # when radio (opt[2]) has "C" selected
-            - shell:echo "no select 1, select a, select C, no select meow"
-            - shell:echo "no select 1, select a, select C, select meow"
-      - # when checkbox (opt[0]) is pressed
-        - # when radio (opt[1]) has "a" selected
-          - # when radio (opt[2]) has "A" selected
-            - shell:echo "select 1, select a, select A, no select meow"
-            - shell:echo "select 1, select a, select A, select meow"
-          - # when radio (opt[2]) has "B" selected
-            - shell:echo "select 1, select a, select B, no select meow"
-            - shell:echo "select 1, select a, select B, select meow"
-          - # when radio (opt[2]) has "C" selected
-            - shell:echo "select 1, select a, select C, no select meow"
-            - shell:echo "select 1, select a, select C, select meow"
-        - # when radio (opt[1]) has "b" selected
-          - # when radio (opt[2]) has "A" selected
-            - shell:echo "select 1, select b, select A, no select meow"
-            - shell:echo "select 1, select b, select A, select meow"
-          - # when radio (opt[2]) has "B" selected
-            - shell:echo "select 1, select b, select B, no select meow"
-            - shell:echo "select 1, select b, select B, select meow"
-          - # when radio (opt[2]) has "C" selected
-            - shell:echo "select 1, select b, select C, no select meow"
-            - shell:echo "select 1, select b, select C, select meow"
-        - # when radio (opt[1]) has "c" selected
-          - # when radio (opt[2]) has "A" selected
-            - shell:echo "select 1, select c, select A, no select meow"
-            - shell:echo "select 1, select c, select A, select meow"
-          - # when radio (opt[2]) has "B" selected
-            - shell:echo "select 1, select c, select B, no select meow"
-            - shell:echo "select 1, select c, select B, select meow"
-          - # when radio (opt[2]) has "C" selected
-            - shell:echo "select 1, select c, select C, no select meow"
-            - shell:echo "select 1, select c, select C, select meow"
+- name: Test
+  provider: Meow
+  description: Meow
+  options:
+    - checkbox: 1 # ← opt[0] = [nil, "1"]      │ opts_lengths[0] = 2
+    - radio: [a, b, c] # ← opt[1] = ["a", "b", "c"] │ opts_lengths[1] = 3
+    - radio: [A, B, C] # ← opt[2] = ["A", "B", "C"] │ opts_lengths[2] = 3
+    - checkbox: meow # ← opt[3] = [nil, "meow"]   │ opts_lengths[3] = 2
+  actions:
+    - # when checkbox (opt[0]) not pressed
+      - # when radio (opt[1]) has "a" selected
+        - # when radio (opt[2]) has "A" selected
+          - shell:echo "no select 1, select a, select A, no select meow"
+          - shell:echo "no select 1, select a, select A, select meow"
+        - # when radio (opt[2]) has "B" selected
+          - shell:echo "no select 1, select a, select B, no select meow"
+          - shell:echo "no select 1, select a, select B, select meow"
+        - # when radio (opt[2]) has "C" selected
+          - shell:echo "no select 1, select a, select C, no select meow"
+          - shell:echo "no select 1, select a, select C, select meow"
+      - # when radio (opt[1]) has "b" selected
+        - # when radio (opt[2]) has "A" selected
+          - shell:echo "no select 1, select b, select A, no select meow"
+          - shell:echo "no select 1, select b, select A, select meow"
+        - # when radio (opt[2]) has "B" selected
+          - shell:echo "no select 1, select b, select B, no select meow"
+          - shell:echo "no select 1, select b, select B, select meow"
+        - # when radio (opt[2]) has "C" selected
+          - shell:echo "no select 1, select b, select C, no select meow"
+          - shell:echo "no select 1, select b, select C, select meow"
+      - # when radio (opt[1]) has "c" selected
+        - # when radio (opt[2]) has "A" selected
+          - shell:echo "no select 1, select c, select A, no select meow"
+          - shell:echo "no select 1, select c, select A, select meow"
+        - # when radio (opt[2]) has "B" selected
+          - shell:echo "no select 1, select c, select B, no select meow"
+          - shell:echo "no select 1, select c, select B, select meow"
+        - # when radio (opt[2]) has "C" selected
+          - shell:echo "no select 1, select a, select C, no select meow"
+          - shell:echo "no select 1, select a, select C, select meow"
+    - # when checkbox (opt[0]) is pressed
+      - # when radio (opt[1]) has "a" selected
+        - # when radio (opt[2]) has "A" selected
+          - shell:echo "select 1, select a, select A, no select meow"
+          - shell:echo "select 1, select a, select A, select meow"
+        - # when radio (opt[2]) has "B" selected
+          - shell:echo "select 1, select a, select B, no select meow"
+          - shell:echo "select 1, select a, select B, select meow"
+        - # when radio (opt[2]) has "C" selected
+          - shell:echo "select 1, select a, select C, no select meow"
+          - shell:echo "select 1, select a, select C, select meow"
+      - # when radio (opt[1]) has "b" selected
+        - # when radio (opt[2]) has "A" selected
+          - shell:echo "select 1, select b, select A, no select meow"
+          - shell:echo "select 1, select b, select A, select meow"
+        - # when radio (opt[2]) has "B" selected
+          - shell:echo "select 1, select b, select B, no select meow"
+          - shell:echo "select 1, select b, select B, select meow"
+        - # when radio (opt[2]) has "C" selected
+          - shell:echo "select 1, select b, select C, no select meow"
+          - shell:echo "select 1, select b, select C, select meow"
+      - # when radio (opt[1]) has "c" selected
+        - # when radio (opt[2]) has "A" selected
+          - shell:echo "select 1, select c, select A, no select meow"
+          - shell:echo "select 1, select c, select A, select meow"
+        - # when radio (opt[2]) has "B" selected
+          - shell:echo "select 1, select c, select B, no select meow"
+          - shell:echo "select 1, select c, select B, select meow"
+        - # when radio (opt[2]) has "C" selected
+          - shell:echo "select 1, select c, select C, no select meow"
+          - shell:echo "select 1, select c, select C, select meow"
 #     ↑ ↑ ↑ ↑
 #     2 3 3 2
 #     ┬ ┬ ┬ ┬
@@ -241,8 +249,8 @@ Let's look at a very complicated example:
 #           └—— should appear 2 times per above item, i.e. total of 2×3×3×2 = 36 times
 ```
 
-As of version `0.1.9`, it is a requirement to explicitly write out all possible choice
-combinations. However, this might change in the future.
+As of version `0.1.9`, it's required to explicitly write out all possible choice
+combinations, this might change in the future.
 
 Possible action values include `copr:...`, `enable_yum_repo:...`, `rpm:...`, `shell:...`,
 `flatpak:...`, or a semicolon (`;`)-separated list of the above values for running multiple
@@ -251,29 +259,28 @@ actions, or `todo`.
 #### Catalogue App Icons and Screenshots
 
 App icons should be stored in `data/catalogue/{category}/{app}.svg`. The exact names are not
-important; in fact, you may store them in other places relative to `data/`. You will
-know why in a minute.
+important; in fact, you may store them in other places relative to `data/` (we'll explain in a moment).
 
 Screenshots are similarly stored in `data/screenshots/`.
 
-The `data/icons.gresource.xml` **must** be modified such that the gresource path
-`/com/fyralabs/Taidan/screenshots/` must contains all the screenshots with aliases in the format of
-`ss-{category}-{app}.png`, **where `{category}` is the name of the yml file excluding extensions,
-and `{app}` is in ASCII lowercase letters and spaces are replaced by `-` dashes.**
+The `data/icons.gresource.xml` **must** be modified such that the GResource path
+`/com/fyralabs/Taidan/screenshots/` contains all screenshots with aliases in the format of
+`ss-{category}-{app}.png`, **where `{category}` is the name of the YAML file excluding extensions,
+and `{app}` is in lowercase letters and spaces are replaced by `-` dashes.**
 
-Similarly, the `/com/fyralabs/Taidan/icons/symbolic/actions/` gresource path must contains icons in
+Similarly, the `/com/fyralabs/Taidan/icons/symbolic/actions/` GResource path must contain icons in
 the format of `ctlg-{category}-{app}.svg`.
 
 In addition, you **should** include other icons you have chosen to use for the `icon:` field for
 the categories, in `/com/fyralabs/Taidan/icons/symbolic/actions/`.
 
-
-[^1]: quote the readme file: "This script will be deprecated in the future when we implement our
-      own OOBE (probably 41). For now, it's a stopgap in our transitional OOBE (Readymade install
-      -> Anaconda/DE OOBE -> Stellar)".
+[^1]:
+    quote the readme file: "This script will be deprecated in the future when we implement our
+    own OOBE (probably 41). For now, it's a stopgap in our transitional OOBE (Readymade install
+    -> Anaconda/DE OOBE -> Stellar)".
 
 [Taidan]: https://github.com/Ultramarine-Linux/taidan
-[out-of-box experience (OOBE)]: https://en.wikipedia.org/wiki/Out-of-box_experience
+[out-of-box experience]: https://en.wikipedia.org/wiki/Out-of-box_experience
 [libhelium]: https://github.com/tau-OS/libhelium
 [initial-setup]: https://github.com/rhinstaller/initial-setup
-[umstellar]: https://github.com/Ultramarine-Linux/stellar
+[Stellar]: https://github.com/Ultramarine-Linux/stellar
