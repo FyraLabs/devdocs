@@ -15,7 +15,7 @@ See the following guide for creating a new package yourself. Quick and easy.
 It's also ok to **suggest packages** to include into Terra, though it might take a while. (We're busy!)
 
 Remember, it takes effort to create a package. If you ever need help, hop into
-[our Discord server](https://discord.gg/5fdPuxTg5Q) and we will try to help you.
+[our Discord server](https://fyralabs.com/discord) and we will try our best to help you.
 
 ## Creating a package
 
@@ -27,21 +27,45 @@ Remember, it takes effort to create a package. If you ever need help, hop into
 
 ### Preparation
 
-- Install [Andaman] on your system and its mock configs
+#### Fedora/Ultramarine
+
+- Install [Andaman] and its mock configs on your system 
   - `[1;32msudo dnf[97m install [0;97;mterra-mock-configs{:ansi}` via Terra
   - anda is also available via rust crates.io
   - If on an atomic system, this command works using podman: `podman run --rm --cap-add=SYS_ADMIN --privileged --volume ./:/anda --volume mock_cache:/var/lib/mock --workdir /anda ghcr.io/terrapkg/builder:frawhide anda`
-- Use `rust2rpm` for **Rust** packages
-- Use `pyp2rpm` for **Python** packages
-- Use `go2rpm` for **Go** packages
-- else, find the source of the packages you are adding, preferably a URL to a `.tar.gz` archive
-  - multiple archives are ok
-  - non `.tar.gz` archives are also ok, but might require additional build dependencies
-  - we also prefer archives from git repositories
+- Fork the [Terra sources repo](https://github.com/terrapkg/packages), and then `git clone` your fork.
+- You are now ready for the Writing Sources section below.
+  
+#### Dev container
+
+You can create, build, and push a package all from within our Dev Container.
+This means you do NOT need to be running Fedora/Ultramarine to create a package.
+You can run this devcontainer from Linux, macOS, or Windows.
+
+- Assuming you are using Visual Studio Code, Open Visual Studio Code and navigate to the Extensions menu located at the bottom of the left hand side bar.
+- Install the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension.
+
+- Fork the [Terra sources repo](https://github.com/terrapkg/packages), and then `git clone` your fork.
+- Open this folder in Visual Studio Code (File -> Open Folder).
+- It should prompt you to `reopen in Dev Container.` If not, press `Ctrl` + `Shift` + `P` and type `Open Folder in Container...` and select `Dev Container: Open Folder in Container...` and select your cloned Terra fork's folder.
+
+- You are now in the Terra Dev Container.
+- You now have all the packages and configuration necessary to start building packages!
+
+#### Language support
+
+The most common languages you will see:
+- RPMSPEC (`.spec`), for the package build scripts
+- rhai, for the auto-update scripts
+- hcl, for informing `anda` of the package
+- xml, for appstream metainfo on some packages
+
+VSCode should prompt you to install these extensions, and Zed should auto-install them.
+If not/using a different IDE, we suggest installing language support for each of these.
 
 ### Writing sources
 
-1. Fork/clone the [Terra sources repo](https://github.com/terrapkg/packages).
+1. Fork the [Terra sources repo](https://github.com/terrapkg/packages), and then `git clone` your fork.
 1. Create a folder named after the package name, for example:
    - A font named `lovelyfonttype` would go in `anda/fonts/lovelyfonttype`.
    - A Pantheon DE package would go in `anda/desktops/elementary/`.
@@ -66,10 +90,17 @@ Remember, it takes effort to create a package. If you ever need help, hop into
    - It is a custom file format for RPM packages.
    - This [RPM Packaging Guide] might help newbies with no prior experiences with RPM specs.
    - This [Spec file format] docs goes into the details of the spec file format.
+   - You could use `rust2rpm` for **Rust** packages.
+   - You could use `pyp2rpm` for **Python** packages.
+   - You could use `go2rpm` for **Go** packages.
+   - else, find the source of the packages you are adding, preferably a URL to a `.tar.gz` archive
+   - multiple archives are ok
+   - non `.tar.gz` archives are also ok, but might require additional build dependencies
+   - we also prefer archives from git repositories
 
 #### Editing the Spec file
 
-> TIP: Check out other spec files for other packages for some examples ;)
+> TIP: Check out other spec files of related packages for some examples ;)
 
 A generic spec file looks like this:
 
@@ -83,8 +114,8 @@ Source0:        https://github.com/some/repo/archive/%{version}.tar.gz
 # You should change the above link to the source tarball you got from the preparation section
 License:        MIT
 BuildRequires:  some dependencies >= 3.2.1 another-dep
-Requires:       deps here
-# We *highly* encourage you to add yourself as the packager here:
+Requires:       runtime deps here
+# We require you to add yourself as the packager here (if this is an issue for you, let us know):
 Packager:       Your Name <meowy@example.com>
 
 %description
@@ -102,7 +133,8 @@ echo "this will run when building pkg"
 echo "this will also run when building pkg but for installing it into %{buildroot} so that anda (mock) can package it"
 
 %files
-/usr/bin/pkgname-binary
+# This macro expands to `/usr/bin`. To see what macros expand to, you can run `rpm --eval %{MACRO}`
+%{_bindir}/pkgname-binary
 /path/to/more/files/*/package
 
 %changelog
@@ -132,7 +164,7 @@ echo "this will also run when building pkg but for installing it into %{buildroo
 
 ## Building
 
-- Having anda installed, run the following command:
+- Having anda installed (or in the Dev Container) run the following command:
 
 ```ansi
 [1;32manda[97m build [0;3;37m-c terra-rawhide-x86_64[0m anda/fonts/lovelyfonttype-fonts/pkg
@@ -143,15 +175,16 @@ up a container), add `--rpm-builder=rpmbuild`. Remember to install the build
 dependencies using `[1;32msudo dnf[97m builddep [0;97;mpath/to/pkgname.spec{:ansi}`!
 
 - You don't need to create `pkg`. It's not supposed to exist, just needs to be at the end of the build command
-- Modify the architecture to match your machine (`x86_64`, `aarch64`)
+- Modify the architecture to match your machine (`x86_64`, `i386`, `aarch64`)
+- If needed (404 errors when buildong off `rawhide`, you can also modify the version it builds on (`43`, `43`, `el10`, etc.)
 - If the package fails to build, fix your spec file accordingly
   - Usually the actual useful error message can be found before the Python traceback (from mock).
-- The built RPM will be inside `anda-build/`
+- The built RPM(s) will be inside `anda-build/`
 
 ## Done?
 
 - Git commit and push; remember you must sign your commits!
-- Create a pull request that merges to the `main` branch
+- Create a pull request that merges to the `frawhide` branch
 
 ## Automatic updates
 
