@@ -43,16 +43,13 @@ This means you do NOT need to be running Fedora/Ultramarine to create a package.
 You can run this devcontainer from Linux, macOS, or Windows.
 
 - Assuming you are using Visual Studio Code, Open Visual Studio Code and navigate to the Extensions menu located at the bottom of the left hand side bar.
-- Install the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension.
-
+- Install [Docker](https://docs.docker.com/engine/install/). If on Linux, you will need to enable the service and restart your shell (reboot, logout, etc.).
 - Fork the [Terra sources repo](https://github.com/terrapkg/packages), and then `git clone` your fork.
 - Open this folder in Visual Studio Code (File -> Open Folder).
-- It should prompt you to `reopen in Dev Container.` If not, press `Ctrl` + `Shift` + `P` and type `Open Folder in Container...` and select `Dev Container: Open Folder in Container...` and select your cloned Terra fork's folder.
+- It should prompt you to `reopen in Dev Container,` click this and wait for the Dev Container to open. If it doesn't prompt you, press `Ctrl` + `Shift` + `P`, type `Reopen in Container`, and press `Enter`.
+- You are now in the Terra Dev Container, and have all the packages and configuration necessary to start building packages!
 
-- You are now in the Terra Dev Container.
-- You now have all the packages and configuration necessary to start building packages!
-
-#### Language support
+#### IDE/text editor language support
 
 The most common languages you will see:
 - RPMSPEC (`.spec`), for the package build scripts
@@ -143,7 +140,7 @@ echo "this will also run when building pkg but for installing it into %{buildroo
 ```
 
 - Add `Source0` or `Source1` or more.
-  These preambles should link to a compressed file (preferably `tar`) and will be extracted during `%prep`
+  These preambles should link to a compressed file (preferably a tarball) and will be extracted during `%prep`.
   You should've had the link prepared during [#Preparation](#preparation) :3
 - Add a new line `%prep`
   - The source file will be automatically downloaded and
@@ -184,7 +181,7 @@ dependencies using `[1;32msudo dnf[97m builddep [0;97;mpath/to/pkgname.spec{:
 ## Done?
 
 - Git commit and push; remember you must sign your commits!
-- Create a pull request that merges to the `frawhide` branch
+- Create a pull request that merges to the `frawhide` (effectivly the main) branch
 
 ## Automatic updates
 
