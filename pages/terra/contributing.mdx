@@ -8,6 +8,7 @@ import { Callout } from "nextra/components";
 # Contributing
 
 Thanks for contributing to Terra!
+
 Terra is specifically designed to be as _package-maintainer-friendly_ as possible — you
 don't need to know everything about the infrastructure to create a package for Terra!
 See the following guide for creating a new package yourself. Quick and easy.
@@ -34,7 +35,7 @@ Remember, it takes effort to create a package. If you ever need help, hop into
   - anda is also available via rust crates.io
   - If on an atomic system, this command works using podman: `podman run --rm --cap-add=SYS_ADMIN --privileged --volume ./:/anda --volume mock_cache:/var/lib/mock --workdir /anda ghcr.io/terrapkg/builder:frawhide anda`
 - Fork the [Terra sources repo](https://github.com/terrapkg/packages), and then `git clone` your fork.
-- You are now ready for the Writing Sources section below.
+- You are now ready for the [Writing Sources]([contributing#writing-sources](https://developer.fyralabs.com/terra/contributing#writing-sources)) section below.
   
 #### Dev Container
 
@@ -72,7 +73,7 @@ If not/using a different IDE, we suggest installing language support for each of
    - The name of the folder name actually is just for identifications for Terra package maintainers.
      What matters is that the spec file name _must_ match with the package name defined in the spec file later.
      This is a Fedora `mock` limitation.
-   - For more information, check out our [packaging policies](policy).
+   - For more information, check out our [packaging policies].
 1. Edit `anda.hcl`, which tells [Andaman] how to build the package:
 
    ```hcl
@@ -91,9 +92,9 @@ If not/using a different IDE, we suggest installing language support for each of
    - You could use `pyp2rpm` for **Python** packages.
    - You could use `go2rpm` for **Go** packages.
    - Otherwise, find the source of the packages you are adding, preferably a URL to a `.tar.gz` archive
-   - Multiple archives are ok
-   - Non `.tar.gz` archives are also ok, but might require additional build dependencies
-   - Archives from git repositories are preferred 
+   - Multiple archives are ok.
+   - Archives not in `.tar.gz` format are also okay, but might require extra work.
+   - Archives from git repositories are preferred.
 
 #### Editing the Spec file
 
