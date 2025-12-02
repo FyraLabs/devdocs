@@ -39,24 +39,33 @@ For other macros available in Fedora/Terra, check out our unofficial [macros lis
 | `%_sccache`                     | `/usr/bin/sccache`                                                     |
 | `%sccache_prep`                 | Sets up environment variables for `sccache`                            |
 | `%cargo_prep_online_sccache`    |                                                                        |
-| `%npm_build`                    | npm build                                                              |
-| `%__bun`                        | `/usr/bin/env %{npm_common_vars} BUN_HOME=%{rpmbuilddir}/.bun BUN_RUNTIME_TRANSPILER_CACHE_PATH=0 /usr/bin/bun` |
+| `%bun_common_envvars`           |                                                                        |
+| `%__bun`                        | `/usr/bin/env %{bun_common_envvars} /usr/bin/bun`                      |
+| `%__bunx`                       |                                                                        |
 | `%bun_build`                    | bun build                                                              |
 | `%bun_audit`                    | bun audit, for use in the `%check` section                             |
+| `%bun_pm_trust`                 |                                                                        |
 | `%vendor_pnpm`                  | If PNPM is not usable/available from repo                              |
-| `%__pnpm`                       | `/usr/bin/env %{npm_common_vars} PNPM_HOME=%{rpmbuilddir}/pnpm %{?with_vendored_pnpm:%{rpmbuilddir}/pnpm/pnpm}%{!?with_vendored_pnpm:/usr/bin/pnpm}` |
+| `%pnpm_common_envvars`          |                                                                        |
+| `%__pnpm`                       | `/usr/bin/env %{pnpm_common_envvars} %{?with_vendored_pnpm:%{rpmbuilddir}/pnpm/pnpm}%{!?with_vendored_pnpm:/usr/bin/pnpm}` |
+| `%__pnpx`                       |                                                                        |
 | `%pnpm_build`                   | pnpm build                                                             |
 | `%pnpm_audit`                   | Audit pnpm if package uses bundled Node dependencies. For use in the `%check` section |
 | `%pnpm_audit_fix`               | Fix dependencies using PNPM                                            |
 | `%pnpm_approve_builds`          | Approve dependency scripts if needed                                   |
-| `%__yarn`                       | `/usr/bin/env %{npm_common_vars} YARN_CACHE_FOLDER=%{rpmbuilddir}/yarn /usr/bin/yarn` |
+| `%yarn_common_envvars`          |                                                                        |
+| `%__yarn`                       | `/usr/bin/env %{yarn_common_envvars} /usr/bin/yarn`                    |
 | `%yarn_build`                   | yarn build                                                             |
 | `%yarn_audit`                   | Audit yarn if package uses bundled Node dependencies. For use in the `%check` section |
-| `%electron_install`             | Install files built from an electron project                           |
-| `%npm_common_vars`              |                                                                        |
+| `electronmeta`                  |                                                                        |
+| `%electron_install`             | Install files built from an Electron project                           |
+| `%npm_common_envvars`           |                                                                        |
 | `%npm_buildflags`               |                                                                        |
+| `%set_node_build_flags`         |                                                                        |
 | `%__npm`                        |                                                                        |
 | `%__npx`                        |                                                                        |
+| `%npm_build`                    | npm build                                                              |
+| `%__nvm`                        |                                                                        |
 | `%npm_prep`                     |                                                                        |
 | `%fetch_node_tests`             |                                                                        |
 | `%npm_install`                  |                                                                        |
