@@ -28,6 +28,28 @@ Install files built from an Electron project.
 
 # Rust
 
+## %cargo_prep_online
+Enables internet access for `cargo_prep`. Replaces `%cargo_prep` in `%prep`.
+
+## %cargo_license_online
+Enables internet access for `cargo_license`.
+Replaces `%cargo_license` in `%build`.
+
+## %cargo_license_summary_online
+Enables internet access for `cargo_license_summary`.
+Replaces `%cargo_license_summary` in `%build`.
+
+## %cargo_vendor_manifest_online
+Enables internet access for `cargo_vendor_manifest_online`. 
+Replaces `%cargo_vendor_manifest` in `%build`. 
+
+## %crate_install_bin
+Used to install crates that build as single binary.
+Can be used instead of `%cargo_install` when [this](https://github.com/terrapkg/packages/issues/1169) is applicable.
+
+## %rustup_nightly
+Used in `%prep` for nightly `rustc`/`cargo` from `rustup`.
+
 # Subpackages (-devel)
 
 # Zig
@@ -45,12 +67,6 @@ expands to `%{?epoch:%{epoch}:}%{version}-%{release}`.
 
 | Macro                           | Function                                                               |
 | ------------------------------- | ---------------------------------------------------------------------- |
-| `%cargo_prep_online`            | Enables internet access for `cargo`. Replaces `%cargo_prep` in `%prep` |
-| `%cargo_license_online`         | Replaces `%cargo_license` in `%build`                                  |
-| `%cargo_license_summary_online` | Replaces `%cargo_license_summary` in `%build`                          |
-| `%cargo_vendor_manifest_online` | Replaces `%cargo_vendor_manifest` in `%build`                          |
-| `%crate_install_bin`            | Used to install crates that build as single binary, applicable to specs generated with rust2rpm |
-| `%rustup_nightly`               | Used in `%prep` for nightly `rustc`/`cargo` from `rustup`              |
 | `%go_task`                      | go-task
 | `%nim_prep`                     | Setting up `nimble`                                                    |
 | `%nim_build` or `%nim_c`        | Builds a nim package. Requires an argument to `src/pkgname`            |
