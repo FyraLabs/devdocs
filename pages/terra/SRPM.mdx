@@ -44,7 +44,7 @@ Install files built using Electron Builder.
 
 By default, the install steps are:
 1. Make the install directory
-  - This will be in the `%{_libdir}` (/usr/lib on 33-bit architectures and /usr/lib64 on 64-bit ones)
+  - This will be in the `%{_libdir}` (/usr/lib on 32-bit architectures and /usr/lib64 on 64-bit ones)
   - This is done because programs with bundled dependencies (Electron, Node modules, and more) MUST have these dependencies kept together
 1. Install the app's files
 1. Symlink the app's binary to the bin directory
