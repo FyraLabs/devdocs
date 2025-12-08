@@ -11,9 +11,24 @@ You may need to refer to the [miscellaneous packaging guidelines](./policy#misce
 
 For other macros available in Fedora/Terra, check out our unofficial [macros list](../rpm/macros).
 
-# Anda Directories
-
 # Shell Completions
+
+# Directories
+
+## %__anda_develfiles
+
+## %_anda_srpm_macros_dir
+`/usr/libexec/anda-srpm-macros`.
+
+## %__anda_staticfiles
+
+## %__anda_libsfiles
+
+## %elvish_completions_dir
+`%_datadir/elvish/lib/completions`
+
+## %rpmbuilddir
+`%{?builddir}%{?!builddir:%{_builddir}}`.
 
 # Electron
 
@@ -87,6 +102,9 @@ Which simply means Electron supports x86_64, x86, aarch64/ARM64, and armv7l.
 
 # Go
 
+## `%go_task`
+Should be used in place of `go-task`.
+
 # JavaScript/JavaScript Package Managers
 
 # Nim
@@ -132,7 +150,6 @@ expands to `%{?epoch:%{epoch}:}%{version}-%{release}`.
 
 | Macro                           | Function                                                               |
 | ------------------------------- | ---------------------------------------------------------------------- |
-| `%go_task`                      | go-task
 | `%nim_prep`                     | Setting up `nimble`                                                    |
 | `%nim_build` or `%nim_c`        | Builds a nim package. Requires an argument to `src/pkgname`            |
 | `%nim_tflags`                   |                                                                        |
@@ -140,14 +157,8 @@ expands to `%{?epoch:%{epoch}:}%{version}-%{release}`.
 | `%pkg_completion`               | Check [here](https://developer.fyralabs.com/terra/policy#shell-completions) for more details |
 | `%pkg_devel_files`              | Set the summary & description, then find development `%files`.         |
 | `%pkg_static_files`             | Set the summary & description, then find static libraries.             |
-| `%_anda_srpm_macros_dir`        | `/usr/libexec/anda-srpm-macros`                                        |
-| `%__anda_develfiles`            |                                                                        |
-| `%__anda_staticfiles`           |                                                                        |
-| `%__anda_libsfiles`             |                                                                        |
 | `%pkg_libs_files`               |                                                                        |
 | `%files_libs`                   |                                                                        |
-| `%rpmbuilddir`                  | `%{?builddir}%{?!builddir:%{_builddir}}`                               |
-| `%elvish_completions_dir`       | `%_datadir/elvish/lib/completions`                                     |
 | `%_sccache`                     | `/usr/bin/sccache`                                                     |
 | `%sccache_prep`                 | Sets up environment variables for `sccache`                            |
 | `%cargo_prep_online_sccache`    |                                                                        |
