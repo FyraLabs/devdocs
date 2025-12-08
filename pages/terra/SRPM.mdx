@@ -17,6 +17,9 @@ For other macros available in Fedora/Terra, check out our unofficial [macros lis
 
 # Electron
 
+## %electron_install
+Install files built from an Electron project.
+
 # Go
 
 # JavaScript
@@ -33,6 +36,14 @@ For other macros available in Fedora/Terra, check out our unofficial [macros lis
 
 # Miscellaneous
 
+## %git_clone
+Downloads the source code via `git clone` with the `--depth=1`, `-q`, and `--recursive-submodules` flags. Should only be used when downloading a compressed source cannot be used (for example, if the build process expects a git environment or the release tarball doesn't contain submodules).
+
+## %evr
+used for declaring how a package interacts with others, for acampe, in a `Requires:` tag.
+For example, `Requires: %{name} = %evr`
+expands to `%{?epoch:%{epoch}:}%{version}-%{release}`.
+
 
 | Macro                           | Function                                                               |
 | ------------------------------- | ---------------------------------------------------------------------- |
@@ -47,7 +58,6 @@ For other macros available in Fedora/Terra, check out our unofficial [macros lis
 | `%nim_build` or `%nim_c`        | Builds a nim package. Requires an argument to `src/pkgname`            |
 | `%nim_tflags`                   |                                                                        |
 | `%nim_lflags`                   |                                                                        |
-| `%git_clone`                    | Downloads the source code via `git clone` with the `--depth=1`, `-q`, and `--recursive-submodules` flags. Should only be used when `%autosetup` cannot be used.  |
 | `%pkg_completion`               | Check [here](https://developer.fyralabs.com/terra/policy#shell-completions) for more details |
 | `%pkg_devel_files`              | Set the summary & description, then find development `%files`.         |
 | `%pkg_static_files`             | Set the summary & description, then find static libraries.             |
@@ -57,7 +67,6 @@ For other macros available in Fedora/Terra, check out our unofficial [macros lis
 | `%__anda_libsfiles`             |                                                                        |
 | `%pkg_libs_files`               |                                                                        |
 | `%files_libs`                   |                                                                        |
-| `%evr`                          | `%{?epoch:%{epoch}:}%{version}-%{release}`                             |
 | `%rpmbuilddir`                  | `%{?builddir}%{?!builddir:%{_builddir}}`                               |
 | `%elvish_completions_dir`       | `%_datadir/elvish/lib/completions`                                     |
 | `%_sccache`                     | `/usr/bin/sccache`                                                     |
@@ -83,7 +92,7 @@ For other macros available in Fedora/Terra, check out our unofficial [macros lis
 | `%yarn_build`                   | yarn build                                                             |
 | `%yarn_audit`                   | Audit yarn if package uses bundled Node dependencies. For use in the `%check` section |
 | `electronmeta`                  |                                                                        |
-| `%electron_install`             | Install files built from an Electron project                           |
+
 | `%npm_common_envvars`           |                                                                        |
 | `%npm_buildflags`               |                                                                        |
 | `%set_node_build_flags`         |                                                                        |
