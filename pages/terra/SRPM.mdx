@@ -26,6 +26,10 @@ Rundown of what all `%electronmeta` does:
   - Defines `%{_electron_cpu}` for aarch64 architectures as `arm64`.
   - Defines `%{_electron_cpu}` for x86 architectures as `ia32`.
   - Defines `%{_electron_cpu}` for armv7l architectures as `armv7l`.
+    - These are defined because Electron names the build files and directories after the architecture
+    - The macros used to build Electron apps (`%npm_build`, `%bun_build`, `%pnpm_build`, and `%yarn_build`) all require this to be set
+    - In some cases, these architectures are used in the source tarballs for Electron projects
+    - This can also be used to help work with the files if you need to do anything manually
 - Defines `%__provides_excludes` to make sure Electron apps are not flagged as providers of their bundled dependencies, such as FFmpeg libraries.
 - Defines `%__requires_excludes` based on architecture to prevent Electron Builder's cross-compilation from causing false dependency positives from RPM.
 - Sets `%debug_package` to `%{nil}` to prevent stripping of bundled libraries and/or build failures due to not enough data to strip.
@@ -40,6 +44,8 @@ Install files built using Electron Builder.
 
 By default, the install steps are:
 1. Make the install directory
+  - This will be in the `%{_libdir}` (/usr/lib on 33-bit architectures and /usr/lib64 on 64-bit ones)
+  - This is done because programs with bundled dependencies (Electron, Node modules, and more) MUST have these dependencies kept together
 1. Install the app's files
 1. Symlink the app's binary to the bin directory
 1. Install the app's icons
@@ -55,8 +61,15 @@ By default, the install steps are:
 - `-E` can be used to set the "--enable-features" flag in the desktop file. Features to enable must be comma separated without spaces.
 - `-O` can be used to set the Ozone flatform the Electron app will run on. If no arguments are supplied, it will fall back to auto. Accepted arguments are `-Ox11` and `-Owayland`
 - `-U` can be used to set either `%u` or `%U` in the desktop file. This REQUIRES you do not use `u` as a macro name for any reason.
-  - `%u` means that a .desktop file can only read one URL at a time, `%U` means that it can read multiple at a time.
-  - Defer to what the .desktop file originally contained if you are unsure.
+  - `%u` means that a desktop file can only read one URL at a time, `%U` means that it can read multiple at a time.
+  - Defer to what the desktop file originally contained if you are unsure.
+
+Example:
+- The command `%electron_install -b app -i app -s app -S alsoapp -D -Owayland -U %u -E WaylandWindowDecorations` would install the program with:
+  - Icons named `app.png`
+  - A symlink named `app`
+  - A second symlink called `alsoapp`
+  - A desktop file with the `Exec` line reading `Exec=/usr/lib(64)/pkgname/app --enable-features=WaylandWindowDecorations --ozone-platform=wayland %u`
 
 ## %electron_license
 The license for bundled Electron. NOT set by default in `%electronmeta` because you cannot set the license field twice. MAY be used in combination with manually adding the other relevant licenses (if this is done, a proper license tag would be `License: XXX-x.x AND %electron_license`.
@@ -66,6 +79,7 @@ The architectures Electron supports. Automatically set as `ExclusiveArch` when u
 
 As written, the macro is:
 - `%{x86_64} %{ix86} %{arm64} armv7l armv7hl armv7hnl`
+
 Which expands fully to:
 - `x86_64 x86_64_v2 x86_64_v3 x86_64_v4 amd64 em64t i386 i486 i586 i686 pentium3 pentium4 athlon geode aarch64 armv7l armv7hl armv7hnl`
 
