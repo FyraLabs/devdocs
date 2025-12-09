@@ -167,7 +167,7 @@ Used in `%prep` for nightly `rustc`/`cargo` from `rustup`.
 
 ## Subpackages
 These macros assist with packages that require certain subpackage types.
-For example, some packages will build application and library files. Using `pkg_devel_files` will greatly help you in making the library files (`-devel`) subpackage.
+For example, some packages will build application and library files. Using `%pkg_devel_files` will greatly help you in making the library files (`-devel`) subpackage.
 More information on subpackages can be found on the [Fedora Packaging Guidelines](https://docs.fedoraproject.org/en-US/packaging-guidelines/#_mixed_use_packages).
 
 ### %pkg_completion
@@ -189,13 +189,14 @@ For specifying the name (the default will be your `%name`) of the shell completi
 ```
 
 Can also pass `cmd1`, etc. as the commands the completion files are for.
+
 Example using all flags:
 ```
 %pkg_completion -Bbefz -n pkgname cmd1 cmd2 ...
 ```
 
 A good example spec that uses this macro is [yadm](https://github.com/terrapkg/packages/blob/d861164790b3d77f5ee094d303de2dfc3299ef8b/anda/devs/yadm/yadm.spec#L22).
-This spec will these packages:
+This spec creates these packages:
 
 ```
 yadm-x.x.x-x.fcxx.noarch.rpm - contains all core package files.
