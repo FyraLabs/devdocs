@@ -12,6 +12,7 @@ You may need to refer to the [miscellaneous packaging guidelines](./policy#misce
 For other macros available in Fedora/Terra, check out our unofficial [macros list](../rpm/macros).
 
 ## Directories
+These macros define certain system directories.
 
 ### %__anda_develfiles
 [TODO]
@@ -28,10 +29,17 @@ For other macros available in Fedora/Terra, check out our unofficial [macros lis
 ### %elvish_completions_dir
 `%_datadir/elvish/lib/completions`
 
+### %__pnpm
+`/usr/bin/env %{pnpm_common_envvars} %{?with_vendored_pnpm:%{rpmbuilddir}/pnpm/pnpm}%{!?with_vendored_pnpm:/usr/bin/pnpm}`
+
+### %__pnpx
+[TODO]
+
 ### %rpmbuilddir
 `%{?builddir}%{?!builddir:%{_builddir}}`.
 
 ## Electron
+These macros assist with the general packaging of applications that use [Electron](https://www.electronjs.org/).
 
 ### %electronmeta
 Set up all basic requirements including build macros for building an Electron app.
@@ -102,13 +110,17 @@ Which expands fully to:
 Which simply means Electron supports x86_64, x86, aarch64/ARM64, and armv7l.
 
 ## Go
+These macros assist with building go projects.
 
 ### %go_task
 Should be used in place of `go-task`.
 
 ## JavaScript/JavaScript Package Managers
+These are macros to assist with the general packaging of applications that use JavaScript runtimes/nodeJS
+[TODO]: make this sound not stupid
 
 ## Nim
+These macros assist with building Nim projects.
 
 ### %nim_prep
 `nimble`.
@@ -124,6 +136,7 @@ Requires an argument to `src/pkgname`
 [TODO]
 
 ## Rust
+These macros assist with building Rust projects.
 
 ### %cargo_prep_online
 Enables internet access for `cargo_prep`. Replaces `%cargo_prep` in `%prep`.
@@ -151,11 +164,14 @@ Used in `%prep` for nightly `rustc`/`cargo` from `rustup`.
 [TODO]
 
 ## Subpackages
+These macros assist with packages that require certain subpackage types.
+For example, some packages will build application and library files. Using `pkg_devel_files` will greatly help you in making the library files (`-devel`) subpackage.
+More information on subpackages can be found on the [Fedora Packaging Guidelines](https://docs.fedoraproject.org/en-US/packaging-guidelines/#_mixed_use_packages).
 
 ### %pkg_completion
 Check [here](https://developer.fyralabs.com/terra/policy#shell-completions) for more details
 
-### pkg_devel_files
+### %pkg_devel_files
 Set the summary & description, then find development `%files`.
 
 ### %pkg_static_files
@@ -165,9 +181,24 @@ Set the summary & description, then find static libraries.
 [TODO]
 
 ## Zig
+These macros assist with building Zig projects.
 
 ### %zig_build_target
-Check out our Zig packaging guidelines [here](https://developer.fyralabs.com/terra/policy#zig)
+Many Zig projects rely on ReleaseFast (or more rarely, ReleaseSmall) builds for runtime optimization, and some Zig projects only work correctly when built for certain microarchitectures or higher (usually, this is `x86_64_v2` instead of `baseline` due to reliance on SIMD).
+If either of the above are the case for your package, you can use `%zig_build_target` with appropriate options in the `%build` or `%install` section depending on how the project is built (as some can be built directly into root by setting the `DESTDIR=%{buildroot}` variable).
+
+Example:
+
+```rpmspec
+%build
+%{zig_build_target -r fast -c x86_64_v2} \
+  -Demit-docs
+```
+
+Note that `-c` also works as a fallback option to the target architecture set by RPM if no following argument is supplied. However, this can **_only_** be used when RPM and Zig's architecture formats are the same, otherwise the build will fail.
+For projects where dynamic linking of all dependencies is simply not possible (such as the version in the Fedora repos being too new or too old) or that have no dependencies to link, you can pass the `-s` flag. You can (and should) still dynamically link compatible dependencies by using `-fsys=pkgname`.
+
+More information can be found on our [Zig packaging guidelines](../terra/policy#zig).
 
 ## Miscellaneous
 
@@ -193,7 +224,6 @@ expands to `%{?epoch:%{epoch}:}%{version}-%{release}`.
 | `%bun_pm_trust`                 |                                                                        |
 | `%vendor_pnpm`                  | If PNPM is not usable/available from repo                              |
 | `%pnpm_common_envvars`          |                                                                        |
-| `%__pnpm`                       | `/usr/bin/env %{pnpm_common_envvars} %{?with_vendored_pnpm:%{rpmbuilddir}/pnpm/pnpm}%{!?with_vendored_pnpm:/usr/bin/pnpm}` |
 | `%__pnpx`                       |                                                                        |
 | `%pnpm_build`                   | pnpm build                                                             |
 | `%pnpm_audit`                   | Audit pnpm if package uses bundled Node dependencies. For use in the `%check` section |
@@ -204,7 +234,6 @@ expands to `%{?epoch:%{epoch}:}%{version}-%{release}`.
 | `%__yarn_dlx`                   |                                                                        |
 | `%yarn_build`                   | yarn build                                                             |
 | `%yarn_audit`                   | Audit yarn if package uses bundled Node dependencies. For use in the `%check` section |
-
 | `%npm_common_envvars`           |                                                                        |
 | `%npm_buildflags`               |                                                                        |
 | `%set_node_build_flags`         |                                                                        |
