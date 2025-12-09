@@ -171,7 +171,38 @@ For example, some packages will build application and library files. Using `pkg_
 More information on subpackages can be found on the [Fedora Packaging Guidelines](https://docs.fedoraproject.org/en-US/packaging-guidelines/#_mixed_use_packages).
 
 ### %pkg_completion
-Check [here](https://developer.fyralabs.com/terra/policy#shell-completions) for more details
+This macro is for creating and installing files for shell completion subpackages.
+This macro SHOULD be used if your package provides shell completion files.
+Use the below flags according to the shell completion files your package uses:
+
+```
+-B: bash (but the completion file doesn't have `.bash` extension)
+-b: bash
+-e: elvish
+-f: fish
+-z: zsh
+```
+
+For specifying the name (the default will be your `%name`) of the shell completion subpackages (if needed):
+```
+-n pkgname
+```
+
+Can also pass `cmd1`, etc. as the commands the completion files are for.
+Example using all flags:
+```
+%pkg_completion -Bbefz -n pkgname cmd1 cmd2 ...
+```
+
+A good example spec that uses this macro is [yadm](https://github.com/terrapkg/packages/blob/d861164790b3d77f5ee094d303de2dfc3299ef8b/anda/devs/yadm/yadm.spec#L22).
+This spec will these packages:
+
+```
+yadm-x.x.x-x.fcxx.noarch.rpm - contains all core package files.
+yadm-bash-completion-x.x.x-x.fcxx.noarch.rpm - contains `/usr/share/bash-completion/completions/yadm`
+yadm-fish-completion-x.x.x-x.fcxx.noarch.rpm - contains `/usr/share/fish/vendor_completions.d/yadm.fish`
+yadm-zsh-completion-x.x.x-x.fcxx.noarch.rpm - contains `/usr/share/zsh/site-functions/_yadm`
+```
 
 ### %pkg_devel_files
 Set the summary & description, then find development `%files`.
@@ -215,8 +246,8 @@ For example, `Requires: %{name} = %evr`
 expands to `%{?epoch:%{epoch}:}%{version}-%{release}`.
 
 ### %git_clone
-Downloads the source code via `git clone`, and passes useful flags such as`--depth 1`, `-q`, `--recursive-submodules`, and `-j${RPM_BUILD_NCPUS}`.
-A URL and a version or commit hash can be passed to this macro.
+Downloads the source code via `git clone`, and passes useful (in this situation) flags such as`--depth 1`, `-q`, `--recursive-submodules`, and `-j${RPM_BUILD_NCPUS}`.
+A git URL and a `%version` or `%commit` SHOULD be passed to this macro.
 Below is an example of how a spec that tracks version tages from a GitHub repo, and needs to git clone the source could handle this:
 
 ```rpmspec
