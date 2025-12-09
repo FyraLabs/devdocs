@@ -15,6 +15,14 @@ You may need to refer to the [miscellaneous packaging guidelines](./policy#misce
 
 For other macros available in Fedora/Terra, check out our unofficial [macros list](../rpm/macros).
 
+<Callout type="info">
+  The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+  NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and
+  "OPTIONAL" in this document are to be interpreted as described in
+  [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and
+  [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
+</Callout>
+
 ## Directories
 These macros define certain system directories.
 
@@ -98,7 +106,11 @@ Example:
   - A desktop file with the `Exec` line reading `Exec=/usr/lib(64)/pkgname/app --enable-features=WaylandWindowDecorations --ozone-platform=wayland %u`
 
 ### %electron_license
-The license for bundled Electron. NOT set by default in `%electronmeta` because you cannot set the license field twice. MAY be used in combination with manually adding the other relevant licenses (if this is done, a proper license tag would be `License: XXX-x.x AND %electron_license`.
+The license for bundled Electron.
+NOT set by default in `%electronmeta` because you cannot set the license field twice.
+MAY be used in combination with manually adding the other relevant licenses (if this is done, a proper license tag would be `License: XXX-x.x AND %electron_license`.
+
+To enable, must have `%bcond bundled_electron 1` in the [preamble](../rpm/sections#preamble) of the spec.
 
 ### %electron_arches
 The architectures Electron supports. Automatically set as `ExclusiveArch` when using `%electronmeta`.
@@ -207,6 +219,14 @@ yadm-zsh-completion-x.x.x-x.fcxx.noarch.rpm - contains `/usr/share/zsh/site-func
 
 ### %pkg_devel_files
 Set the summary & description, then find development `%files`.
+
+```
+%package devel
+# generates Summary:, %description devel and the file lists
+# use -F to omit %files
+# use -n to manually specify name other than `%name-%devel`
+%pkg_devel_files
+```
 
 ### %pkg_static_files
 Set the summary & description, then find static libraries.

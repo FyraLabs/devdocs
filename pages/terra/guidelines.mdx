@@ -1,0 +1,187 @@
+---
+title: Guidelines
+description: "Terra-specific guidelines."
+---
+
+import { Callout } from "nextra/components";
+
+# Terra Guidelines
+
+<Callout type="info">
+  The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+  NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and
+  "OPTIONAL" in this document are to be interpreted as described in
+  [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and
+  [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
+</Callout>
+
+Packagers and maintainers MUST follow the policies and guidelines listed in this document.
+
+These are general packaging guidelines for Terra. Everything covered here is one of 3 things:
+
+- A difference in the Fedora guidelines
+- In addition to the Fedora guidelines
+- Adding a new guideline
+
+## Terra Packaging Guidelines
+
+### Packager Field
+
+The package maintainer of a package SHOULD be added to the `Packager:{:rpmspec}` preamble as follows:
+
+```rpmspec
+Packager: Raboneko <raboneko@fyralabs.com>
+```
+
+### Usages of the `mold` linker
+
+We encourage the use of [`mold`](https://github.com/rui314/mold), which may speed up build times especially in large projects.
+You MAY enable it in C/++ projects by adding `-fuse-ld=mold` in `CFLAGS`/`CXXFLAGS`.
+
+The `%with_mold` flag is enabled by default in `anda-srpm-macros`. `mold` is also preinstalled in the builders.
+
+You can disable `mold` for Rust and Nim by using `%bcond_with mold`.
+
+### Interpreted Languages (Python, Ruby, etc.)
+
+All packages using interpreted languages follow the traditional Fedora guidelines.
+All dependencies **_must_** be packaged individually as they are considered runtime dependencies.
+
+### Dynamically compiled languages (C, C++, Vala)
+
+Dependencies required for runtime MUST be packaged separately.
+
+### Statically compiled languages
+
+As Terra does not strictly follow Fedora's reproducibility requirements, and we do not want large amounts of development libraries for them, packagers SHOULD vendor dependencies on build time.
+
+Terra's mock sandbox has networking enabled, so builders can download the dependencies directly on build time.
+
+#### Rust
+
+- You may generate the spec file using `rust2rpm`.
+- You SHOULD NOT use the tradtional Fedora `%cargo_prep` macro. Use `%cargo_prep_online` from `anda-srpm-macros` instead, and you SHOULD remove the `%generate_buildrequires` macro, as it is useless.
+- It is RECOMMENDED to use `%cargo_license_online` and `%cargo_license_summary_online`, although they are not a strict requirement.
+- You SHOULD NOT use both `%cargo_build` and `%cargo_install` in the same spec file as `cargo install` might cause a rebuild due to a bug. You SHOULD only include either one of them. In most cases, you can just omit `%cargo_build` entirely and it will just build fine.
+Example:
+
+```rpmspec
+%prep
+%autosetup -n %{crate}-%{version} -p1
+%cargo_prep_online
+
+%build
+%{cargo_license_online} > LICENSE.dependencies
+
+%install
+%cargo_install
+```
+
+In some rare cases, you might need to use `%cargo_build` and `%crate_install_bin` instead:
+
+```rpmspec
+%prep
+%autosetup -n %{crate}-%{version}
+%cargo_prep_online
+
+%build
+%{cargo_license_online} > LICENSE.dependencies
+%{cargo_build} --locked
+
+%install
+# install the binary from target/rpm/%{crate} to %buildroot%_bindir
+%crate_install_bin
+```
+
+If Rust nightly is required, add the `%rustup_nightly` in `%prep`.
+
+Check the [Rust section on the SRPM page](../terra/SRPM#rust) for more information on these macros.
+
+#### Go
+
+If you use `go2rpm`, you SHOULD NOT use the default naming (except non-leaf packages) but you MAY `Provides:{:rpmspec}`, as an unnecessarily long package name with unnecessary information is bad for UX.
+
+Remove the `%generate_buildrequires{:rpmspec}` section, and add `%global gomodulesmode GO111MODULE=on{:rpmspec}`.
+
+#### Nim
+
+Use our [Nim macros](../terra/SRPM#nim).
+
+#### Zig
+
+Many Zig projects rely on ReleaseFast (or more rarely, ReleaseSmall) builds for runtime optimization, and some Zig projects only work correctly when built for certain microarchitectures or higher (usually, this is `x86_64_v2` instead of `baseline` due to reliance on SIMD).
+
+If either of the above are the case for your package, you can use `%zig_build_target` with appropriate options in the `%build` or `%install` section depending on how the project is built (as some can be built directly into root by setting the `DESTDIR=%{buildroot}` variable).
+
+Example:
+
+```rpmspec
+%build
+%{zig_build_target -r fast -c x86_64_v2} \
+  -Demit-docs
+```
+
+Note that `-c` also works as a fallback option to the target architecture set by RPM if no following argument is supplied. However, this can **_only_** be used when RPM and Zig's architecture formats are the same, otherwise the build will fail.
+
+Also note that ReleaseFast and especially ReleaseSmall will strip some debug info from the binaries, some Zig projects have enabled build flags to override this and those **_should_** be used if available (this will usually be `-Dstrip=false`). If they are not, you may need to disable debug packages using the global variable `%global debug_package %{nil}` if not enough debug info is preserved to strip.
+
+For projects where dynamic linking of all dependencies is simply not possible (such as the version in the Fedora repos being too new or too old) or that have no dependencies to link, you can pass the `-s` flag. You can (and should) still dynamically link compatible dependencies by using `-fsys=pkgname`.
+
+### Shell completions
+
+- SHOULD be a subpackage.
+- Should use the [`%pkg_completion` macro](../terra/SRPM#pkg_completion).
+
+For more information on the macros, see [here](../terra/SRPM#).
+
+### Development and Shared Libraries
+
+You SHOULD try to use the [`%pkg_devel_files`, `%pkg_libs_files` and `%pkg_static_files` macros](../terra/SRPM#subpackages).
+
+Shared library packages SHOULD be suffixed with `-libs`.
+These packages SHOULD NOT contain anything **except**:
+
+```rpmspec
+%_libdir/*.so.*
+%doc …
+%license …
+```
+
+<Callout type="warning">
+  Do not confuse the `-libs` file (`*.so.*`) with a `-devel` file (`*.so`).
+</Callout>
+
+Development library packages SHOULD be suffixed with `-devel`.
+These packages SHOULD NOT contain anything **except**:
+
+```rpmspec
+%doc …
+%license …
+%_includedir/*
+# ^ source files, depending on the language, could be in other locations
+%_libdir/*.so
+%_libdir/*.a
+%_libdir/pkgconfig/%{name}.pc
+# and other development files (.vapi, .typelib, .gir, etc.).
+```
+
+### Miscellaneous
+
+#### Patches
+
+- Packages files SHOULD only use the `-p1` flag in `%autosetup` if patches are being applied
+- Packages SHOULD apply patches during `%autosetup`. If this is not possible (typically when `%autosetup is not used`), you should use [`%autopatch`](../rpm/macros#autopatch).
+
+#### Fixing Packages
+
+- If a package fix PR is fixing/changing anything user-facing, the `Release:` tag SHOULD be bumped. The only exception *should* be if you are fixing a package where the current version does not and has never built.
+  - Some (not all!) examples of 'user-facing' fixes requiring a `Release:` bump:
+    - Installing a missing file.
+    - Adding a needed package to the `Requires:`.
+    - Changing any user-facing "metainfo" fields (`URL:`, `License:`,  `Summary:`, etc.).
+- If a package fix PR is fixing/changing anything build-facing, the `Release` tag does not need to be bumped.
+  - Some (not all!) examples of 'user-facing' fixes requiring a `Release:` bump:
+    - Adding a needed package to the `BuildRequires:`.
+    - Fixing a package that failed to build when version bumped.
+    - Adding/changing new macros/build steps/install steps/general source code handing during build time (assuming this does not affect the installed files the user will see).
+- If you are unsure if a `Release:` bump is needed, please open the PR and ask, and we will be happy to provide guidance!
