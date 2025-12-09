@@ -22,10 +22,8 @@ These macros define certain system directories.
 [TODO]
 
 ### %_anda_srpm_macros_dir
-`/usr/libexec/anda-srpm-macros`.
-
-### %__anda_staticfiles
-[TODO]
+Expands to: `/usr/libexec/anda-srpm-macros`.
+Anda directory for scripts such as `find-develinfo.sh` used by Anda macros.
 
 ### %__anda_libsfiles
 [TODO]
@@ -205,15 +203,43 @@ For projects where dynamic linking of all dependencies is simply not possible (s
 More information can be found on our [Zig packaging guidelines](../terra/policy#zig).
 
 ## Miscellaneous
+General macros that do not fit into a specific category.
 
-### %git_clone
-Downloads the source code via `git clone` with the `--depth=1`, `-q`, and `--recursive-submodules` flags. Should only be used when downloading a compressed source cannot be used (for example, if the build process expects a git environment or the release tarball doesn't contain submodules).
+### %__anda_staticfiles
+Expands to: `%_anda_srpm_macros_dir/find-staticinfo.sh %buildroot > anda-staticfiles.list`.
+Creates anda-staticfiles.list file in `%{buildroot}` to be used by `%pkg_static_files`.
 
 ### %evr
 used for declaring how a package interacts with others, for acampe, in a `Requires:` tag.
 For example, `Requires: %{name} = %evr`
 expands to `%{?epoch:%{epoch}:}%{version}-%{release}`.
 
+### %git_clone
+Downloads the source code via `git clone`, and passes useful flags such as`--depth 1`, `-q`, `--recursive-submodules`, and `-j${RPM_BUILD_NCPUS}`.
+A URL and a version or commit hash can be passed to this macro.
+Below is an example of how a spec that tracks version tages from a GitHub repo, and needs to git clone the source could handle this:
+
+```rpmspec
+Version:        0.8.0
+---
+URL:            https://github.com/ethangreen-dev/lovely-injector
+---
+%prep
+%git_clone %{url} v%{version}
+```
+
+Below is an example of how a spec that tracks the latest commit from a GitHub repo, and needs to git clone the source could handle this:
+
+```rpmspec
+%global commit 9417838c91aab6088778089b9a3e8330bca53fbd
+---
+URL:           https://github.com/ad-oliviero/uwufetch
+---
+%prep
+%git_clone %{url} %{commit}
+```
+
+`%git_clone` should only be used when downloading a compressed source cannot be used (for example, if the build process expects a git environment or the release tarball doesn't contain submodules).
 
 | Macro                           | Function                                                               |
 | ------------------------------- | ---------------------------------------------------------------------- |
