@@ -219,7 +219,7 @@ You can disable `mold` for Rust and Nim by using `%bcond_with mold`.
 
 ### Interpreted Languages (Python, Ruby, etc.)
 
-All packages using interpreted languages follow the traditional Fedora guidelines, with all dependencies **_must_** be packaged individually as they are considered runtime dependencies.
+All packages using interpreted languages follow the traditional Fedora guidelines. All dependencies **_must_** be packaged individually as they are considered runtime dependencies.
 
 ### Dynamically compiled languages (C, C++, Vala)
 
@@ -269,6 +269,8 @@ In some rare cases, you might need to use `%cargo_build` and `%crate_install_bin
 ```
 
 If Rust nightly is required, add the `%rustup_nightly` in `%prep`.
+
+Check the [Rust section on the SRPM page](../SRPM) for more information on these macros.
 
 #### Go
 

@@ -11,26 +11,29 @@ You may need to refer to the [miscellaneous packaging guidelines](./policy#misce
 
 For other macros available in Fedora/Terra, check out our unofficial [macros list](../rpm/macros).
 
-# Directories
+## Directories
 
-## %__anda_develfiles
+### %__anda_develfiles
+[TODO]
 
-## %_anda_srpm_macros_dir
+### %_anda_srpm_macros_dir
 `/usr/libexec/anda-srpm-macros`.
 
-## %__anda_staticfiles
+### %__anda_staticfiles
+[TODO]
 
-## %__anda_libsfiles
+### %__anda_libsfiles
+[TODO]
 
-## %elvish_completions_dir
+### %elvish_completions_dir
 `%_datadir/elvish/lib/completions`
 
-## %rpmbuilddir
+### %rpmbuilddir
 `%{?builddir}%{?!builddir:%{_builddir}}`.
 
-# Electron
+## Electron
 
-## %electronmeta
+### %electronmeta
 Set up all basic requirements including build macros for building an Electron app.
 
 Rundown of what all `%electronmeta` does:
@@ -52,7 +55,7 @@ Rundown of what all `%electronmeta` does:
 
 This ensures packagers do not need to manually set these for every Electron app's spec, hopefully eliminating depsolver problems and helping reduce common build issues.
 
-## %electron_install
+### %electron_install
 Install files built using Electron Builder.
 
 By default, the install steps are:
@@ -84,10 +87,10 @@ Example:
   - A second symlink called `alsoapp`
   - A desktop file with the `Exec` line reading `Exec=/usr/lib(64)/pkgname/app --enable-features=WaylandWindowDecorations --ozone-platform=wayland %u`
 
-## %electron_license
+### %electron_license
 The license for bundled Electron. NOT set by default in `%electronmeta` because you cannot set the license field twice. MAY be used in combination with manually adding the other relevant licenses (if this is done, a proper license tag would be `License: XXX-x.x AND %electron_license`.
 
-## %electron_arches
+### %electron_arches
 The architectures Electron supports. Automatically set as `ExclusiveArch` when using `%electronmeta`.
 
 As written, the macro is:
@@ -98,62 +101,80 @@ Which expands fully to:
 
 Which simply means Electron supports x86_64, x86, aarch64/ARM64, and armv7l.
 
-# Go
+## Go
 
-## %go_task
+### %go_task
 Should be used in place of `go-task`.
 
-# JavaScript/JavaScript Package Managers
+## JavaScript/JavaScript Package Managers
 
-# Nim
+## Nim
 
-# Rust
+### %nim_prep
+`nimble`.
 
-## %cargo_prep_online
+### %nim_build (or %nim_c)
+Builds a nim package.
+Requires an argument to `src/pkgname`
+
+### %nim_tflags
+[TODO]
+
+### %nim_lflags
+[TODO]
+
+## Rust
+
+### %cargo_prep_online
 Enables internet access for `cargo_prep`. Replaces `%cargo_prep` in `%prep`.
 
-## %cargo_license_online
+### %cargo_license_online
 Enables internet access for `cargo_license`.
 Replaces `%cargo_license` in `%build`.
 
-## %cargo_license_summary_online
+### %cargo_license_summary_online
 Enables internet access for `cargo_license_summary`.
 Replaces `%cargo_license_summary` in `%build`.
 
-## %cargo_vendor_manifest_online
+### %cargo_vendor_manifest_online
 Enables internet access for `cargo_vendor_manifest_online`. 
 Replaces `%cargo_vendor_manifest` in `%build`. 
 
-## %crate_install_bin
+### %crate_install_bin
 Used to install crates that build as single binary.
 Can be used instead of `%cargo_install` when [this](https://github.com/terrapkg/packages/issues/1169) is applicable.
 
-## %rustup_nightly
+### %rustup_nightly
 Used in `%prep` for nightly `rustc`/`cargo` from `rustup`.
 
-# Subpackages
+### %cargo_prep_online_sccache
+[TODO]
 
-## %pkg_completion
+## Subpackages
+
+### %pkg_completion
 Check [here](https://developer.fyralabs.com/terra/policy#shell-completions) for more details
 
-## pkg_devel_files
+### pkg_devel_files
 Set the summary & description, then find development `%files`.
 
-## %pkg_static_files
+### %pkg_static_files
 Set the summary & description, then find static libraries.
 
-## %pkg_libs_files
+### %pkg_libs_files
+[TODO]
 
+## Zig
 
+### %zig_build_target
+Check out our Zig packaging guidelines [here](https://developer.fyralabs.com/terra/policy#zig)
 
-# Zig
+## Miscellaneous
 
-# Miscellaneous
-
-## %git_clone
+### %git_clone
 Downloads the source code via `git clone` with the `--depth=1`, `-q`, and `--recursive-submodules` flags. Should only be used when downloading a compressed source cannot be used (for example, if the build process expects a git environment or the release tarball doesn't contain submodules).
 
-## %evr
+### %evr
 used for declaring how a package interacts with others, for acampe, in a `Requires:` tag.
 For example, `Requires: %{name} = %evr`
 expands to `%{?epoch:%{epoch}:}%{version}-%{release}`.
@@ -161,14 +182,9 @@ expands to `%{?epoch:%{epoch}:}%{version}-%{release}`.
 
 | Macro                           | Function                                                               |
 | ------------------------------- | ---------------------------------------------------------------------- |
-| `%nim_prep`                     | Setting up `nimble`                                                    |
-| `%nim_build` or `%nim_c`        | Builds a nim package. Requires an argument to `src/pkgname`            |
-| `%nim_tflags`                   |                                                                        |
-| `%nim_lflags`                   |                                                                        |
 | `%files_libs`                   |                                                                        |
 | `%_sccache`                     | `/usr/bin/sccache`                                                     |
 | `%sccache_prep`                 | Sets up environment variables for `sccache`                            |
-| `%cargo_prep_online_sccache`    |                                                                        |
 | `%bun_common_envvars`           |                                                                        |
 | `%__bun`                        | `/usr/bin/env %{bun_common_envvars} /usr/bin/bun`                      |
 | `%__bunx`                       |                                                                        |
@@ -206,4 +222,3 @@ expands to `%{?epoch:%{epoch}:}%{version}-%{release}`.
 | `%npm_license`                  |                                                                        |
 | `%node_self_test`               |                                                                        |
 | `%npm_test`                     |                                                                        |
-| `%zig_build_target`             | Check out our Zig packaging guidelines [here](https://developer.fyralabs.com/terra/policy#zig) |
