@@ -7,36 +7,63 @@ description: "Frequently Asked Questions"
 
 ## Repo Information
 
+### What packages does Terra have?
+
+A lot!
+
+Some popular packages include:
+- [Stardust XR](https://stardustxr.org/) components
+- [Zed](https://zed.dev)
+- [Ghostty](https://ghostty.org/)
+- [Bazzite's](https://bazzite.gg/) offical build of Mesa, and other packages used in UBlue projects.
+- [Prism Launcher](https://prismlauncher.org)
+- Various hardware enablement tools
+
+You can search packages via `dnf search`, [pkgs.org], or [Repology].
+
+### Why YET another repository? Why not RPM Fusion? Why not Copr?
+
+The main principles that guide Terra are:
+- Ease of use, for users, maintainers, distros, and projects.
+  - For users, we purposely chose to host the project on a monorepo on GitHub so it's easy to discover, debug, and report issues. In general, we emphasize pragmatism when it improves the user experience.
+  - For maintainers, we try to lower the burden required to contribute by:
+    - Using common and easily accessible platforms such as GitHub.
+    - More lenient guidelines, such as allowing anonymous contributions, online builds, and all packages that are redistributable.
+    - Heavily documenting our workflow and RPM packaging in general.
+    - Using a custom toolchain and set of packaging helpers/macros, that extend on Fedora's.
+  - For distros, we provide a shared infrastructure that allows them to collaborate with other distros.
+    - For example, [Bazzite's](https://bazzite.gg) custom build of mesa, which is hosted on Terra, is co-maintained and used by Ultramarine Linux.
+  - For projects, we give an easy path to distribute their software with minimal downstream modifications, near to immediate updates, and less red tape.
+    - For example, Terra and [Prism Launcher](https://prismlauncher.org) have worked together in order to automatically build and distrbute nightly versions of Prism Launcher, that allows users to test new changes and discover bugs, before they hit a stable release.
+    - Another example is with the [Stardust XR](https://stardustxr.org) project, which was a largely collaborative effort to bring their software to end-users.
+- Automation that tracks, updates, and backports packages, reducing the time between upstream release and distribution to end-users. Additionally, this reduces a significant burden for maintainers, who have lives too ;p.
+- The latest and greatest, which is why Terra offers nightly, preview, and rolling-release versions of packages when needed.
+
+Due to our principles, our goals for Terra are different than the goals of other repositories. Here is a comparison:
+- [RPM Fusion](https://rpmfusion.org/) is a great repository, but it doesn't have the level of openness and transparency we're aiming for. Additionally, Terra runs on a rolling release model, which Fusion doesn't claim to meet.
+  - Of course, these aspects have benefits and trade-offs, rolling release means you get the latest and greatest, but has a level of implied instability. Lowering the bar for contribution allows for more people to contribute more packages, which may be a trade-off in quality. We try to balance these aspects and find a solution we think works best.
+- [Copr](https://copr.fedorainfracloud.org) is great for individuals who want to utilize Fedora infrastructure to maintain and package personal repositories.
+  - However, this diverges from a major aspect of Terra, which is our shared infrastructure, maintainers, and community. We belive this allows for a more consistent standard of quality and discoverability of packages.
+
+A much more detailed answer can be found from one of our maintainers: https://github.com/terrapkg/packages/issues/6897#issuecomment-3447981771.
+
+### Why do you hate Fedora?
+
+We don't. We maintain a good relationship with the Fedora Project, several maintainers, and other downstreams. Note that Terra does not replace Fedora, it depends on and supplements Fedora.
+While we may have disagreements of principle with upstream, we still highly value and respect their work, in which Terra would not be possible without.
+We do market Terra in a way that some may feel provocative, but our intent is not to denegrate the work of others, but rather differentiate ourselves as a project.
+
+## Technical details
+
 ### Where is the file server?
 
-https://repos.fyralabs.com/terra41/
+https://repos.fyralabs.com/terrarawhide/
 
 or for sources
 
-https://repos.fyralabs.com/terra41-source/
+https://repos.fyralabs.com/terrarawhide-source/
 
-Replace `41` with your Fedora release version.
-
-### What packages does Terra have?
-
-A lot! 
-We have all necessary [Stardust XR](https://stardustxr.org/) compontents, various hardware enablement tools, and also games, apps, fonts, and more!
-
-You can search packages via `dnf search` or [Repology].
-
-### Why YET another repository?
-
-- Terra has much more transparency and ease of use/contribution
-
-  - You can see build logs via [Github Actions]
-    - NOTE: due to [Github limitations](https://docs.github.com/en/actions/learn-github-actions/usage-limits-billing-and-administration#artifact-and-log-retention-policy), logs are kept for 90 days only
-  - The [Andaman] build system and [Subatomic] are fully open sourced
-
-- You can add and manage packages much more easily (See [Contribute](contributing))
-- Our autoupdate system ensures that you get the latest packages, with less maintainer burden
-- You should see the full introduction at https://terra.fyralabs.com
-
-## Technical details
+Replace `rawhide` with your Fedora version release number.
 
 ### What is your Build Infrastructure?
 
@@ -69,6 +96,7 @@ https://repos.fyralabs.com/terrarawhide-source/
 You should be able to grab them by `dnf download --source <pkgname>`
 
 [repology]: https://repology.org/repository/terra_rawhide
+[pkgs.org]: https://fedora.pkgs.org/rawhide/terra/
 [github actions]: https://github.com/terrapkg/packages/actions
 [andaman]: https://github.com/FyraLabs/anda
 [subatomic]: https://github.com/FyraLabs/subatomic

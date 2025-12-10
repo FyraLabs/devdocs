@@ -8,7 +8,7 @@
 
 3. Set the necessary flags for the Submarine partition with `cgpt add -i <partition number> -t kernel -P 15 -T 1 -S 1 /dev/sdX`, substituting &lt;partition number&gt; for the number of the Submarine partition and `/dev/sdX` for the block device of your external media.
 
-4. Write `submarine-x86_64.kpart` to the Submarine partition created in step 2.
+4. Write `submarine-<arch>.kpart` to the Submarine partition created in step 2.
 
 5. Reminder: to boot Submarine from external media, you first need to run the following commands as root
 
@@ -40,7 +40,7 @@ makepkg -si
 
 4. As before, set the necessary flags for the Submarine partition on your internal disk.
 
-5. Write `submarine-x86_64.kpart` to the Submarine partition.
+5. Write `submarine-<arch>.kpart` to the Submarine partition.
 
 6. Proceed with the rest of the Arch Linux installation as described in the installation guide on the ArchWiki.
 
