@@ -43,6 +43,7 @@ Anda directory for scripts such as `find-develinfo.sh` used by Anda macros.
 
 ### %__pnpm
 `/usr/bin/env %{pnpm_common_envvars} %{?with_vendored_pnpm:%{rpmbuilddir}/pnpm/pnpm}%{!?with_vendored_pnpm:/usr/bin/pnpm}`
+[TODO]: Should macros like these be in the directories section?
 
 ### %__pnpx
 [TODO]
@@ -134,58 +135,80 @@ Should be used in place of `go-task`.
 ## JavaScript/JavaScript Package Managers
 These are macros to assist with the general packaging of applications that use JavaScript runtimes/nodeJS
 [TODO]: make this sound not stupid
+[TODO]: descriptions for the sub-sections
+[TODO]: examples/links to examples of how to use the macros here (at least the common ones)
 
 ### Bun Macros
+[TODO]
 
 #### %bun_common_envvars
+[TODO]
 
 #### %__bun
 Expands to: `/usr/bin/env %{bun_common_envvars} /usr/bin/bun`
 
 #### %__bunx
+[TODO]
 
 #### %bun_build
-bun build
+Should be used in place of `bun build`.
 
 #### %bun_audit
-bun audit, for use in the `%check` section
+bun audit, for use in the `%check` section.
 
 #### %bun_pm_trust
+[TODO]
 
 ### Node Macros
+[TODO]
 
 #### %fetch_node_tests
+[TODO]
 
 ### NPM Macros
+[TODO]
 
 #### %npm_common_envvars
+[TODO]
 
 #### %npm_buildflags
+[TODO]
 
 #### %set_node_build_flags
+[TODO]
 
 #### %__npm
+[TODO]
 
 #### %__npx
+[TODO]
 
 #### %npm_build
 Should be used in place of `npm build`.
 
 #### %__nvm
+[TODO]
 
 #### %npm_prep
+[TODO]
 
 #### %npm_install
+[TODO]
 
 #### %npm_audit
+[TODO]
 
 #### %npm_audit_fix
+[TODO]
 
 #### %npm_license_summary
+[TODO]
 
 #### %npm_test
+[TODO]
 
 #### %node_self_test
+[TODO]
 
 #### %__npm_license_checker
 Expands to: `/usr/bin/license-checker`.
@@ -222,8 +245,10 @@ Example output:
 Use if PNPM is not usable/available from repo
 
 #### %pnpm_common_envvars
+[TODO]
 
 #### %__pnpx
+[TODO]
 
 #### %pnpm_build
 Should be used in place of `pnpm build`.
@@ -238,13 +263,16 @@ Fix dependencies using PNPM
 Approve dependency scripts if needed
 
 ### Yarn Macros
+[TODO]
 
 #### %yarn_common_envvars
+[TODO]
 
 #### %__yarn
 Expands to: `/usr/bin/env %{yarn_common_envvars} /usr/bin/yarn`.
 
 #### %__yarn_dlx
+[TODO]
 
 #### %yarn_build
 Should be used in place of `yarn build`.
@@ -353,6 +381,7 @@ yadm-zsh-completion-x.x.x-x.fcxx.noarch.rpm - contains `/usr/share/zsh/site-func
 ```
 
 ### %pkg_devel_files
+[TODO]: flesh this out lol
 Set the summary & description, then find development `%files`.
 
 ```
