@@ -83,9 +83,9 @@ By default, the install steps are:
 1. Make the install directory
   - This will be in the `%{_libdir}` (/usr/lib on 32-bit architectures and /usr/lib64 on 64-bit ones)
   - This is done because programs with bundled dependencies (Electron, Node modules, and more) MUST have these dependencies kept together
-1. Install the app's files
-1. Symlink the app's binary to the bin directory
-1. Install the app's icons
+2. Install the app's files
+3. Symlink the app's binary to the bin directory
+4. Install the app's icons
 
 `%electron_install` supports several flags to help control variables of the install. Most of the fallbacks if none are passed are the name of the package.
 - `-b` must be used when the app's executable differs from the name of the package.
