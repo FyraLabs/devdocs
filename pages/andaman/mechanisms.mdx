@@ -74,7 +74,9 @@ Which will be parsed to:
 
 See [Terra autoupdate documentation](/terra/autoupdate) for supported functions in AndaX
 
-Anda supports automatically updating packages via the `anda update` command. The command finds all the projects with the file `update.rhai` in the same directory or if the configuration file has the `update` property set to a value:
+Anda supports automatically updating packages via the `anda update` command.
+The command finds all the projects with an `update.rhai` in the same directory.
+It can also find a project if the configuration file has the `update` property set:
 
 ```rhai
 project project_name {

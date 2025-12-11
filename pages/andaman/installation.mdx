@@ -7,11 +7,11 @@ description: Install Andaman
 
 ## Ultramarine Linux
 
-Ultramarine comes with the Terra Repository, simply install Andaman!
+Ultramarine comes with the Terra Repository; simply install Andaman!
 
 `sudo dnf install anda`
 
-## Fedora and derivatives
+## Fedora and Derivatives
 
 ```bash
 sudo dnf install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' terra-release
@@ -24,13 +24,13 @@ curl -fsSL https://github.com/terrapkg/subatomic-repos/raw/main/terra.repo | pke
 sudo rpm-ostree install terra-release
 ```
 
-Optionally, you can install `terra-release-extra` to use the Extras repository. This also installs the Nvidia, and Mesa streams but does not enable them.
+Optionally, you can install `terra-release-extra` to use the Extras repository. This also installs the Nvidia and Mesa streams but does not enable them.
 
 Then, install Andaman
 
 `sudo dnf install anda`
 
-## Enterprise Linux (EL) and derivatives
+## Enterprise Linux (EL) and Derivatives
 
 Only EL10 is supported. Not all packages available in Terra are available in Terra EL at this time.
 
@@ -46,7 +46,7 @@ And Terra EL itself can be installed with:
 sudo dnf install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terrael$releasever' terra-release
 ```
 
-Then, install Andaman
+Then, install Andaman:
 
 `sudo dnf install anda`
 

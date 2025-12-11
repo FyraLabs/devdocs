@@ -17,11 +17,13 @@ import { Callout } from "nextra/components";
 
 Packagers and maintainers MUST follow the policies and guidelines listed in this document.
 
-These are general packaging guidelines for Terra. Everything covered here is one of 3 things:
+These are packaging guidelines for Terra. Everything covered here is one of 3 things:
 
-- A difference in the Fedora guidelines
-- In addition to the Fedora guidelines
+- A difference in the [Fedora Packaging Guidelines]
+- In addition to the [Fedora Packaging Guidelines]
 - Adding a new guideline
+
+If something seems missing, please refer to the [Fedora Packaging Guidelines].
 
 ## Terra Packaging Guidelines
 
@@ -33,7 +35,7 @@ The package maintainer of a package SHOULD be added to the `Packager:{:rpmspec}`
 Packager: Raboneko <raboneko@fyralabs.com>
 ```
 
-### Usages of the `mold` linker
+### Usages of the `mold` Linker
 
 We encourage the use of [`mold`](https://github.com/rui314/mold), which may speed up build times especially in large projects.
 You MAY enable it in C/++ projects by adding `-fuse-ld=mold` in `CFLAGS`/`CXXFLAGS`.
@@ -47,11 +49,11 @@ You can disable `mold` for Rust and Nim by using `%bcond_with mold`.
 All packages using interpreted languages follow the traditional Fedora guidelines.
 All dependencies **_must_** be packaged individually as they are considered runtime dependencies.
 
-### Dynamically compiled languages (C, C++, Vala)
+### Dynamically Compiled Languages (C, C++, Vala)
 
 Dependencies required for runtime MUST be packaged separately.
 
-### Statically compiled languages
+### Statically Compiled Languages
 
 As Terra does not strictly follow Fedora's reproducibility requirements, and we do not want large amounts of development libraries for them, packagers SHOULD vendor dependencies on build time.
 
@@ -127,7 +129,7 @@ Also note that ReleaseFast and especially ReleaseSmall will strip some debug inf
 
 For projects where dynamic linking of all dependencies is simply not possible (such as the version in the Fedora repos being too new or too old) or that have no dependencies to link, you can pass the `-s` flag. You can (and should) still dynamically link compatible dependencies by using `-fsys=pkgname`.
 
-### Shell completions
+### Shell Completions
 
 - SHOULD be a subpackage.
 - Should use the [`%pkg_completion` macro](../terra/SRPM#pkg_completion).
@@ -186,8 +188,8 @@ These packages SHOULD NOT contain anything **except**:
     - Adding/changing new macros/build steps/install steps/general source code handing during build time (assuming this does not affect the installed files the user will see).
 - If you are unsure if a `Release:` bump is needed, please open the PR and ask, and we will be happy to provide guidance!
 
-#### Usage of Periods in Package fields
-- You MUST not have a period in the `Summary:`, and you SHOULD have a period in all `%description` descriptions.
+#### Usage of Periods in Package Fields
+- You MUST not have a period at the end of the `Summary:`, and you SHOULD have a period at the end of all `%description` descriptions.
 
 #### Usage of %elifarch
 
@@ -213,3 +215,5 @@ Correct:
 %define arch arm64-
 %endif
 ```
+
+[Fedora Packaging Guidelines]: https://docs.fedoraproject.org/en-US/packaging-guidelines/
