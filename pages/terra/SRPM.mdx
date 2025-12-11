@@ -26,7 +26,7 @@ For other macros available in Fedora/Terra, check out our unofficial [macros lis
 </Callout>
 
 ## Directories
-These macros define certain system directories.
+These macros define certain system directories, and SHOULD be used in place of the raw directory path.
 
 ### %__anda_develfiles
 [TODO]
@@ -38,8 +38,38 @@ Anda directory for scripts such as `find-develinfo.sh` used by Anda macros.
 ### %__anda_libsfiles
 [TODO]
 
+### %_applicationsdir
+Expands to: `%_datadir/applications` or `/usr/share/applications`.
+This may seem like a directory to place the application itself into, but this directory SHOULD ONLY be used for the applicaitons `.desktop` file.
+
 ### %elvish_completions_dir
 `%_datadir/elvish/lib/completions`
+
+### %_hicolordir 
+Expands to: `%_iconsdir/hicolor`, or `/usr/share/icons/hicolor`.
+The directory that SHOULD be used when installing application `.png` files. Note that you will then need to install the (typically app icon) file to the `apps` folder within the fixed-size directory in `%_hicolordir`.
+
+For example:
+
+```bash
+# Lets say package 'foo' has a 16x16 and 64x64 .png
+install -Dm644 icons/16x16.png %{buildroot}%{_hicolordir}/16x16/apps/%{name}.svg
+install -Dm644 icons/64x64.png %{buildroot}%{_hicolordir}/64x64/apps/%{name}.svg
+```
+
+If the file is a `.svg`, use the macro below.
+
+### %_hicolor_apps_scale_dir
+Expands to: `%_hicolordir/scalable/apps`, or `/usr/share/icons/hicolor/scalable/apps/`.
+The directory that SHOULD be used when installing application `.svg` files to.
+You do not need to specify any folders for this macro, add the file can be added to the end of this macro.
+For example:
+
+```bash
+install -Dm644 icons/%{name}.svg %{buildroot}%{_hicolor_apps_scale_dir}/%{name}.svg
+```
+
+If the file is a `.png`, use the macro above.
 
 ### %__pnpm
 `/usr/bin/env %{pnpm_common_envvars} %{?with_vendored_pnpm:%{rpmbuilddir}/pnpm/pnpm}%{!?with_vendored_pnpm:/usr/bin/pnpm}`
