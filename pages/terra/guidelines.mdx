@@ -185,3 +185,31 @@ These packages SHOULD NOT contain anything **except**:
     - Fixing a package that failed to build when version bumped.
     - Adding/changing new macros/build steps/install steps/general source code handing during build time (assuming this does not affect the installed files the user will see).
 - If you are unsure if a `Release:` bump is needed, please open the PR and ask, and we will be happy to provide guidance!
+
+#### Usage of Periods in Package fields
+- You MUST not have a period in the `Summary:`, and you SHOULD have a period in all `%description` descriptions.
+
+#### Usage of %elifarch
+
+To make specs easier to read, you SHOULD use `%elifarch` instead of `%endif` followed by `%ifarch`.
+
+Incorrect:
+
+```rpmspec 
+%ifarch x86_64
+%define arch %{nil}
+%endif
+%ifarch aarch64
+%define arch arm64-
+%endif
+```
+
+Correct:
+
+```rpmspec
+%ifarch x86_64
+%define arch %{nil}
+%elifarch aarch64
+%define arch arm64-
+%endif
+```
