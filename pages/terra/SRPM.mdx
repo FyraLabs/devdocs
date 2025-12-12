@@ -41,15 +41,14 @@ Anda directory for scripts such as `find-develinfo.sh` used by Anda macros.
 ### %elvish_completions_dir
 `%_datadir/elvish/lib/completions`
 
-### %__pnpm
-`/usr/bin/env %{pnpm_common_envvars} %{?with_vendored_pnpm:%{rpmbuilddir}/pnpm/pnpm}%{!?with_vendored_pnpm:/usr/bin/pnpm}`
-[TODO]: Should macros like these be in the directories section?
-
-### %__pnpx
-[TODO]
-
 ### %rpmbuilddir
-`%{?builddir}%{?!builddir:%{_builddir}}`.
+This macro exists because Terra supports EL distributions (Red Hat Enterprise Linux, Alma Linux, etc.) which currently have an RPM version from before the [`%{builddir}` change to address issues like this](https://github.com/rpm-software-management/rpm/issues/3151).
+
+The common, albeit clunky, solution is to define `%{builddir}` manually as `%{_builddir}` in specs targeting distros with different versions of RPM where one has a version older than 4.20. We have this macro instead to make the process easier.
+
+This macro is subject to being retired once all EL distributions with an RPM version older than 4.20 are end of life (likely when EL10 is end of life), or in the event we can no longer support EL distributions this old.
+
+Expands to: `%{?builddir}%{?!builddir:%{_builddir}}`
 
 ## Electron
 These macros assist with the general packaging of applications that use [Electron](https://www.electronjs.org/).
@@ -91,7 +90,7 @@ By default, the install steps are:
 - `-b` must be used when the app's executable differs from the name of the package.
 - `-d` can be used to install the app under a different directory than the name of the package.
 - `-i` must be used when the app's desktop file points to an icon name different from the name of the package.
-- `-l` can be used to fetch all licenses including the bundled ones and put them in a directory in the `%{builddir}`. You can then put them in the license directory using `%license %{rpmbuilddir}/bundled_licenses/*` (for more information on `%{rpmbuilddir}` and why we have it, see [TBA])
+- `-l` can be used to fetch all licenses including the bundled ones and put them in a directory called `bundled_licenses`. You can then put them in the license directory using `%license bundled_licenses/*`
 - `-s` can be used to choose the name of the symlink.
 - `-S` can be used to create an additional symlink with a different name. Useful when an app has two interchangeable common names.
 - `-D` can be used to handle automatic installation of the .desktop file. This ONLY works if Electron Builder builds an AppImage, and should not be used if the source contains a desktop file.
@@ -113,8 +112,6 @@ The license for bundled Electron.
 NOT set by default in `%electronmeta` because you cannot set the license field twice.
 MAY be used in combination with manually adding the other relevant licenses (if this is done, a proper license tag would be `License: XXX-x.x AND %electron_license`.
 
-To enable, must have `%bcond bundled_electron 1` in the [preamble](../rpm/sections#preamble) of the spec.
-
 ### %electron_arches
 The architectures Electron supports. Automatically set as `ExclusiveArch` when using `%electronmeta`.
 
@@ -127,82 +124,31 @@ Which expands fully to:
 Which simply means Electron supports x86_64, x86, aarch64/ARM64, and armv7l.
 
 ## Go
-These macros assist with building go projects.
+These macros assist with building Go projects.
 
 ### %go_task
 Should be used in place of `go-task`.
 
 ## JavaScript/JavaScript Package Managers
-These are macros to assist with the general packaging of applications that use JavaScript runtimes/nodeJS
+These are macros to assist with the general packaging of applications that use JavaScript runtimes, such as Node.js or Bun.
 [TODO]: make this sound not stupid
 [TODO]: descriptions for the sub-sections
 [TODO]: examples/links to examples of how to use the macros here (at least the common ones)
 
-### Bun Macros
-[TODO]
-
-#### %bun_common_envvars
-[TODO]
-
-#### %__bun
-Expands to: `/usr/bin/env %{bun_common_envvars} /usr/bin/bun`
-
-#### %__bunx
-[TODO]
-
-#### %bun_build
-Should be used in place of `bun build`.
-
-#### %bun_audit
-bun audit, for use in the `%check` section.
-
-#### %bun_pm_trust
-[TODO]
-
-### Node Macros
-[TODO]
-
-#### %fetch_node_tests
-[TODO]
-
-### NPM Macros
-[TODO]
-
-#### %npm_common_envvars
-[TODO]
-
-#### %npm_buildflags
-[TODO]
-
-#### %set_node_build_flags
-[TODO]
-
-#### %__npm
-[TODO]
-
-#### %__npx
-[TODO]
-
-#### %npm_build
-Should be used in place of `npm build`.
+### Node.js Macros
+Macros for Node.js itself. These require use of the existing Node.js macros in Fedora's `nodejs-packaging` package.
 
 #### %__nvm
 [TODO]
 
+### Node Module Macros
+"Node modules" refers to JavaScript packages run using a JavaScript runtime (usually Node.js), almost always hosted on the [NPM Registry](https://www.npmjs.com/).
+
 #### %npm_prep
-[TODO]
+Prepare a Node module for build steps.
 
 #### %npm_install
-[TODO]
-
-#### %npm_audit
-[TODO]
-
-#### %npm_audit_fix
-[TODO]
-
-#### %npm_license_summary
-[TODO]
+Install a Node module to `%{npm_sitelib}`.
 
 #### %npm_test
 [TODO]
@@ -212,7 +158,7 @@ Should be used in place of `npm build`.
 
 #### %__npm_license_checker
 Expands to: `/usr/bin/license-checker`.
-Runs the npm [`license-checker`](https://www.npmjs.com/package/license-checker) command.
+Runs the npm [`license-checker`](https://www.npmjs.com/package/license-checker-rseidelsohn) command.
 
 Example output:
 
@@ -231,6 +177,8 @@ Example output:
 Expands to: `/usr/bin/license-checker --limitAttributes licenses`.
 Above macro, but limits the output to only the license.
 
+Accepts an `-o` flag as a shorthand for `--out`.
+
 Example output:
 
 ```
@@ -239,46 +187,260 @@ Example output:
    └─ licenses: MIT
 ```
 
+SHOULD be used if packaging Node modules.
+
+Example usage:
+
+```
+%{npm_license} --out LICENSE.modules
+```
+
+OR:
+
+```
+%npm_license -o LICENSE.modules
+```
+
+The above would create a `LICENSE.modules` file which can then be packaged using `%license LICENSE.modules`.
+
+#### %npm_license_summary
+Outputs a summary of the bundled licenses. Useful for determining what to put in the `License:` section for Node modules.
+
+Expands to: `%{__npm_license_checker} --summary`
+
+### Notes for JavaScript package managers:
+1. The JavaScript package manager cache directories are placed in [`%{rpmbuilddir}`](#rpmbuilddir) because `$HOME` can be different depending on if a build is in Mock or RPM Build.
+  - This is very important for consistent macro behavior as well as if the cache must be modified or deleted during build for any reason.
+2. All macros calling the package managers also call NPM environment variables because most of them are using build dependencies from the NPM Registry, and some even wrap NPM commands with their own. This ensures consistent NPM behavior.
+
+### NPM Macros
+[TODO]
+
+#### %_npm_cache_dir
+Expands to: `%{rpmbuilddir}/.npm`
+
+#### %npm_common_envvars
+**NOTE:** NPM environment variables written in uppercase will be __ignored__ if the project sets different ones explicitly. This is intentional behavior which these macros do not override in order to avoid build issues. For more information, please see [this issue](https://github.com/npm/npm/issues/14528) in the original NPM GitHub repository.
+  - If for any reason you need to hardcode an environment override, use a flag passed to NPM or manually set the environment variable in all lowercase.
+  - For more information on NPM config flags and environment variables, please see: https://docs.npmjs.com/cli/v11/using-npm/config
+
+Expands to: `NPM_CONFIG_USERCONFIG=%{rpmbuilddir}/.npmrc NPM_CONFIG_GLOBALCONFIG=%{rpmbuilddir}/npmrc NPM_CONFIG_CACHE=%{_npm_cache_dir} NPM_CONFIG_LOGLEVEL=error NPM_CONFIG_FUND=false NPM_CONFIG_UPDATE_NOTIFIER=false NO_UPDATE_NOTIFIER=1 NPM_CONFIG_COLOR=always NPM_CONFIG_INIT_MODULE=%{rpmbuilddir}/.npm-init.js`
+
+What these do:
+- Forces all configuration files into the `%{rpmbuilddir}` so they are easily locatable and to prevent attempting to write to the host file system for global config
+- Sets the NPM log level to errors (previously `warn` but this included warnings irrelevant to builds or Node modules)
+- Disables funding notifications as this does not make sense to display in an automated build and causes log spam
+- Disables update notifications since we are using a packaged version of NPM unless using `%vendor_nodejs`
+- Sets color to "always" for more easily readable logs
+
+#### %npm_buildflags
+Explicit NPM configuration flags of the environment variables set by the Macros.
+
+Expands to: `--userconfig=%{rpmbuilddir}/.npmrc --globalconfig=%{rpmbuilddir}/npmrc --cache=%{rpmbuilddir}/.npm --loglevel=error --fund=false --update-notifier=false --color=always --init-module=%{rpmbuilddir}/.npm-init.js`
+
+#### %set_node_build_flags
+Set the flags and environment variables used for JavaScript package manager builds.
+
+Based on Fedora's `%set_build_flags`.
+
+Expands to:
+```
+NPM_CONFIG_USERCONFIG="%{rpmbuilddir}/.npmrc" ; export NPM_CONFIG_USERCONFIG ; \
+NPM_CONFIG_GLOBALCONFIG="%{rpmbuilddir}/npmrc" ; export NPM_CONFIG_GLOBALCONFIG ; \
+NPM_CONFIG_CACHE="%{_npm_cache_dir}" ; export NPM_CONFIG_CACHE ; \
+NPM_CONFIG_LOGLEVEL="error" ; export NPM_CONFIG_LOGLEVEL ; \
+NPM_CONFIG_FUND="false" ; export NPM_CONFIG_FUND ; \
+NPM_CONFIG_UPDATE_NOTIFIER="false" ; export NPM_CONFIG_UPDATE_NOTIFIER ; \
+NO_UPDATE_NOTIFIER="1" ; export NO_UPDATE_NOTIFIER ; \
+NPM_CONFIG_COLOR="always" ; export NPM_CONFIG_COLOR ; \
+NPM_CONFIG_INIT_MODULE="%{rpmbuilddir}/.npm-init.js" ; export NPM_CONFIG_INIT_MODULE ; \
+BUN_HOME="%{_bun_cache_dir}" ; export BUN_HOME ; \
+BUN_RUNTIME_TRANSPILER_CACHE_PATH="0" ; export BUN_RUNTIME_TRANSPILER_CACHE_PATH ; \
+PNPM_HOME="%{_pnpm_cache_dir}" ; export PNPM_HOME ; \
+YARN_CACHE_FOLDER="%{_yarn_cache_dir}" ; export YARN_CACHE_FOLDER ; \
+NPMFLAGS="${NPMFLAGS:-%{npm_buildflags} }" ; export NPMFLAGS
+```
+
+This ensures the environment variables are explicitly exported and are more likely to be picked up by all shell processes. It also creates an environment variable called `$NPMFLAGS` which can be passed to NPM in lieu of the macro `%{npm_buildflags}` to force our config, if necessary.
+
+This should only be needed in the event you are using `%__npx`, `%__pnpx`, `%__bunx` or `%__yarn_dlx`.
+
+#### %__npm
+Macro to call NPM with predetermined enviroment variables.
+
+Expands to: `/usr/bin/env %{npm_common_envvars} %{?with_vendored_nodejs:%{_vendored_nodejs_dir}/npm}%{!?with_vendored_nodejs:/usr/bin/npm}`
+
+#### %__npx
+Remotely run Node modules with NPX.
+
+Expands to: `/usr/bin/env %{npm_common_envvars} %{?with_vendored_nodejs:%{_vendored_nodejs_dir}/npx}%{!?with_vendored_nodejs:/usr/bin/npx}`
+
+#### %npm_build
+Should be used for building Electron projects with NPM. Has a great deal of flags to work around NPM specific limitations.
+
+Available flags:
+- `-c` will run `%{__npm} ci` instead of `%{__npm} install`. May be necessary for projects with stricter build dependencies.
+- `-e`: Execute commands and modules within the NPM build environment. Some commands may need `--` in between the command itself and the following arguments.
+- `-r`: Executes `%{__npm} run` for scripts in the `package.json`. Expects an argument.
+- `-E`: Execute Electron Builder/Electron Forge. Will NOT work for projects that require build steps which use Node.js or executing JavaScript scripts directly.
+- `-V`: Execute Electron Vite. Same limitation as with `-E`.
+- `-M`: Mode to use in Electron Vite builds. Accepts `production`, `development`, and `staging`. Note that this differs from `$NODE_ENV` so you can run any combination of Vite environment modes and Node.js environment modes.
+
+#### %npm_audit
+Audit with NPM if package uses bundled Node dependencies. For use in the `%check` section
+
+#### %npm_audit_fix
+Fix vulnerabilities found using `%npm_audit` Should be used in `%prep` section.
+
+Installed packages with fixed dependencies SHOULD be tested first to make sure the applied fix did not cause any issues.
+
+Available flags:
+- `-d` will run with `--dry-run` so you can check what the fix would do.
+- `-f` will run with `--force`, ignoring package locks or other requirements set by the module to fix the dependencies. MUST be tested locally and verified to not cause breakage.
+- `-o` will omit a dependency or group (such as `dev`) from being fixed.
+- `-O` will only fix a specified depency or group.
+- `-p` will limit the run to the package lock.
+
+LIMITATION: Cannot be used on modules installed using the `-g` flag (which is done in `%npm_prep`) which use a package lock.
+
+### Bun Macros
+[TODO]
+
+#### %__bun_home
+Unfortunately, Bun doesn't actually have a way to enforce this yet. However the proposed environment variable is `$BUN_HOME`, so we have this for the future.
+
+Expands to: `%{rpmbuilddir}/.bun`
+
+#### %_bun_cache_dir
+Directory that Bun cache files are stored in.
+
+Expands to: `%{_bun_home}/install/cache`
+
+#### %bun_common_envvars
+Sets the `$BUN_HOME` for when this feature becomes available and disables transpiler cache.
+
+Expands to: `%{npm_common_envvars} BUN_HOME=%{_bun_home} BUN_INSTALL_CACHE_DIR=%{_bun_cache_dir} BUN_RUNTIME_TRANSPILER_CACHE_PATH=%{_bun_cache_dir} FORCE_COLOR=1`
+
+#### %__bun
+Expands to: `/usr/bin/env %{bun_common_envvars} /usr/bin/bun`
+
+#### %__bunx
+Run Node modules (downloading them if necessary) with Bun.
+
+Expands to: `/usr/bin/env %{bun_common_envvars} /usr/bin/bunx`
+
+#### %bun_build
+Should be used to build Electron projects with Bun.
+
+#### %bun_audit
+Audit with Bun if package uses bundled Node dependencies. For use in the `%check` section
+
+NOTE: Bun audit is a currently a wrapper for NPM audit but lacks the `fix` option, in order to fix vulnerabilities you need to use `%npm_audit_fix`.
+
+You DON'T need to fix vulnerabilities for Node modules that are __not bundled in the final package.__ This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
+
+#### %bun_pm_trust
+Add Node modules to trusted dependencies so their postinstall scripts may be run. Should only be used if necessary.
+
+Available flags:
+- `-a` can be used to trust all dependencies, otherwise simply list the depdencies you want to trust after the command.
+
+Expands to: `%{__bun} pm trust`
+
 ### PNPM Macros
 
-#### %vendor_pnpm
-Use if PNPM is not usable/available from repo
+#### %_pnpm_home
+Where PNPM files and cache are stored.
+
+Expands to: `%{rpmbuilddir}/.pnpm`
+
+#### %_pnpm_store
+Where Node modules installed by PNPM usually go. This will usually not be produced when using PNPM as a build tool, but exists for rare builds it may be created in.
+
+Expands to: `%{_pnpm_home}/store`
 
 #### %pnpm_common_envvars
-[TODO]
+
+Expands to: `%{npm_common_envvars} PNPM_HOME=%{_pnpm_home}`
+
+#### %__pnpm
+
+Expands to: `/usr/bin/env %{pnpm_common_envvars} %{?with_vendored_pnpm:%{rpmbuilddir}/pnpm/pnpm}%{!?with_vendored_pnpm:/usr/bin/pnpm}`
 
 #### %__pnpx
-[TODO]
+Remotely execute Node modules using PNPX.
+
+Expands to: `/usr/bin/env %{pnpm_common_envvars} /usr/bin/pnpx`
+
+#### %vendor_pnpm
+Use if PNPM is not usable/available from the available repositories.
+
+Examples:
+- Fedora's currently packaged PNPM is too old for the build
+- You want to make the package build on EL (does not have PNPM)
+  - In this case, you SHOULD wrap `%vendor_pnpm` in `%if` macros such as:
+  - ```%if %{defined rhel}
+       %vendor_pnpm
+       %endif
+    ```
 
 #### %pnpm_build
-Should be used in place of `pnpm build`.
+Should be used for building Electron apps with PNPM.
+
+Available flags:
+- `-e`: Execute Node modules or installed programs in the PNPM build environment.
+- `-F`: Executes the `%{__pnpm} install` step with `--frozen-lockfile`. May be necessary for projects expecting very strict build dependencies, but can also override projects that do not enforce a lock.
+- `-N`: Executes the `%{__pnpm} install` step with `--no-frozen-lockfile`. Overrides projects that try to enforce a lockfile.
+- `-r`: Executes `%{__pnpm} run` for scripts in the `package.json`. Expects an argument. Not recommended for Electron Builder, Electron Forge, or Electron Vite commands.
+- `-R`: Makes `%{__pnpm} exec` run on every project in the worspace recursively. Use with caution.
+- `-v`: Run Electron Vite build steps. Not needed for all Electron apps.
 
 #### %pnpm_audit
-Audit pnpm if package uses bundled Node dependencies. For use in the `%check` section
+Audit with PNPM if package uses bundled Node dependencies. For use in the `%check` section
+
+You DON'T need to fix vulnerabilities for Node modules that are __not bundled in the final package.__ This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
 
 #### %pnpm_audit_fix
-Fix dependencies using PNPM
+Fix security issues in dependencies using PNPM.
 
 #### %pnpm_approve_builds
-Approve dependency scripts if needed
+Approve dependency scripts with PNPM if needed.
 
 ### Yarn Macros
 [TODO]
 
+#### %_yarn_cache_dir
+
+Expands to: `%{rpmbuilddir}/.yarn`
+
 #### %yarn_common_envvars
-[TODO]
+
+Expands to: `%{npm_common_envvars} YARN_CACHE_FOLDER=%{_yarn_cache_dir}`
 
 #### %__yarn
 Expands to: `/usr/bin/env %{yarn_common_envvars} /usr/bin/yarn`.
 
 #### %__yarn_dlx
-[TODO]
+Remotely execute a Node module with Yarn DLX.
+
+Expands to: `%{yarn_common_envvars} /usr/bin/yarn dlx`
+
+NOTE: Requires `yarnpkg-berry` instead of `yarnpkg` as a build dependency.
 
 #### %yarn_build
-Should be used in place of `yarn build`.
+Should be used to build Electron apps with Yarn.
+
+Available flags:
+- `-e`: Execute Node modules or installed programs in the Yarn build environment.
+- `-F`: Executes the `%{__yarn} install` step with `--frozen-lockfile`. May be necessary for projects expecting very strict build dependencies, but can also override projects that do not enforce a lock.
+- `-N`: Executes the `%{__yarn} install` step with `--no-lockfile`. Do not update a lockfile on depedency installation.
+- `-r`: Executes `%{__yarn} run` for scripts in the `package.json`. Expects an argument. Not recommended for Electron Builder, Electron Forge, or Electron Vite commands.
+- `-v`: Run Electron Vite build steps. Not needed for all Electron apps.
 
 #### %yarn_audit
-Audit yarn if package uses bundled Node dependencies. For use in the `%check` section
+Audit Yarn if package uses bundled Node dependencies. For use in the `%check` section
+
+You DON'T need to fix vulnerabilities for Node modules that are __not bundled in the final package.__ This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
 
 ## Nim
 These macros assist with building Nim projects.
@@ -300,18 +462,18 @@ Requires an argument to `src/pkgname`
 These macros assist with building Rust projects.
 
 ### %cargo_prep_online
-Enables internet access for `cargo_prep`. Replaces `%cargo_prep` in `%prep`.
+Enables internet access for `%cargo_prep`. Replaces `%cargo_prep` in `%prep`.
 
 ### %cargo_license_online
-Enables internet access for `cargo_license`.
+Enables internet access for `%cargo_license`.
 Replaces `%cargo_license` in `%build`.
 
 ### %cargo_license_summary_online
-Enables internet access for `cargo_license_summary`.
+Enables internet access for `%cargo_license_summary`.
 Replaces `%cargo_license_summary` in `%build`.
 
 ### %cargo_vendor_manifest_online
-Enables internet access for `cargo_vendor_manifest_online`. 
+Enables internet access for `%cargo_vendor_manifest_online`.
 Replaces `%cargo_vendor_manifest` in `%build`. 
 
 ### %crate_install_bin
