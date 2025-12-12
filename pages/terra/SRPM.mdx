@@ -254,9 +254,10 @@ NPM_CONFIG_UPDATE_NOTIFIER="false" ; export NPM_CONFIG_UPDATE_NOTIFIER ; \
 NO_UPDATE_NOTIFIER="1" ; export NO_UPDATE_NOTIFIER ; \
 NPM_CONFIG_COLOR="always" ; export NPM_CONFIG_COLOR ; \
 NPM_CONFIG_INIT_MODULE="%{rpmbuilddir}/.npm-init.js" ; export NPM_CONFIG_INIT_MODULE ; \
-BUN_HOME="%{_bun_cache_dir}" ; export BUN_HOME ; \
-BUN_RUNTIME_TRANSPILER_CACHE_PATH="0" ; export BUN_RUNTIME_TRANSPILER_CACHE_PATH ; \
-PNPM_HOME="%{_pnpm_cache_dir}" ; export PNPM_HOME ; \
+BUN_HOME="%{_bun_home}" ; export BUN_HOME ; \
+BUN_INSTALL_CACHE_DIR="%{_bun_cache_dir}" ; export BUN_INSTALL_CACHE_DIR \
+BUN_RUNTIME_TRANSPILER_CACHE_PATH="%{_bun_cache_dir}" ; export BUN_RUNTIME_TRANSPILER_CACHE_PATH ; \
+PNPM_HOME="%{_pnpm_home}" ; export PNPM_HOME ; \
 YARN_CACHE_FOLDER="%{_yarn_cache_dir}" ; export YARN_CACHE_FOLDER ; \
 NPMFLAGS="${NPMFLAGS:-%{npm_buildflags} }" ; export NPMFLAGS
 ```
@@ -279,7 +280,7 @@ Expands to: `/usr/bin/env %{npm_common_envvars} %{?with_vendored_nodejs:%{_vendo
 Should be used for building Electron projects with NPM. Has a great deal of flags to work around NPM specific limitations.
 
 Available flags:
-- `-c` will run `%{__npm} ci` instead of `%{__npm} install`. May be necessary for projects with stricter build dependencies.
+- `-c`: Run `%{__npm} ci` instead of `%{__npm} install`. May be necessary for projects with stricter build dependencies.
 - `-e`: Execute commands and modules within the NPM build environment. Some commands may need `--` in between the command itself and the following arguments.
 - `-r`: Executes `%{__npm} run` for scripts in the `package.json`. Expects an argument.
 - `-E`: Execute Electron Builder/Electron Forge. Will NOT work for projects that require build steps which use Node.js or executing JavaScript scripts directly.
@@ -317,7 +318,7 @@ Directory that Bun cache files are stored in.
 Expands to: `%{_bun_home}/install/cache`
 
 #### %bun_common_envvars
-Sets the `$BUN_HOME` for when this feature becomes available and disables transpiler cache.
+Sets the `$BUN_HOME` for future use and sets the cache dir.
 
 Expands to: `%{npm_common_envvars} BUN_HOME=%{_bun_home} BUN_INSTALL_CACHE_DIR=%{_bun_cache_dir} BUN_RUNTIME_TRANSPILER_CACHE_PATH=%{_bun_cache_dir} FORCE_COLOR=1`
 
@@ -360,6 +361,7 @@ Where Node modules installed by PNPM usually go. This will usually not be produc
 Expands to: `%{_pnpm_home}/store`
 
 #### %pnpm_common_envvars
+Sets the NPM evironment variables and the PNPM home dir.
 
 Expands to: `%{npm_common_envvars} PNPM_HOME=%{_pnpm_home}`
 
@@ -406,6 +408,11 @@ Fix security issues in dependencies using PNPM.
 #### %pnpm_approve_builds
 Approve dependency scripts with PNPM if needed.
 
+Available flags:
+- `-g` can be used to trust depdendencies of globally installed packages.
+
+Expands to `%{__pnpm} approve-builds`
+
 ### Yarn Macros
 [TODO]
 
@@ -414,6 +421,7 @@ Approve dependency scripts with PNPM if needed.
 Expands to: `%{rpmbuilddir}/.yarn`
 
 #### %yarn_common_envvars
+Sets the NPM evironment variables and Yarn's cache folder.
 
 Expands to: `%{npm_common_envvars} YARN_CACHE_FOLDER=%{_yarn_cache_dir}`
 
@@ -433,7 +441,7 @@ Should be used to build Electron apps with Yarn.
 Available flags:
 - `-e`: Execute Node modules or installed programs in the Yarn build environment.
 - `-F`: Executes the `%{__yarn} install` step with `--frozen-lockfile`. May be necessary for projects expecting very strict build dependencies, but can also override projects that do not enforce a lock.
-- `-N`: Executes the `%{__yarn} install` step with `--no-lockfile`. Do not update a lockfile on depedency installation.
+- `-N`: Executes the `%{__yarn} install` step with `--no-lockfile`. Makes Yarn not update the lockfile on depedency installation.
 - `-r`: Executes `%{__yarn} run` for scripts in the `package.json`. Expects an argument. Not recommended for Electron Builder, Electron Forge, or Electron Vite commands.
 - `-v`: Run Electron Vite build steps. Not needed for all Electron apps.
 
