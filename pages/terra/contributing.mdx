@@ -13,7 +13,7 @@ Terra is specifically designed to be as _package-maintainer-friendly_ as possibl
 don't need to know everything about the infrastructure to create a package for Terra!
 See the following guide for creating a new package yourself. Quick and easy.
 
-It's also ok to **suggest packages** to include into Terra through raising a [GitHub issue](https://github.com/terrapkg/packages/issues), though it might take a while. (We're busy!)
+It's also ok to **suggest packages** to include into Terra by raising a [GitHub issue](https://github.com/terrapkg/packages/issues), though it might take a while. (We're busy!)
 
 It takes effort to create a package, and as always, there is a learning curve.
 If you ever need help, hop into [our Discord server](https://fyralabs.com/discord) and we will try to help you.
@@ -302,26 +302,25 @@ For UX reasons, some packages MAY consider specifying `Provides: %{rawname}-%{ta
 Packages SHOULD follow one of the version formats below:
 
 ```rpmspec
-## (a)
+## (Release tag tracking (stable))
 Version:  %{latest_stable_version}
-## (b)
+## (Commit tacking (nightly off version tag))
 Version:  %{latest_stable_version}^%{commit_date}git.%{shortcommit}
-## (c)
+## (Commit tacking (no stable version tag))
 Version:  %{unreleased_version}~%{commit_date}git.%{shortcommit}
 ```
 
 `git` SHOULD be replaced with the correct _VCS identifier_ for **(b)** and **(c)** as listed on the right.
 
-If one of **(b)** and **(c)** is used, you MUST also include `labels { nightly = 1 }{:hcl}` in `anda.hcl` unless there is no `update.rhai`,
+If either commit tracking option is used, you MUST also include `labels { nightly = 1 }{:hcl}` in `anda.hcl` unless there is no `update.rhai`,
 as these 2 formats rely on the assumption that there is 1 `%shortcommit` for each `%commit_date` (and vice versa).
 
 `%unreleased_version` refers to the expected version number for the next stable (or a more stable _tag_ than `nightly`) release,
 while `%latest_stable_version` refers to the current latest released version number, preferably stable.
 
-**(c)** SHOULD be preferred over **(b)** if possible, since having a `%unreleased_version` can indicate to users
-breaking changes/new features depending on the versioning system (usually SemVer).
+`Commit tacking (nightly off version tag)` SHOULD be used when there is a stable and nightly version of a package.
 
-If upstream does not provide a version, use **(c)** and treat `%unreleased_version` as `0`.
+If upstream does not provide a version, use `Commit tacking (no stable version tag)` and replace `%unreleased_version` as `0`.
 
 ### Release Field
 

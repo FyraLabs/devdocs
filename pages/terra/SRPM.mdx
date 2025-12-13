@@ -26,7 +26,7 @@ For other macros available in Fedora/Terra, check out our unofficial [macros lis
 </Callout>
 
 ## Directories
-These macros define certain system directories.
+These macros define certain system directories, and SHOULD be used in place of the raw directory path.
 
 ### %__anda_develfiles
 [TODO]
@@ -38,8 +38,38 @@ Anda directory for scripts such as `find-develinfo.sh` used by Anda macros.
 ### %__anda_libsfiles
 [TODO]
 
+### %_appsdir
+Expands to: `%_datadir/applications` or `/usr/share/applications`.
+This may seem like a directory to place the application itself into, but this directory SHOULD ONLY be used for the applicaitons `.desktop` file.
+
 ### %elvish_completions_dir
 `%_datadir/elvish/lib/completions`
+
+### %_hicolordir 
+Expands to: `%_iconsdir/hicolor`, or `/usr/share/icons/hicolor`.
+The directory that SHOULD be used when installing application `.png` files. Note that you will then need to install the (typically app icon) file to the `apps` folder within the fixed-size directory in `%_hicolordir`.
+
+For example:
+
+```bash
+# Lets say package 'foo' has a 16x16 and 64x64 .png
+install -Dm644 icons/16x16.png %{buildroot}%{_hicolordir}/16x16/apps/%{name}.svg
+install -Dm644 icons/64x64.png %{buildroot}%{_hicolordir}/64x64/apps/%{name}.svg
+```
+
+If the file is a `.svg`, use the macro below.
+
+### %_scalableiconsdir 
+Expands to: `%_hicolordir/scalable/apps`, or `/usr/share/icons/hicolor/scalable/apps/`.
+The directory that SHOULD be used when installing application `.svg` files to.
+You do not need to specify any folders for this macro, add the file can be added to the end of this macro.
+For example:
+
+```bash
+install -Dm644 icons/%{name}.svg %{buildroot}%{_scalableiconsdir}/%{name}.svg
+```
+
+If the file is a `.png`, use the macro above.
 
 ### %rpmbuilddir
 This macro exists because Terra supports EL distributions (Red Hat Enterprise Linux, Alma Linux, etc.) which currently have an RPM version from before the [`%{builddir}` change to address issues like this](https://github.com/rpm-software-management/rpm/issues/3151).
@@ -82,9 +112,9 @@ By default, the install steps are:
 1. Make the install directory
   - This will be in the `%{_libdir}` (/usr/lib on 32-bit architectures and /usr/lib64 on 64-bit ones)
   - This is done because programs with bundled dependencies (Electron, Node modules, and more) MUST have these dependencies kept together
-1. Install the app's files
-1. Symlink the app's binary to the bin directory
-1. Install the app's icons
+2. Install the app's files
+3. Symlink the app's binary to the bin directory
+4. Install the app's icons
 
 `%electron_install` supports several flags to help control variables of the install. Most of the fallbacks if none are passed are the name of the package.
 - `-b` must be used when the app's executable differs from the name of the package.
@@ -454,17 +484,17 @@ You DON'T need to fix vulnerabilities for Node modules that are __not bundled in
 These macros assist with building Nim projects.
 
 ### %nim_prep
-`nimble`.
+Set up build environment with required packages via `nimble setup`.
 
 ### %nim_build (or %nim_c)
 Builds a nim package.
 Requires an argument to `src/pkgname`
 
 ### %nim_tflags
-[TODO]
+C Compiler flags to Nim.
 
 ### %nim_lflags
-[TODO]
+Linker flags to Nim.
 
 ## Rust
 These macros assist with building Rust projects.
@@ -566,7 +596,7 @@ Set the summary & description, then find development `%files`.
 Set the summary & description, then find static libraries.
 
 ### %pkg_libs_files
-[TODO]
+Set the summary & description, then find dynamic library files (`%_libdir/*.so.*`).
 
 ## Zig
 These macros assist with building Zig projects.
@@ -625,4 +655,4 @@ URL:           https://github.com/ad-oliviero/uwufetch
 %git_clone %{url} %{commit}
 ```
 
-`%git_clone` should only be used when downloading a compressed source cannot be used (for example, if the build process expects a git environment or the release tarball doesn't contain submodules).
+`%git_clone` SHOULD only be used when the source tarballs provided by upstream does not include all required sources in the repository (e.g., if the build process expects a git environment or the tarball doesn't contain submodules).
