@@ -72,7 +72,7 @@ install -Dm644 icons/%{name}.svg %{buildroot}%{_scalableiconsdir}/%{name}.svg
 If the file is a `.png`, use the macro above.
 
 ### %rpmbuilddir
-This macro exists because Terra supports EL distributions (Red Hat Enterprise Linux, Alma Linux, etc.) which currently have an RPM version from before the [`%{builddir}` change to address issues like this](https://github.com/rpm-software-management/rpm/issues/3151).
+This macro exists because Terra supports EL distributions (Red Hat Enterprise Linux, Alma Linux, etc.) which currently have an RPM version from before the `%{builddir}` change to address issues [like this](https://github.com/rpm-software-management/rpm/issues/3151).
 
 The common, albeit clunky, solution is to define `%{builddir}` manually as `%{_builddir}` in specs targeting distros with different versions of RPM where one has a version older than 4.20. We have this macro instead to make the process easier.
 
