@@ -120,7 +120,7 @@ By default, the install steps are:
 - `-b` must be used when the app's executable differs from the name of the package.
 - `-d` can be used to install the app under a different directory than the name of the package.
 - `-i` must be used when the app's desktop file points to an icon name different from the name of the package.
-- `-l` can be used to fetch all licenses including the bundled ones and put them in a directory called `bundled_licenses`. You can then put them in the license directory using `%license bundled_licenses/*`
+- `-l` can be used to fetch all licenses including the bundled ones and put them in a directory called `bundled_licenses`. You can then put them in the license directory using `%license bundled_licenses/*` in the %files section.
 - `-s` can be used to choose the name of the symlink.
 - `-S` can be used to create an additional symlink with a different name. Useful when an app has two interchangeable common names.
 - `-D` can be used to handle automatic installation of the .desktop file. This ONLY works if Electron Builder builds an AppImage, and should not be used if the source contains a desktop file.
