@@ -166,7 +166,7 @@ These are macros to assist with the general packaging of applications that use J
 [TODO]: examples/links to examples of how to use the macros here (at least the common ones)
 
 ### Node.js Macros
-Macros for Node.js itself. These require use of the [existing Fedora Node.js macros](https://docs.fedoraproject.org/en-US/packaging-guidelines/Node.js/#_macros) in the `nodejs-packaging` package.
+Macros for Node.js itself. These require use of the [Fedora Node.js macros](https://docs.fedoraproject.org/en-US/packaging-guidelines/Node.js/#_macros) in the `nodejs-packaging` package.
 
 You MUST either set `%global npm_name pkgname` or use `%npm_prep -n pkgname` when packaging Node modules directly. This MUST be defined as the canonical name of the module as listed on the NPM Registry.
 
