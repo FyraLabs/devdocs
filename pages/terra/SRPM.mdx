@@ -125,7 +125,7 @@ By default, the install steps are:
 - `-S` can be used to create an additional symlink with a different name. Useful when an app has two interchangeable common names.
 - `-D` can be used to handle automatic installation of the .desktop file. This ONLY works if Electron Builder builds an AppImage, and should not be used if the source contains a desktop file.
 - `-E` can be used to set the "--enable-features" flag in the desktop file. Features to enable must be comma separated without spaces.
-- `-O` can be used to set the Ozone flatform the Electron app will run on. If no arguments are supplied, it will fall back to auto. Accepted arguments are `-Ox11` and `-Owayland`
+- `-O` can be used to set the Ozone flatform the Electron app will run on. If no arguments are supplied, it will fall back to `--ozone-platform-hint=auto`. Accepted arguments are `-Ox11` and `-Owayland`
 - `-U` can be used to set either `%u` or `%U` in the desktop file. This REQUIRES you do not use `u` as a macro name for any reason.
   - `%u` means that a desktop file can only read one URL at a time, `%U` means that it can read multiple at a time.
   - Defer to what the desktop file originally contained if you are unsure.
@@ -145,7 +145,7 @@ MAY be used in combination with manually adding the other relevant licenses (if 
 ### %electron_arches
 The architectures Electron supports. Automatically set as `ExclusiveArch` when using `%electronmeta`.
 
-As written, the macro is:
+As written, the macro expands to:
 - `%{x86_64} %{ix86} %{arm64} armv7l armv7hl armv7hnl`
 
 Which expands fully to:
@@ -166,7 +166,7 @@ These are macros to assist with the general packaging of applications that use J
 [TODO]: examples/links to examples of how to use the macros here (at least the common ones)
 
 ### Node.js Macros
-Macros for Node.js itself. These require use of the existing Node.js macros in Fedora's `nodejs-packaging` package.
+Macros for Node.js itself. These require use of the [existing Fedora Node.js macros](https://docs.fedoraproject.org/en-US/packaging-guidelines/Node.js/#_macros) in the `nodejs-packaging` package.
 
 You MUST either set `%global npm_name pkgname` or use `%npm_prep -n pkgname` when packaging Node modules directly. This MUST be defined as the canonical name of the module as listed on the NPM Registry.
 
