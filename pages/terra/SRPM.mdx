@@ -354,7 +354,9 @@ Available flags:
 - `-M`: Mode to use in Electron Vite builds. Accepts `production`, `development`, and `staging`. Note that this differs from `$NODE_ENV` so you can run any combination of Vite environment modes and Node.js environment modes.
 
 #### %npm_audit
-Audit with NPM if package uses bundled Node dependencies. For use in the `%check` section
+Audit with NPM if package uses bundled Node dependencies. For use in the `%check` section.
+
+You SHOULD NOT need to fix vulnerabilities for Node modules that are __not bundled in the final package.__ This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
 
 #### %npm_audit_fix
 Fix vulnerabilities found using `%npm_audit` Should be used in `%prep` section.
@@ -404,7 +406,7 @@ Audit with Bun if package uses bundled Node dependencies. For use in the `%check
 
 NOTE: Bun audit is a currently a wrapper for NPM audit but lacks the `fix` option, in order to fix vulnerabilities you need to use `%npm_audit_fix`.
 
-You DON'T need to fix vulnerabilities for Node modules that are __not bundled in the final package.__ This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
+You SHOULD NOT need to fix vulnerabilities for Node modules that are __not bundled in the final package.__ This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
 
 #### %bun_pm_trust
 Add Node modules to trusted dependencies so their postinstall scripts may be run. Should only be used if necessary.
@@ -466,7 +468,7 @@ Available flags:
 #### %pnpm_audit
 Audit with PNPM if package uses bundled Node dependencies. For use in the `%check` section
 
-You DON'T need to fix vulnerabilities for Node modules that are __not bundled in the final package.__ This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
+You SHOULD NOT need to fix vulnerabilities for Node modules that are __not bundled in the final package.__ This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
 
 #### %pnpm_audit_fix
 Fix security issues in dependencies using PNPM.
@@ -514,7 +516,7 @@ Available flags:
 #### %yarn_audit
 Audit Yarn if package uses bundled Node dependencies. For use in the `%check` section
 
-You DON'T need to fix vulnerabilities for Node modules that are __not bundled in the final package.__ This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
+You SHOULD NOT need to fix vulnerabilities for Node modules that are __not bundled in the final package.__ This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
 
 ## Nim
 These macros assist with building Nim projects.
