@@ -444,10 +444,10 @@ Usecase examples:
 - Fedora's currently packaged PNPM is too old for the build
 - You want to make the package build on EL (does not have PNPM)
   - In this case, you SHOULD wrap `%vendor_pnpm` in `%if` macros such as:
-  - ```%if %{defined rhel}
-       %vendor_pnpm
-       %endif
-    ```
+  ```%if %{defined rhel}
+     %vendor_pnpm
+     %endif
+  ```
 
 #### %pnpm_build
 Should be used for building Electron apps with PNPM.
