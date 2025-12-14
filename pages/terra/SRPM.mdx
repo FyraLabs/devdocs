@@ -165,34 +165,6 @@ These are macros to assist with the general packaging of applications that use J
 [TODO]: descriptions for the sub-sections
 [TODO]: examples/links to examples of how to use the macros here (at least the common ones)
 
-#### %set_node_build_flags
-Set the flags and environment variables used for JavaScript package manager builds.
-
-Based on Fedora's [`%set_build_flags` macro](https://src.fedoraproject.org/rpms/redhat-rpm-config/blob/rawhide/f/buildflags.md#using-rpm-build-flags).
-
-Expands to:
-```rpmspec
-NPM_CONFIG_USERCONFIG="%{rpmbuilddir}/.npmrc" ; export NPM_CONFIG_USERCONFIG ; \
-NPM_CONFIG_GLOBALCONFIG="%{rpmbuilddir}/npmrc" ; export NPM_CONFIG_GLOBALCONFIG ; \
-NPM_CONFIG_CACHE="%{_npm_cache_dir}" ; export NPM_CONFIG_CACHE ; \
-NPM_CONFIG_LOGLEVEL="error" ; export NPM_CONFIG_LOGLEVEL ; \
-NPM_CONFIG_FUND="false" ; export NPM_CONFIG_FUND ; \
-NPM_CONFIG_UPDATE_NOTIFIER="false" ; export NPM_CONFIG_UPDATE_NOTIFIER ; \
-NO_UPDATE_NOTIFIER="1" ; export NO_UPDATE_NOTIFIER ; \
-NPM_CONFIG_COLOR="always" ; export NPM_CONFIG_COLOR ; \
-NPM_CONFIG_INIT_MODULE="%{rpmbuilddir}/.npm-init.js" ; export NPM_CONFIG_INIT_MODULE ; \
-BUN_HOME="%{_bun_home}" ; export BUN_HOME ; \
-BUN_INSTALL_CACHE_DIR="%{_bun_cache_dir}" ; export BUN_INSTALL_CACHE_DIR \
-BUN_RUNTIME_TRANSPILER_CACHE_PATH="%{_bun_cache_dir}" ; export BUN_RUNTIME_TRANSPILER_CACHE_PATH ; \
-PNPM_HOME="%{_pnpm_home}" ; export PNPM_HOME ; \
-YARN_CACHE_FOLDER="%{_yarn_cache_dir}" ; export YARN_CACHE_FOLDER ; \
-NPMFLAGS="${NPMFLAGS:-%{npm_buildflags} }" ; export NPMFLAGS
-```
-
-This ensures the environment variables are explicitly exported and are more likely to be picked up by all shell processes. It also creates an environment variable called `$NPMFLAGS` which can be passed to NPM in lieu of the macro `%{npm_buildflags}` to force our config, if necessary.
-
-This should only be needed in the event you are using [`%__npx`](#__npx), [`%__pnpx`](#__pnpx), [`%__bunx`](#__bunx), or [`%__yarn_dlx`](#__yarn_dlx).
-
 ### Node.js Macros
 Macros for Node.js itself. These require use of the [Fedora Node.js macros](https://docs.fedoraproject.org/en-US/packaging-guidelines/Node.js/#_macros) in the `nodejs-packaging` package.
 
@@ -517,6 +489,37 @@ Available flags:
 Audit Yarn if package uses bundled Node dependencies. For use in the `%check` section
 
 You SHOULD NOT need to fix vulnerabilities for Node modules that are __not bundled in the final package.__ This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
+
+### Other
+Macros that apply to *or* do not fit into all of the above categories.
+
+#### %set_node_build_flags
+Set the flags and environment variables used for JavaScript package manager builds.
+
+Based on Fedora's [`%set_build_flags` macro](https://src.fedoraproject.org/rpms/redhat-rpm-config/blob/rawhide/f/buildflags.md#using-rpm-build-flags).
+
+Expands to:
+```rpmspec
+NPM_CONFIG_USERCONFIG="%{rpmbuilddir}/.npmrc" ; export NPM_CONFIG_USERCONFIG ; \
+NPM_CONFIG_GLOBALCONFIG="%{rpmbuilddir}/npmrc" ; export NPM_CONFIG_GLOBALCONFIG ; \
+NPM_CONFIG_CACHE="%{_npm_cache_dir}" ; export NPM_CONFIG_CACHE ; \
+NPM_CONFIG_LOGLEVEL="error" ; export NPM_CONFIG_LOGLEVEL ; \
+NPM_CONFIG_FUND="false" ; export NPM_CONFIG_FUND ; \
+NPM_CONFIG_UPDATE_NOTIFIER="false" ; export NPM_CONFIG_UPDATE_NOTIFIER ; \
+NO_UPDATE_NOTIFIER="1" ; export NO_UPDATE_NOTIFIER ; \
+NPM_CONFIG_COLOR="always" ; export NPM_CONFIG_COLOR ; \
+NPM_CONFIG_INIT_MODULE="%{rpmbuilddir}/.npm-init.js" ; export NPM_CONFIG_INIT_MODULE ; \
+BUN_HOME="%{_bun_home}" ; export BUN_HOME ; \
+BUN_INSTALL_CACHE_DIR="%{_bun_cache_dir}" ; export BUN_INSTALL_CACHE_DIR \
+BUN_RUNTIME_TRANSPILER_CACHE_PATH="%{_bun_cache_dir}" ; export BUN_RUNTIME_TRANSPILER_CACHE_PATH ; \
+PNPM_HOME="%{_pnpm_home}" ; export PNPM_HOME ; \
+YARN_CACHE_FOLDER="%{_yarn_cache_dir}" ; export YARN_CACHE_FOLDER ; \
+NPMFLAGS="${NPMFLAGS:-%{npm_buildflags} }" ; export NPMFLAGS
+```
+
+This ensures the environment variables are explicitly exported and are more likely to be picked up by all shell processes. It also creates an environment variable called `$NPMFLAGS` which can be passed to NPM in lieu of the macro `%{npm_buildflags}` to force our config, if necessary.
+
+This should only be needed in the event you are using [`%__npx`](#__npx), [`%__pnpx`](#__pnpx), [`%__bunx`](#__bunx), or [`%__yarn_dlx`](#__yarn_dlx).
 
 ## Nim
 These macros assist with building Nim projects.
