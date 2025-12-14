@@ -187,7 +187,7 @@ Expands to: `/usr/bin/env NVM_DIR=%{_nvm_dir} /usr/bin/nvm`
 Prepare a Node module for build steps.
 
 Available flags:
-- `-n`: Use this if you have not defined `%{npm_name}` as a global macro.
+- `-n`: Used to define `%{npm_name}` if it was not defined as a global macro.
 
 #### %fetch_node_tests
 Fetch self-tests from a Git repo. MUST include all necessary test files and folders. If used, SHOULD be used in `%prep`.
