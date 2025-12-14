@@ -170,8 +170,9 @@ Macros for Node.js itself. These require use of the [Fedora Node.js macros](http
 
 You MUST either set `%global npm_name pkgname` or use `%npm_prep -n pkgname` when packaging Node modules directly. This MUST be defined as the canonical name of the module as listed on the NPM Registry.
 
+
 #### %_nvm_dir
-Sets the NVM dir to a location in the `%{rpmbuilddir}`.
+The location in the `%{rpmbuilddir}` what will be passed to `$NVM_DIR`.
 
 Expands to: `%{rpmbuilddir}/.nvm`
 
@@ -179,6 +180,17 @@ Expands to: `%{rpmbuilddir}/.nvm`
 Calls NVM (Node Version Manager) while setting `$NVM_DIR`. Only used if vendoring Node.js.
 
 Expands to: `/usr/bin/env NVM_DIR=%{_nvm_dir} /usr/bin/nvm`
+
+#### %vendor_nodejs
+SHOULD only be used if Node.js packages available from the repos are not usable for some reason.
+
+Examples:
+- Fedora has not yet packaged the correct version of Node.js or the required version is older than what is supplied
+  - This means that packaged Node modules will probably not meet their runtime requirements, but Electron apps may be fine
+- EL does not yet have the correct version of Node.js
+  - This poses the same concern as above
+
+For this reason whatever you are packaging SHOULD be tested locally upon a successful build to see if it meets any runtime issues.
 
 ### Node Module Macros
 "Node modules" refers to JavaScript packages run using a JavaScript runtime (usually Node.js), almost always hosted on the [NPM Registry](https://www.npmjs.com/).
@@ -193,7 +205,7 @@ Available flags:
 Fetch self-tests from a Git repo. MUST include all necessary test files and folders. If used, SHOULD be used in `%prep`.
 
 Available flags:
-- `-u` Define the URL if the URL for the package is not detectable as a clonable URL.
+- `-u`: Define the URL if the URL for the package is not detectable as a clonable URL.
 
 All necessary test files and folders SHOULD be listed after the macro. Test folders MUST start with `/`.
 
@@ -415,7 +427,7 @@ Remotely execute Node modules using PNPX.
 Expands to: `/usr/bin/env %{pnpm_common_envvars} /usr/bin/pnpx`
 
 #### %vendor_pnpm
-Use if PNPM is not usable/available from the available repositories.
+SHOULD only be used if PNPM is not usable/available from the available repositories.
 
 Examples:
 - Fedora's currently packaged PNPM is too old for the build
