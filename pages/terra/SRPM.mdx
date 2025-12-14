@@ -188,7 +188,7 @@ You MUST add `nvm` as a build requirement to the spec if using this macro.
 Available flags:
 - `-v` is REQUIRED for this macro to pass the version to NVM. This can be either the full version of Node.js or the major (e.g., `24`), but the full version is preferable.
 
-Examples:
+Usecase examples:
 - Fedora has not yet packaged the correct version of Node.js or the required version is older than what is supplied
   - This means that packaged Node modules will probably not meet their runtime requirements, but Electron apps may be fine
 - EL does not yet have the correct version of Node.js
@@ -440,7 +440,7 @@ Expands to: `/usr/bin/env %{pnpm_common_envvars} /usr/bin/pnpx`
 #### %vendor_pnpm
 SHOULD only be used if PNPM is not usable/available from the available repositories.
 
-Examples:
+Usecase examples:
 - Fedora's currently packaged PNPM is too old for the build
 - You want to make the package build on EL (does not have PNPM)
   - In this case, you SHOULD wrap `%vendor_pnpm` in `%if` macros such as:
