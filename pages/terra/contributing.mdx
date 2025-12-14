@@ -325,7 +325,7 @@ If upstream does not provide a version, use `Commit tacking (no stable version t
 ### Release Field
 
 The `Release:{:rpmspec}` preamble MUST NOT contain information regarding upstream versioning,
-including but not limited to commit dates, commit SHAs, software versions, _tags_, etc.
+including but not limited to commit dates, commit hashes, software versions, _tags_, etc.
 Without approval from the team, packages MUST use the format `Release: 1%?dist{:rpmspec}` (or `1%{?dist}{:rpmspec}`).
 
 The release number SHOULD be incremented if changes are made to the package, unless the `Version:{:rpmspec}` changes.
