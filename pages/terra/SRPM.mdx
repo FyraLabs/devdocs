@@ -170,7 +170,6 @@ Macros for Node.js itself. These require use of the [Fedora Node.js macros](http
 
 You MUST either set `%global npm_name pkgname` or use `%npm_prep -n pkgname` when packaging Node modules directly. This MUST be defined as the canonical name of the module as listed on the NPM Registry.
 
-
 #### %_nvm_dir
 The location in the `%{rpmbuilddir}` what will be passed to `$NVM_DIR`.
 
@@ -184,6 +183,11 @@ Expands to: `/usr/bin/env NVM_DIR=%{_nvm_dir} /usr/bin/nvm`
 #### %vendor_nodejs
 SHOULD only be used if Node.js packages available from the repos are not usable for some reason.
 
+You MUST add `nvm` as a build requirement to the spec if using this macro.
+
+Available flags:
+- `-v` is REQUIRED for this macro to pass the version to NVM. This can be either the full version of Node.js or the major (e.g., `24`), but the full version is preferable.
+
 Examples:
 - Fedora has not yet packaged the correct version of Node.js or the required version is older than what is supplied
   - This means that packaged Node modules will probably not meet their runtime requirements, but Electron apps may be fine
@@ -191,6 +195,13 @@ Examples:
   - This poses the same concern as above
 
 For this reason whatever you are packaging SHOULD be tested locally upon a successful build to see if it meets any runtime issues.
+
+What `%vendor_nodejs` does:
+1. Installs the desired Node.js version to `%{_nvm_dir}`
+1. Redefines `%{__nodejs}` to run the vendored version through NVM
+1. Sets a `%bcond` to `vendored_nodejs` so other macros will use the vendored version
+
+Vendored versions of NPM and NPX are subject to limitations in commands as they must be run through `exec`.
 
 ### Node Module Macros
 "Node modules" refers to JavaScript packages run using a JavaScript runtime (usually Node.js), almost always hosted on the [NPM Registry](https://www.npmjs.com/).
