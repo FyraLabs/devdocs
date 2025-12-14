@@ -497,7 +497,7 @@ Remotely execute a Node module with Yarn DLX.
 
 Expands to: `%{yarn_common_envvars} /usr/bin/yarn dlx`
 
-NOTE: Requires `yarnpkg-berry` instead of `yarnpkg` as a build dependency.
+NOTE: REQUIRES `yarnpkg-berry` instead of `yarnpkg` as a build dependency.
 
 #### %yarn_build
 Should be used to build Electron apps with Yarn.
@@ -515,7 +515,7 @@ Audit Yarn if package uses bundled Node dependencies. For use in the `%check` se
 You SHOULD NOT need to fix vulnerabilities for Node modules that are __not bundled in the final package.__ This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
 
 ### Other
-Macros that apply to *or* do not fit into all of the above categories.
+JavaScript related macros that apply to all of, or do not fit into any of, the above categories.
 
 #### %set_node_build_flags
 Set the flags and environment variables used for JavaScript package manager builds.
