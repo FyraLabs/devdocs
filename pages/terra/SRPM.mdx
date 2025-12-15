@@ -107,9 +107,10 @@ Rundown of what all `%electronmeta` does:
 This ensures packagers do not need to manually set these for every Electron app's spec, hopefully eliminating depsolver problems and helping reduce common build issues.
 
 Like other meta macros (e.g., `%forgemeta` from Fedora), you MUST be mindful of where in the spec this macro should be placed.
-- It MUST always come after `Name:` is defined, but MAY need to come before the sources if an upstream provides sources named after the Electron architecture.
-- It SHOULD come before the `License:` field if using [`%{electron_license}`](#electron_license).
-- It MAY be used under preambles but before `%prep` if not using `%{electron_license}`.
+- MUST always come after `Name:` is defined and before the `%prep` section.
+- SHOULD come before the `License:` field if using [`%{electron_license}`](#electron_license).
+- MAY need to come before the sources if an upstream provides sources named after the Electron architecture.
+- MAY be used under preambles but before `%prep` if not using `%{electron_license}`.
 
 The safest location is under `Name:` and above other preambles. When in doubt, place the macro here.
 
