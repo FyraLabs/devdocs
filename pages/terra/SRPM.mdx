@@ -86,6 +86,10 @@ These macros assist with the general packaging of applications that use [Electro
 ### %electronmeta
 Set up all basic requirements including build macros for building an Electron app.
 
+Available flags:
+- `-a` will pull in additional build dependencies often needed particularly when building with NPM.
+  - Currently, this includes `nodejs-devel`, `nodejs-packaging`, and `typescript`.
+
 Rundown of what all `%electronmeta` does:
 - Converts `%{_target_cpu}` (the RPM build architecture) into `%{_electron_cpu}`, the Electron format for architectures it is compatible with.
   - Defines `%{_electron_cpu}` for x86_64 architectures as `x64`.
@@ -99,7 +103,7 @@ Rundown of what all `%electronmeta` does:
 - Defines `%__provides_excludes` to make sure Electron apps are not flagged as providers of their bundled dependencies, such as FFmpeg libraries.
 - Defines `%__requires_excludes` based on architecture to prevent Electron Builder's cross-compilation from causing false dependency positives from RPM.
 - Sets `%debug_package` to `%{nil}` to prevent stripping of bundled libraries and/or build failures due to not enough data to strip.
-- Sets the build and runtime dependencies. The -a flag can be used to pull additional build dependencies that are sometimes needed when building through NPM in particular.
+- Sets the build and runtime dependencies.
 - Sets the `ExclusiveArch` field to only the architectures Electron supports.
 - Defines a `%bcond` for whether or not Electron is bundled for other macros.
 - Defines the bundled dependencies as bundled. NOTE: This only defines Electron's bundled dependencies, not any Node modules the app may also bundle.
@@ -133,16 +137,16 @@ By default, the install steps are:
 4. Install the app's icons
 
 `%electron_install` supports several flags to help control variables of the install. Most of the fallbacks if none are passed are the name of the package.
-- `-b` must be used when the app's executable differs from the name of the package.
-- `-d` can be used to install the app under a different directory than the name of the package.
-- `-i` must be used when the app's desktop file points to an icon name different from the name of the package.
-- `-l` can be used to fetch all licenses including the bundled ones and put them in a directory called `bundled_licenses`. You can then put them in the license directory using `%license bundled_licenses/*` in the %files section.
-- `-s` can be used to choose the name of the symlink.
-- `-S` can be used to create an additional symlink with a different name. Useful when an app has two interchangeable common names.
-- `-D` can be used to handle automatic installation of the .desktop file. This ONLY works if Electron Builder builds an AppImage, and should not be used if the source contains a desktop file.
-- `-E` can be used to set the "--enable-features" flag in the desktop file. Features to enable must be comma separated without spaces.
-- `-O` can be used to set the Ozone flatform the Electron app will run on. If no arguments are supplied, it will fall back to `--ozone-platform-hint=auto`. Accepted arguments are `-Ox11` and `-Owayland`
-- `-U` can be used to set either `%u` or `%U` in the desktop file. This REQUIRES you do not use `u` as a macro name for any reason.
+- `-b` MUST be used when the app's executable differs from the name of the package.
+- `-d` MAY be used to install the app under a different directory than the name of the package.
+- `-i` MUST be used when the app's desktop file points to an icon name different from the name of the package.
+- `-l` MAY be used to fetch all licenses including the bundled ones and put them in a directory called `bundled_licenses`. You SHOULD then package them in the license directory using `%license bundled_licenses/*` in the `%files` section.
+- `-s` MAY be used to choose the name of the symlink.
+- `-S` MAY be used to create an additional symlink with a different name. Useful when an app has two interchangeable common names.
+- `-D` MAY be used to handle automatic installation of the .desktop file. This ONLY works if Electron Builder builds an AppImage, and should not be used if the source contains a desktop file.
+- `-E` MAY be used to set the "--enable-features" flag in the desktop file. Features to enable MUST be comma separated without spaces.
+- `-O` MAY be used to set the [Ozone platform](https://chromium.googlesource.com/chromium/src/+/lkgr/docs/ozone_overview.md) the Electron app will run on. If no arguments are supplied, it will fall back to `--ozone-platform-hint=auto`. Accepted arguments are `-Ox11` and `-Owayland`
+- `-U` MAY be used to set either `%u` or `%U` in the desktop file. If using this you MUST NOT use `u` as a macro name for any reason.
   - `%u` means that a desktop file can only read one URL at a time, `%U` means that it can read multiple at a time.
   - Defer to what the desktop file originally contained if you are unsure.
 
@@ -174,8 +178,8 @@ Which simply means Electron supports x86_64, x86, aarch64/ARM64, and armv7l.
 ## Go
 These macros assist with building Go projects.
 
-#### %goprep_online
-Can be used to prep a Go package for online builds. Would replace `%goprep` in `%prep`.
+### %goprep_online
+MAY be used to prep a Go package for online builds. Replaces `%goprep` in `%prep`.
 
 ## JavaScript/JavaScript Package Managers
 These are macros to assist with the general packaging of applications that use JavaScript runtimes, such as Node.js or Bun.
@@ -204,7 +208,7 @@ SHOULD only be used if Node.js packages available from the repos are not usable 
 You MUST add `nvm` as a build requirement to the spec if using this macro.
 
 Available flags:
-- `-v` is REQUIRED for this macro to pass the version to NVM. This can be either the full version of Node.js or the major (e.g., `24`), but the full version is preferable.
+- `-v` is REQUIRED for this macro to pass the version to NVM. Accepts a full version, the major for the latest of a major version of Node.js (e.g., `24`), or `node` to use the latest version of Node.js available.
 
 Usecase examples:
 - Fedora has not yet packaged the correct version of Node.js or the required version is older than what is supplied
@@ -228,15 +232,15 @@ Vendored versions of NPM and NPX are subject to limitations in commands as they 
 Prepare a Node module for build steps.
 
 Available flags:
-- `-n`: Used to define `%{npm_name}` if it was not defined as a global macro.
+- `-n` MUST be used to define `%{npm_name}` if it was not defined as a global macro.
 
 #### %fetch_node_tests
 Fetch self-tests from a Git repo. MUST include all necessary test files and folders. If used, SHOULD be used in `%prep`.
 
 Available flags:
-- `-u`: Define the URL if the URL for the package is not detectable as a clonable URL.
+- `-u` MUST be used to define the URL if the one listed in the `URL:` field for the package is not detectable as clonable.
 
-All necessary test files and folders SHOULD be listed after the macro. Test folders MUST start with `/`.
+All necessary test files and folders MUST be listed after the macro. Test folders MUST start with `/`.
 
 Example usage:
 ```rpmspec
@@ -260,11 +264,11 @@ Available flags:
 - `-R`: Direct duplicate of an `-R` flag. Project dependent.
 - `-v`: Direct duplicate of a `-v` flag. Project dependent.
 
-You MUST run `%fetch_node_tests` if using this.
+You MUST use [`%fetch_node_tests`](#fetch_node_tests) first if using this.
 
 #### %__npm_license_checker
 Expands to: `/usr/bin/license-checker`.
-Runs the npm [`license-checker`](https://www.npmjs.com/package/license-checker-rseidelsohn) command.
+Runs the NPM [`license-checker`](https://www.npmjs.com/package/license-checker-rseidelsohn) command.
 
 Example output:
 
@@ -284,11 +288,11 @@ Expands to: `/usr/bin/license-checker --limitAttributes licenses`.
 Above macro, but limits the output to only the license.
 
 Available flags:
-- `-o` can be used as a shorthand for `--out`
+- `-o` MAY be used as a shorthand for `--out`.
 
 Example output:
 
-```r
+```
 /usr/bin/license-checker --limitAttributes licenses
 └─ @fyralabs/devdocs@@0.0.1
    └─ licenses: MIT
@@ -298,13 +302,13 @@ SHOULD be used if packaging Node modules.
 
 Example usage:
 
-```
+```rpmspec
 %{npm_license} --out LICENSE.modules
 ```
 
 OR:
 
-```
+```rpmspec
 %npm_license -o LICENSE.modules
 ```
 
@@ -348,12 +352,12 @@ Expands to: `--userconfig=%{rpmbuilddir}/.npmrc --globalconfig=%{rpmbuilddir}/np
 #### %__npm
 Macro to call NPM with predetermined enviroment variables.
 
-Expands to: `/usr/bin/env %{npm_common_envvars} %{?with_vendored_nodejs:%{_vendored_nodejs_dir}/npm}%{!?with_vendored_nodejs:/usr/bin/npm}`
+Expands to: `/usr/bin/env %{npm_common_envvars} %{?with_vendored_nodejs:%{__nvm} exec npm --}%{!?with_vendored_nodejs:/usr/bin/npm}`
 
 #### %__npx
 Remotely run Node modules with NPX.
 
-Expands to: `/usr/bin/env %{npm_common_envvars} %{?with_vendored_nodejs:%{_vendored_nodejs_dir}/npx}%{!?with_vendored_nodejs:/usr/bin/npx}`
+Expands to: `/usr/bin/env %{npm_common_envvars} %{?with_vendored_nodejs:%{__nvm} exec npx --}%{!?with_vendored_nodejs:/usr/bin/npx}`
 
 #### %npm_build
 Should be used for building Electron projects with NPM. Has a great deal of flags to work around NPM specific limitations.
@@ -457,6 +461,9 @@ Expands to: `/usr/bin/env %{pnpm_common_envvars} /usr/bin/pnpx`
 
 #### %vendor_pnpm
 SHOULD only be used if PNPM is not usable/available from the available repositories.
+
+Available flags:
+- `-v` MAY be used to define a desired version of PNPM.
 
 Usecase examples:
 - Fedora's currently packaged PNPM is too old for the build
