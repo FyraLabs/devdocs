@@ -238,16 +238,16 @@ Expands to: `%{rpmbuilddir}/.npm`
 #### %npm_common_envvars
 **NOTE:** NPM environment variables written in uppercase will be __ignored__ if the project sets different ones explicitly. This is intentional behavior which these macros do not override in order to avoid build issues. For more information, please see [this issue](https://github.com/npm/npm/issues/14528) in the original NPM GitHub repository.
   - If for any reason you need to hardcode an environment override, use a flag passed to NPM or manually set the environment variable in all lowercase.
-  - For more information on NPM config flags and environment variables, please see: https://docs.npmjs.com/cli/v11/using-npm/config
+  - For more information on NPM config flags and environment variables, please see: https://docs.npmjs.com/cli/v11/using-npm/config.
 
 Expands to: `NPM_CONFIG_USERCONFIG=%{rpmbuilddir}/.npmrc NPM_CONFIG_GLOBALCONFIG=%{rpmbuilddir}/npmrc NPM_CONFIG_CACHE=%{_npm_cache_dir} NPM_CONFIG_LOGLEVEL=error NPM_CONFIG_FUND=false NPM_CONFIG_UPDATE_NOTIFIER=false NO_UPDATE_NOTIFIER=1 NPM_CONFIG_COLOR=always NPM_CONFIG_INIT_MODULE=%{rpmbuilddir}/.npm-init.js`
 
 What these do:
 - Forces all configuration files into the `%{rpmbuilddir}` so they are easily locatable and to prevent attempting to write to the host file system for global config
-- Sets the NPM log level to errors (previously `warn` but this included warnings irrelevant to builds or Node modules)
-- Disables funding notifications as this does not make sense to display in an automated build and causes log spam
-- Disables update notifications since we are using a packaged version of NPM unless using `%vendor_nodejs`
-- Sets color to "always" for more easily readable logs
+- Sets the NPM log level to errors (previously `warn` but this included warnings irrelevant to builds or Node modules).
+- Disables funding notifications as this does not make sense to display in an automated build and causes log spam.
+- Disables update notifications since we are using a packaged version of NPM unless using `%vendor_nodejs`.
+- Sets color to "always" for more easily readable logs.
 
 #### %npm_buildflags
 Explicit NPM configuration flags of the environment variables set by the Macros.
@@ -310,7 +310,7 @@ Run Node modules (downloading them if necessary) with Bun.
 Expands to: `/usr/bin/env %{bun_common_envvars} /usr/bin/bunx`
 
 #### %bun_audit
-Audit with Bun if package uses bundled Node dependencies. For use in the `%check` section
+Audit with Bun if package uses bundled Node dependencies. For use in the `%check` section.
 
 NOTE: Bun audit is a currently a wrapper for NPM audit but lacks the `fix` option, in order to fix vulnerabilities you need to use `%npm_audit_fix`.
 
@@ -410,7 +410,7 @@ Expands to: `/usr/bin/env %{yarn_common_envvars} /usr/bin/yarn dlx`
 NOTE: REQUIRES `yarnpkg-berry` instead of `yarnpkg` as a build dependency.
 
 #### %yarn_audit
-Audit Yarn if package uses bundled Node dependencies. For use in the `%check` section
+Audit Yarn if package uses bundled Node dependencies. For use in the `%check` section.
 
 You SHOULD NOT need to fix vulnerabilities for Node modules that are <u>not bundled in the final package.</u> This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
 
@@ -464,10 +464,10 @@ Rundown of what all `%electronmeta` does:
   - Defines `%{_electron_cpu}` for x86 architectures as `ia32`.
   - Defines `%{_electron_cpu}` for armv7l architectures as `armv7l`.
   - Defines `%{_electron_cpu}` for mips64 architectures as `mips64el`.
-    - These are defined because Electron names the build files and directories after the architecture
-    - The macros used to build Electron apps (`%npm_build`, `%bun_build`, `%pnpm_build`, and `%yarn_build`) all require this to be set
-    - In some cases, these architectures are used in the source tarballs for Electron projects
-    - This can also be used to help work with the files if you need to do anything manually
+    - These are defined because Electron names the build files and directories after the architecture.
+    - The macros used to build Electron apps (`%npm_build`, `%bun_build`, `%pnpm_build`, and `%yarn_build`) all require this to be set.
+    - In some cases, these architectures are used in the source tarballs for Electron projects.
+    - This can also be used to help work with the files if you need to do anything manually.
 - Defines `%__provides_excludes` to make sure Electron apps are not flagged as providers of their bundled dependencies, such as FFmpeg libraries.
 - Defines `%__requires_excludes` based on architecture to prevent Electron projects' cross-platform builds from causing false dependency positives from RPM.
 - Sets `%debug_package` to `%{nil}` to prevent stripping of bundled libraries and/or build failures due to not enough data to strip.
@@ -557,12 +557,12 @@ Available flags:
 Install files of apps built using Electron Builder or Electron Forge.
 
 By default, the install steps are:
-1. Make the install directory
-  - This will be in the `%{_libdir}` (/usr/lib on 32-bit architectures and /usr/lib64 on 64-bit ones)
-  - This is done because programs with bundled dependencies (Electron, Node modules, and more) MUST have these dependencies kept together
-2. Install the app's files
-3. Symlink the app's binary to the bin directory
-4. Install the app's icons
+1. Make the install directory.
+  - This will be in the `%{_libdir}` (/usr/lib on 32-bit architectures and /usr/lib64 on 64-bit ones).
+  - This is done because programs with bundled dependencies (Electron, Node modules, and more) MUST have these dependencies kept together.
+2. Install the app's files.
+3. Symlink the app's binary to the bin directory.
+4. Install the app's icons.
 
 Available flags:
 - `-b` MUST be used when the app's executable differs from the name of the package.
@@ -580,10 +580,10 @@ Available flags:
 
 Example usage:
 - The command `%electron_install -b app -i app -s app -S alsoapp -D -Owayland -U %u -E WaylandWindowDecorations` would install the program with:
-  - Icons named `app.png`
-  - A symlink named `app`
-  - A second symlink called `alsoapp`
-  - A desktop file with the `Exec` line reading `Exec=/usr/lib(64)/pkgname/app --enable-features=WaylandWindowDecorations --ozone-platform=wayland %u`
+  - Icons named `app.png`.
+  - A symlink named `app`.
+  - A second symlink called `alsoapp`.
+  - A desktop file with the `Exec` line reading `Exec=/usr/lib(64)/pkgname/app --enable-features=WaylandWindowDecorations --ozone-platform=wayland %u`.
 
 ### %electron_license
 The license for bundled Electron.
