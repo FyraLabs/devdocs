@@ -28,24 +28,24 @@ For other macros available in Fedora/Terra, check out our unofficial [macros lis
 ## Directories
 These macros define certain system directories, and SHOULD be used in place of the raw directory path.
 
-#### %__anda_develfiles
+### %__anda_develfiles
 [TODO]
 
-#### %_anda_srpm_macros_dir
+### %_anda_srpm_macros_dir
 Expands to: `/usr/libexec/anda-srpm-macros`.
 Anda directory for scripts such as `find-develinfo.sh` used by Anda macros.
 
 #### %__anda_libsfiles
 [TODO]
 
-#### %_appsdir
+### %_appsdir
 Expands to: `%_datadir/applications` or `/usr/share/applications`.
 This may seem like a directory to place the application itself into, but this directory SHOULD ONLY be used for the applicaitons `.desktop` file.
 
 ### %elvish_completions_dir
 `%_datadir/elvish/lib/completions`
 
-#### %_hicolordir
+### %_hicolordir
 Expands to: `%_iconsdir/hicolor`, or `/usr/share/icons/hicolor`.
 The directory that SHOULD be used when installing application `.png` files. Note that you will then need to install the (typically app icon) file to the `apps` folder within the fixed-size directory in `%_hicolordir`.
 
@@ -59,7 +59,7 @@ install -Dm644 icons/64x64.png %{buildroot}%{_hicolordir}/64x64/apps/%{name}.svg
 
 If the file is a `.svg`, use the macro below.
 
-#### %_scalableiconsdir
+### %_scalableiconsdir
 Expands to: `%_hicolordir/scalable/apps`, or `/usr/share/icons/hicolor/scalable/apps/`.
 The directory that SHOULD be used when installing application `.svg` files to.
 You do not need to specify any folders for this macro, add the file can be added to the end of this macro.
@@ -71,7 +71,7 @@ install -Dm644 icons/%{name}.svg %{buildroot}%{_scalableiconsdir}/%{name}.svg
 
 If the file is a `.png`, use the macro above.
 
-#### %rpmbuilddir
+### %rpmbuilddir
 This macro exists because Terra supports EL distributions (Red Hat Enterprise Linux, Alma Linux, etc.) which currently have an RPM version from before the `%{builddir}` change to address issues [like this](https://github.com/rpm-software-management/rpm/issues/3151).
 
 The common, albeit clunky, solution is to define `%{builddir}` manually as `%{_builddir}` in specs targeting distros with different versions of RPM where one has a version older than 4.20. We have this macro instead to make the process easier without overriding any Fedora macros.
@@ -83,7 +83,7 @@ Expands to: `%{?builddir}%{?!builddir:%{_builddir}}`
 ## Go
 These macros assist with building Go projects.
 
-#### %goprep_online
+### %goprep_online
 MAY be used to prep a Go package for online builds. Replaces `%goprep` in `%prep`.
 
 ## JavaScript/JavaScript Package Managers
