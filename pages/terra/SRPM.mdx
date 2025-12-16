@@ -238,7 +238,7 @@ Expands to: `%{rpmbuilddir}/.npm`
 #### %npm_common_envvars
 **NOTE:** NPM environment variables written in uppercase will be __ignored__ if the project sets different ones explicitly. This is intentional behavior which these macros do not override in order to avoid build issues. For more information, please see [this issue](https://github.com/npm/npm/issues/14528) in the original NPM GitHub repository.
   - If for any reason you need to hardcode an environment override, use a flag passed to NPM or manually set the environment variable in all lowercase.
-  - For more information on NPM config flags and environment variables, please see: https://docs.npmjs.com/cli/v11/using-npm/config.
+  - For more information on NPM config flags and environment variables, please see: https://docs.npmjs.com/cli/v11/using-npm/config
 
 Expands to: `NPM_CONFIG_USERCONFIG=%{rpmbuilddir}/.npmrc NPM_CONFIG_GLOBALCONFIG=%{rpmbuilddir}/npmrc NPM_CONFIG_CACHE=%{_npm_cache_dir} NPM_CONFIG_LOGLEVEL=error NPM_CONFIG_FUND=false NPM_CONFIG_UPDATE_NOTIFIER=false NO_UPDATE_NOTIFIER=1 NPM_CONFIG_COLOR=always NPM_CONFIG_INIT_MODULE=%{rpmbuilddir}/.npm-init.js`
 
@@ -509,7 +509,7 @@ However, at this time Terra only supports x86_64, AArch64, and 32-bit x86.
 ### Electron build macros
 These are macros used to build software using Electron using JavaScript package managers.
 
-For more information on each package manager, see (NPM Macros)[#npm-macros], Bun Macros[#bun-macros], [PNPM Macros](#pnpm-macros), and [Yarn Macros](#yarn-macros).
+For more information on each package manager, see [NPM Macros](#npm-macros), [Bun Macros](#bun-macros), [PNPM Macros](#pnpm-macros), and [Yarn Macros](#yarn-macros).
 
 #### %npm_build
 SHOULD be used for building Electron projects with NPM. Has a great deal of flags to work around NPM specific limitations.
