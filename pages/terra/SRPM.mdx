@@ -45,7 +45,7 @@ This may seem like a directory to place the application itself into, but this di
 ### %elvish_completions_dir
 `%_datadir/elvish/lib/completions`
 
-### %_hicolordir 
+### %_hicolordir
 Expands to: `%_iconsdir/hicolor`, or `/usr/share/icons/hicolor`.
 The directory that SHOULD be used when installing application `.png` files. Note that you will then need to install the (typically app icon) file to the `apps` folder within the fixed-size directory in `%_hicolordir`.
 
@@ -59,7 +59,7 @@ install -Dm644 icons/64x64.png %{buildroot}%{_hicolordir}/64x64/apps/%{name}.svg
 
 If the file is a `.svg`, use the macro below.
 
-### %_scalableiconsdir 
+### %_scalableiconsdir
 Expands to: `%_hicolordir/scalable/apps`, or `/usr/share/icons/hicolor/scalable/apps/`.
 The directory that SHOULD be used when installing application `.svg` files to.
 You do not need to specify any folders for this macro, add the file can be added to the end of this macro.
@@ -71,178 +71,106 @@ install -Dm644 icons/%{name}.svg %{buildroot}%{_scalableiconsdir}/%{name}.svg
 
 If the file is a `.png`, use the macro above.
 
-### %__pnpm
-`/usr/bin/env %{pnpm_common_envvars} %{?with_vendored_pnpm:%{rpmbuilddir}/pnpm/pnpm}%{!?with_vendored_pnpm:/usr/bin/pnpm}`
-[TODO]: Should macros like these be in the directories section?
-
-### %__pnpx
-[TODO]
-
 ### %rpmbuilddir
-`%{?builddir}%{?!builddir:%{_builddir}}`.
+This macro exists because Terra supports EL distributions (Red Hat Enterprise Linux, Alma Linux, etc.) which currently have an RPM version from before the `%{builddir}` change to address issues [like this](https://github.com/rpm-software-management/rpm/issues/3151).
 
-## Electron
-These macros assist with the general packaging of applications that use [Electron](https://www.electronjs.org/).
+The common, albeit clunky, solution is to define `%{builddir}` manually as `%{_builddir}` in specs targeting distros with different versions of RPM where one has a version older than 4.20. We have this macro instead to make the process easier without overriding any Fedora macros.
 
-### %electronmeta
-Set up all basic requirements including build macros for building an Electron app.
+This macro is subject to being retired once all EL distributions with an RPM version older than 4.20 are end of life (likely when EL10 is end of life), or in the event we can no longer support EL distributions this old.
 
-Rundown of what all `%electronmeta` does:
-- Converts `%{_target_cpu}` (the RPM build architecture) into `%{_electron_cpu}`, the Electron format for architectures it is compatible with.
-  - Defines `%{_electron_cpu}` for x86_64 architectures as `x64`.
-  - Defines `%{_electron_cpu}` for aarch64 architectures as `arm64`.
-  - Defines `%{_electron_cpu}` for x86 architectures as `ia32`.
-  - Defines `%{_electron_cpu}` for armv7l architectures as `armv7l`.
-    - These are defined because Electron names the build files and directories after the architecture
-    - The macros used to build Electron apps (`%npm_build`, `%bun_build`, `%pnpm_build`, and `%yarn_build`) all require this to be set
-    - In some cases, these architectures are used in the source tarballs for Electron projects
-    - This can also be used to help work with the files if you need to do anything manually
-- Defines `%__provides_excludes` to make sure Electron apps are not flagged as providers of their bundled dependencies, such as FFmpeg libraries.
-- Defines `%__requires_excludes` based on architecture to prevent Electron Builder's cross-compilation from causing false dependency positives from RPM.
-- Sets `%debug_package` to `%{nil}` to prevent stripping of bundled libraries and/or build failures due to not enough data to strip.
-- Sets the build and runtime dependencies. The -a flag can be used to pull additional build dependencies that are sometimes needed when building through NPM in particular.
-- Sets the `ExclusiveArch` field to only the architectures Electron supports.
-- Defines the bundled dependencies as bundled. NOTE: This only defines Electron's bundled dependencies, not any Node modules the app may also bundle.
-
-This ensures packagers do not need to manually set these for every Electron app's spec, hopefully eliminating depsolver problems and helping reduce common build issues.
-
-### %electron_install
-Install files built using Electron Builder.
-
-By default, the install steps are:
-1. Make the install directory
-  - This will be in the `%{_libdir}` (/usr/lib on 32-bit architectures and /usr/lib64 on 64-bit ones)
-  - This is done because programs with bundled dependencies (Electron, Node modules, and more) MUST have these dependencies kept together
-2. Install the app's files
-3. Symlink the app's binary to the bin directory
-4. Install the app's icons
-
-`%electron_install` supports several flags to help control variables of the install. Most of the fallbacks if none are passed are the name of the package.
-- `-b` must be used when the app's executable differs from the name of the package.
-- `-d` can be used to install the app under a different directory than the name of the package.
-- `-i` must be used when the app's desktop file points to an icon name different from the name of the package.
-- `-l` can be used to fetch all licenses including the bundled ones and put them in a directory in the `%{builddir}`. You can then put them in the license directory using `%license %{rpmbuilddir}/bundled_licenses/*` (for more information on `%{rpmbuilddir}` and why we have it, see [TBA])
-- `-s` can be used to choose the name of the symlink.
-- `-S` can be used to create an additional symlink with a different name. Useful when an app has two interchangeable common names.
-- `-D` can be used to handle automatic installation of the .desktop file. This ONLY works if Electron Builder builds an AppImage, and should not be used if the source contains a desktop file.
-- `-E` can be used to set the "--enable-features" flag in the desktop file. Features to enable must be comma separated without spaces.
-- `-O` can be used to set the Ozone flatform the Electron app will run on. If no arguments are supplied, it will fall back to auto. Accepted arguments are `-Ox11` and `-Owayland`
-- `-U` can be used to set either `%u` or `%U` in the desktop file. This REQUIRES you do not use `u` as a macro name for any reason.
-  - `%u` means that a desktop file can only read one URL at a time, `%U` means that it can read multiple at a time.
-  - Defer to what the desktop file originally contained if you are unsure.
-
-Example:
-- The command `%electron_install -b app -i app -s app -S alsoapp -D -Owayland -U %u -E WaylandWindowDecorations` would install the program with:
-  - Icons named `app.png`
-  - A symlink named `app`
-  - A second symlink called `alsoapp`
-  - A desktop file with the `Exec` line reading `Exec=/usr/lib(64)/pkgname/app --enable-features=WaylandWindowDecorations --ozone-platform=wayland %u`
-
-### %electron_license
-The license for bundled Electron.
-NOT set by default in `%electronmeta` because you cannot set the license field twice.
-MAY be used in combination with manually adding the other relevant licenses (if this is done, a proper license tag would be `License: XXX-x.x AND %electron_license`.
-
-To enable, must have `%bcond bundled_electron 1` in the [preamble](../rpm/sections#preamble) of the spec.
-
-### %electron_arches
-The architectures Electron supports. Automatically set as `ExclusiveArch` when using `%electronmeta`.
-
-As written, the macro is:
-- `%{x86_64} %{ix86} %{arm64} armv7l armv7hl armv7hnl`
-
-Which expands fully to:
-- `x86_64 x86_64_v2 x86_64_v3 x86_64_v4 amd64 em64t i386 i486 i586 i686 pentium3 pentium4 athlon geode aarch64 armv7l armv7hl armv7hnl`
-
-Which simply means Electron supports x86_64, x86, aarch64/ARM64, and armv7l.
+Expands to: `%{?builddir}%{?!builddir:%{_builddir}}`
 
 ## Go
-These macros assist with building go projects.
+These macros assist with building Go projects.
 
-### %go_task
-Should be used in place of `go-task`.
+### %goprep_online
+MAY be used to prep a Go package for online builds. Replaces `%goprep` in `%prep`.
 
 ## JavaScript/JavaScript Package Managers
-These are macros to assist with the general packaging of applications that use JavaScript runtimes/nodeJS
-[TODO]: make this sound not stupid
-[TODO]: descriptions for the sub-sections
-[TODO]: examples/links to examples of how to use the macros here (at least the common ones)
+These are macros to assist with the general packaging of applications that use JavaScript runtimes, such as Node.js or Bun.
 
-### Bun Macros
-[TODO]
+### Node.js Macros
+Macros for using [Node.js](https://nodejs.org). These require use of the [Fedora Node.js macros](https://docs.fedoraproject.org/en-US/packaging-guidelines/Node.js/#_macros) in the `nodejs-packaging` package.
 
-#### %bun_common_envvars
-[TODO]
+You MUST either set `%global npm_name pkgname` or use `%npm_prep -n pkgname` when packaging Node modules directly. This MUST be defined as the canonical name of the module as listed on the NPM Registry.
 
-#### %__bun
-Expands to: `/usr/bin/env %{bun_common_envvars} /usr/bin/bun`
+#### %_nvm_dir
+The location in the `%{rpmbuilddir}` what will be passed to `$NVM_DIR`.
 
-#### %__bunx
-[TODO]
-
-#### %bun_build
-Should be used in place of `bun build`.
-
-#### %bun_audit
-bun audit, for use in the `%check` section.
-
-#### %bun_pm_trust
-[TODO]
-
-### Node Macros
-[TODO]
-
-#### %fetch_node_tests
-[TODO]
-
-### NPM Macros
-[TODO]
-
-#### %npm_common_envvars
-[TODO]
-
-#### %npm_buildflags
-[TODO]
-
-#### %set_node_build_flags
-[TODO]
-
-#### %__npm
-[TODO]
-
-#### %__npx
-[TODO]
-
-#### %npm_build
-Should be used in place of `npm build`.
+Expands to: `%{rpmbuilddir}/.nvm`
 
 #### %__nvm
-[TODO]
+Calls NVM (Node Version Manager) while setting `$NVM_DIR`. Only used if vendoring Node.js.
+
+Expands to: `/usr/bin/env NVM_DIR=%{_nvm_dir} /usr/bin/nvm`
+
+#### %vendor_nodejs
+SHOULD only be used if Node.js packages available from the repos are not usable for some reason.
+
+You MUST add `nvm` as a build requirement to the spec if using this macro.
+
+Available flags:
+- `-v` is REQUIRED for this macro to pass the version to NVM. Accepts a full version, the major for the latest of a major version of Node.js (e.g., `24`), or `node` to use the latest version of Node.js available.
+
+Usecase examples:
+- Fedora has not yet packaged the correct version of Node.js or the required version is older than what is supplied.
+  - This means that packaged Node modules will probably not meet their runtime requirements, but Electron apps may be fine.
+- EL does not yet have the correct version of Node.js.
+  - This poses the same concern as above.
+
+For this reason whatever you are packaging SHOULD be tested locally upon a successful build to see if it meets any runtime issues.
+
+What `%vendor_nodejs` does:
+1. Installs the desired Node.js version to `%{_nvm_dir}`.
+1. Redefines `%{__nodejs}` to run the vendored version through NVM.
+1. Sets a `%bcond` to `vendored_nodejs` so other macros will use the vendored version.
+
+Vendored versions of NPM and NPX are subject to limitations in commands as they must be run through `exec`.
+
+### Node Module Macros
+"Node modules" refers to JavaScript packages run using a JavaScript runtime (usually Node.js), almost always hosted on the [NPM Registry](https://www.npmjs.com/).
 
 #### %npm_prep
-[TODO]
+Prepare a Node module for build steps.
+
+Available flags:
+- `-n` MUST be used to define `%{npm_name}` if it was not defined as a global macro.
+
+#### %fetch_node_tests
+Fetch self-tests from a Git repo. MUST include all necessary test files and folders. If used, SHOULD be used in `%prep`.
+
+Available flags:
+- `-u` MUST be used to define the URL if the one listed in the `URL:` field for the package is not detectable as clonable.
+
+All necessary test files and folders MUST be listed after the macro. Test folders MUST start with `/`.
+
+Example usage:
+```rpmspec
+%prep
+%npm_prep
+%fetch_node_tests -u https://github.com/dev/module.git /tests .eslintrc
+```
 
 #### %npm_install
-[TODO]
-
-#### %npm_audit
-[TODO]
-
-#### %npm_audit_fix
-[TODO]
-
-#### %npm_license_summary
-[TODO]
+Install a Node module to `%{npm_sitelib}` and symlink its executable.
 
 #### %npm_test
-[TODO]
+Runs generic NPM tests. This will not be applicable to all Node modules. For use in `%check`.
+
+Expands to: `%{__npm} test`
 
 #### %node_self_test
-[TODO]
+Run self-defined tests on the Node module. This will not be applicable for all Node modules and not all types of tests are supported as Node modules can use a wide variety of testing tools. For use in `%check`.
+
+Available flags:
+- `-R`: Direct duplicate of an `-R` flag. Project dependent.
+- `-v`: Direct duplicate of a `-v` flag. Project dependent.
+
+You MUST use [`%fetch_node_tests`](#fetch_node_tests) first if using this.
 
 #### %__npm_license_checker
 Expands to: `/usr/bin/license-checker`.
-Runs the npm [`license-checker`](https://www.npmjs.com/package/license-checker) command.
+Runs the NPM [`license-checker`](https://www.npmjs.com/package/license-checker-rseidelsohn) command.
 
 Example output:
 
@@ -261,6 +189,9 @@ Example output:
 Expands to: `/usr/bin/license-checker --limitAttributes licenses`.
 Above macro, but limits the output to only the license.
 
+Available flags:
+- `-o` MAY be used as a shorthand for `--out`.
+
 Example output:
 
 ```
@@ -269,46 +200,400 @@ Example output:
    └─ licenses: MIT
 ```
 
-### PNPM Macros
+SHOULD be used if packaging Node modules.
 
-#### %vendor_pnpm
-Use if PNPM is not usable/available from repo
+Example usage:
+
+```rpmspec
+%{npm_license} --out LICENSE.modules
+```
+
+OR:
+
+```rpmspec
+%npm_license -o LICENSE.modules
+```
+
+The above would create a `LICENSE.modules` file which can then be packaged using `%license LICENSE.modules`.
+
+#### %npm_license_summary
+Outputs a summary of the bundled licenses. Useful for determining what to put in the `License:` section for Node modules.
+
+Expands to: `%{__npm_license_checker} --summary`
+
+### Notes for JavaScript package managers:
+1. The JavaScript package manager cache directories are placed in [`%{rpmbuilddir}`](#rpmbuilddir) because `$HOME` can be different depending on if a build is in Mock or RPM Build.
+  - This is very important for consistent macro behavior as well as if the cache must be modified or deleted during build for any reason.
+2. All macros calling the package managers also call NPM environment variables because most of them are using build dependencies from the NPM Registry, and some even wrap NPM commands with their own. This ensures consistent NPM behavior.
+
+### NPM Macros
+Macros for using [NPM](https://www.npmjs.com).
+
+#### %_npm_cache_dir
+Expands to: `%{rpmbuilddir}/.npm`
+
+#### %npm_common_envvars
+**NOTE:** NPM environment variables written in uppercase will be __ignored__ if the project sets different ones explicitly. This is intentional behavior which these macros do not override in order to avoid build issues. For more information, please see [this issue](https://github.com/npm/npm/issues/14528) in the original NPM GitHub repository.
+  - If for any reason you need to hardcode an environment override, use a flag passed to NPM or manually set the environment variable in all lowercase.
+  - For more information on NPM config flags and environment variables, please go [here](https://docs.npmjs.com/cli/v11/using-npm/config).
+
+Expands to: `NPM_CONFIG_USERCONFIG=%{rpmbuilddir}/.npmrc NPM_CONFIG_GLOBALCONFIG=%{rpmbuilddir}/npmrc NPM_CONFIG_CACHE=%{_npm_cache_dir} NPM_CONFIG_LOGLEVEL=error NPM_CONFIG_FUND=false NPM_CONFIG_UPDATE_NOTIFIER=false NO_UPDATE_NOTIFIER=1 NPM_CONFIG_COLOR=always NPM_CONFIG_INIT_MODULE=%{rpmbuilddir}/.npm-init.js`
+
+What these do:
+- Forces all configuration files into the `%{rpmbuilddir}` so they are easily locatable and to prevent attempting to write to the host file system for global config.
+- Sets the NPM log level to errors (previously `warn` but this included warnings irrelevant to builds or Node modules).
+- Disables funding notifications as this does not make sense to display in an automated build and causes log spam.
+- Disables update notifications since we are using a packaged version of NPM unless using `%vendor_nodejs`.
+- Sets color to "always" for more easily readable logs.
+
+#### %npm_buildflags
+Explicit NPM configuration flags of the environment variables set by the Macros.
+
+Expands to: `--userconfig=%{rpmbuilddir}/.npmrc --globalconfig=%{rpmbuilddir}/npmrc --cache=%{rpmbuilddir}/.npm --loglevel=error --fund=false --update-notifier=false --color=always --init-module=%{rpmbuilddir}/.npm-init.js`
+
+#### %__npm
+Macro to call NPM with predetermined enviroment variables.
+
+Expands to: `/usr/bin/env %{npm_common_envvars} %{?with_vendored_nodejs:%{__nvm} exec npm --}%{!?with_vendored_nodejs:/usr/bin/npm}`
+
+#### %__npx
+Remotely run Node modules with NPX.
+
+Expands to: `/usr/bin/env %{npm_common_envvars} %{?with_vendored_nodejs:%{__nvm} exec npx --}%{!?with_vendored_nodejs:/usr/bin/npx}`
+
+#### %npm_audit
+Audit with NPM if package uses bundled Node dependencies. For use in the `%check` section.
+
+You SHOULD NOT need to fix vulnerabilities for Node modules that are <u>not bundled in the final package.</u> This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
+
+#### %npm_audit_fix
+Fix vulnerabilities found using `%npm_audit` Should be used in `%prep` section.
+
+Installed packages with fixed dependencies SHOULD be tested first to make sure the applied fix did not cause any issues.
+
+Available flags:
+- `-d` will run with `--dry-run` so you can check what the fix would do.
+- `-f` will run with `--force`, ignoring package locks or other requirements set by the module to fix the dependencies. MUST be tested locally and verified to not cause breakage.
+- `-o` will omit a dependency or group (such as `dev`) from being fixed.
+- `-O` will only fix a specified depency or group.
+- `-p` will limit the run to the package lock.
+
+LIMITATION: Cannot be used on modules installed using the `-g` flag (which is done in `%npm_prep`) which use a package lock.
+
+### Bun Macros
+Macros for using [Bun](https://bun.com).
+
+#### %__bun_home
+Unfortunately, Bun doesn't actually have a way to enforce this yet. However the proposed environment variable is `$BUN_HOME`, so we have this for the future.
+
+Expands to: `%{rpmbuilddir}/.bun`
+
+#### %_bun_cache_dir
+Directory that Bun cache files are stored in.
+
+Expands to: `%{_bun_home}/install/cache`
+
+#### %bun_common_envvars
+Sets the `$BUN_HOME` for future use and sets the cache dir.
+
+Expands to: `%{npm_common_envvars} BUN_HOME=%{_bun_home} BUN_INSTALL_CACHE_DIR=%{_bun_cache_dir} BUN_RUNTIME_TRANSPILER_CACHE_PATH=%{_bun_cache_dir} FORCE_COLOR=1`
+
+#### %__bun
+Expands to: `/usr/bin/env %{bun_common_envvars} /usr/bin/bun`
+
+#### %__bunx
+Run Node modules (downloading them if necessary) with Bun.
+
+Expands to: `/usr/bin/env %{bun_common_envvars} /usr/bin/bunx`
+
+#### %bun_audit
+Audit with Bun if package uses bundled Node dependencies. For use in the `%check` section.
+
+NOTE: Bun audit is a currently a wrapper for NPM audit but lacks the `fix` option, in order to fix vulnerabilities you need to use `%npm_audit_fix`.
+
+You SHOULD NOT need to fix vulnerabilities for Node modules that are <u>not bundled in the final package.</u> This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
+
+#### %bun_pm_trust
+Add Node modules to trusted dependencies so their postinstall scripts may be run. Should only be used if necessary.
+
+Available flags:
+- `-a` can be used to trust all dependencies, otherwise simply list the dependencies you want to trust after the command.
+
+Expands to: `%{__bun} pm trust`
+
+### PNPM Macros
+Macros for using [PNPM](https://pnpm.io).
+
+#### %_pnpm_home
+Where PNPM files and cache are stored.
+
+Expands to: `%{rpmbuilddir}/.pnpm`
+
+#### %_pnpm_store
+Where Node modules installed by PNPM usually go. This will usually not be produced when using PNPM as a build tool, but exists for rare builds it may be created in.
+
+Expands to: `%{_pnpm_home}/store`
 
 #### %pnpm_common_envvars
-[TODO]
+Sets the NPM evironment variables and the PNPM home dir.
+
+Expands to: `%{npm_common_envvars} PNPM_HOME=%{_pnpm_home}`
+
+#### %__pnpm
+
+Expands to: `/usr/bin/env %{pnpm_common_envvars} %{?with_vendored_pnpm:%{rpmbuilddir}/pnpm/pnpm}%{!?with_vendored_pnpm:/usr/bin/pnpm}`
 
 #### %__pnpx
-[TODO]
+Remotely execute Node modules using PNPX.
 
-#### %pnpm_build
-Should be used in place of `pnpm build`.
+Expands to: `/usr/bin/env %{pnpm_common_envvars} /usr/bin/pnpx`
+
+#### %vendor_pnpm
+SHOULD only be used if PNPM is not usable/available from the available repositories.
+
+Available flags:
+- `-v` MAY be used to define a desired version of PNPM.
+
+Usecase examples:
+- Fedora's currently packaged PNPM is too old for the build.
+- You want to make the package build on EL (does not have PNPM).
+  - In this case, you SHOULD wrap `%vendor_pnpm` in `%if` macros such as:
+  - ```rpmspec
+     %if %{defined rhel}
+     %vendor_pnpm
+     %endif
+    ```
 
 #### %pnpm_audit
-Audit pnpm if package uses bundled Node dependencies. For use in the `%check` section
+Audit with PNPM if package uses bundled Node dependencies. For use in the `%check` section.
+
+You SHOULD NOT need to fix vulnerabilities for Node modules that are <u>not bundled in the final package.</u> This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
 
 #### %pnpm_audit_fix
-Fix dependencies using PNPM
+Fix security issues in dependencies using PNPM.
+
+Expands to: `NPM_CONFIG_AUDIT_LEVEL=low %{__pnpm} audit`
 
 #### %pnpm_approve_builds
-Approve dependency scripts if needed
+Approve dependency scripts with PNPM if needed.
+
+Available flags:
+- `-g` can be used to trust depdendencies of globally installed packages.
+
+Expands to `%{__pnpm} approve-builds`
 
 ### Yarn Macros
-[TODO]
+Macros for using [Yarn (Yarn Classic/Yarn v1)](https://classic.yarnpkg.com) and [Yarn Berry/Yarn Modern/Yarn v2+](https://yarnpkg.com).
+
+You SHOULD use `yarnpkg` (Yarn Classic) unless you need `yarnpkg-berry` (Yarn Berry) specifically.
+
+#### %_yarn_cache_dir
+
+Expands to: `%{rpmbuilddir}/.yarn`
 
 #### %yarn_common_envvars
-[TODO]
+Sets the NPM evironment variables and Yarn's cache folder.
+
+Expands to: `%{npm_common_envvars} YARN_CACHE_FOLDER=%{_yarn_cache_dir}`
 
 #### %__yarn
 Expands to: `/usr/bin/env %{yarn_common_envvars} /usr/bin/yarn`.
 
 #### %__yarn_dlx
-[TODO]
+Remotely execute a Node module with Yarn DLX.
 
-#### %yarn_build
-Should be used in place of `yarn build`.
+Expands to: `/usr/bin/env %{yarn_common_envvars} /usr/bin/yarn dlx`
+
+NOTE: REQUIRES `yarnpkg-berry` instead of `yarnpkg` as a build dependency.
 
 #### %yarn_audit
-Audit yarn if package uses bundled Node dependencies. For use in the `%check` section
+Audit Yarn if package uses bundled Node dependencies. For use in the `%check` section.
+
+You SHOULD NOT need to fix vulnerabilities for Node modules that are <u>not bundled in the final package.</u> This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
+
+### Other
+JavaScript related macros that apply to all of, or do not fit into any of, the above categories.
+
+#### %set_node_build_flags
+Set the flags and environment variables used for JavaScript package manager builds.
+
+Based on Fedora's [`%set_build_flags` macro](https://src.fedoraproject.org/rpms/redhat-rpm-config/blob/rawhide/f/buildflags.md#using-rpm-build-flags).
+
+Expands to:
+```rpmspec
+NPM_CONFIG_USERCONFIG="%{rpmbuilddir}/.npmrc" ; export NPM_CONFIG_USERCONFIG ; \
+NPM_CONFIG_GLOBALCONFIG="%{rpmbuilddir}/npmrc" ; export NPM_CONFIG_GLOBALCONFIG ; \
+NPM_CONFIG_CACHE="%{_npm_cache_dir}" ; export NPM_CONFIG_CACHE ; \
+NPM_CONFIG_LOGLEVEL="error" ; export NPM_CONFIG_LOGLEVEL ; \
+NPM_CONFIG_FUND="false" ; export NPM_CONFIG_FUND ; \
+NPM_CONFIG_UPDATE_NOTIFIER="false" ; export NPM_CONFIG_UPDATE_NOTIFIER ; \
+NO_UPDATE_NOTIFIER="1" ; export NO_UPDATE_NOTIFIER ; \
+NPM_CONFIG_COLOR="always" ; export NPM_CONFIG_COLOR ; \
+NPM_CONFIG_INIT_MODULE="%{rpmbuilddir}/.npm-init.js" ; export NPM_CONFIG_INIT_MODULE ; \
+BUN_HOME="%{_bun_home}" ; export BUN_HOME ; \
+BUN_INSTALL_CACHE_DIR="%{_bun_cache_dir}" ; export BUN_INSTALL_CACHE_DIR \
+BUN_RUNTIME_TRANSPILER_CACHE_PATH="%{_bun_cache_dir}" ; export BUN_RUNTIME_TRANSPILER_CACHE_PATH ; \
+PNPM_HOME="%{_pnpm_home}" ; export PNPM_HOME ; \
+YARN_CACHE_FOLDER="%{_yarn_cache_dir}" ; export YARN_CACHE_FOLDER ; \
+NPMFLAGS="${NPMFLAGS:-%{npm_buildflags} }" ; export NPMFLAGS
+```
+
+This ensures the environment variables are explicitly exported and are more likely to be picked up by all shell processes. It also creates an environment variable called `$NPMFLAGS` which can be passed to NPM in lieu of the macro `%{npm_buildflags}` to force our config, if necessary.
+
+This should only be needed in the event you are using [`%__npx`](#__npx), [`%__pnpx`](#__pnpx), [`%__bunx`](#__bunx), or [`%__yarn_dlx`](#__yarn_dlx).
+
+## Electron
+These macros assist with the general packaging of applications that use [Electron](https://www.electronjs.org).
+
+### %electronmeta
+Set up all basic requirements including build macros for building an Electron app.
+
+Does <u>not</u> install the JavaScript package managers used for builds (e.g., `nodejs-npm`, `bun`, `pnpm`, `yarnpkg`, `yarnpkg-berry`). These must still be specified in the `BuildRequires:` manually.
+
+Available flags:
+- `-a` will pull in additional build dependencies often needed particularly when building with NPM.
+  - Currently, this includes `nodejs-devel`, `nodejs-packaging`, and `typescript`.
+
+Rundown of what all `%electronmeta` does:
+- Converts `%{_target_cpu}` (the RPM build architecture) into `%{_electron_cpu}`, the Electron format for architectures it is compatible with.
+  - Defines `%{_electron_cpu}` for x86_64 architectures as `x64`.
+  - Defines `%{_electron_cpu}` for aarch64 architectures as `arm64`.
+  - Defines `%{_electron_cpu}` for x86 architectures as `ia32`.
+  - Defines `%{_electron_cpu}` for armv7l architectures as `armv7l`.
+  - Defines `%{_electron_cpu}` for mips64 architectures as `mips64el`.
+    - These are defined because Electron names the build files and directories after the architecture.
+    - The macros used to build Electron apps (`%npm_build`, `%bun_build`, `%pnpm_build`, and `%yarn_build`) all require this to be set.
+    - In some cases, these architectures are used in the source tarballs for Electron projects.
+    - This can also be used to help work with the files if you need to do anything manually.
+- Defines `%__provides_excludes` to make sure Electron apps are not flagged as providers of their bundled dependencies, such as FFmpeg libraries.
+- Defines `%__requires_excludes` based on architecture to prevent Electron projects' cross-platform builds from causing false dependency positives from RPM.
+- Sets `%debug_package` to `%{nil}` to prevent stripping of bundled libraries and/or build failures due to not enough data to strip.
+- Sets the build and runtime dependencies.
+- Sets the `ExclusiveArch` field to only the architectures Electron supports.
+- Defines a `%bcond` for whether or not Electron is bundled for other macros.
+- Defines the bundled dependencies as bundled. NOTE: This only defines Electron's bundled dependencies, not any Node modules the app may also bundle.
+
+This ensures packagers do not need to manually set these for every Electron app's spec, hopefully eliminating depsolver problems and helping reduce common build issues.
+
+Like other meta macros (e.g., `%forgemeta` from Fedora), you MUST be mindful of where in the spec this macro should be placed.
+- MUST always come after `Name:` is defined and before the `%prep` section.
+- SHOULD come before the `License:` field if using [`%{electron_license}`](#electron_license).
+- MAY need to come before the sources if an upstream provides sources named after the Electron architecture.
+- MAY be used under preambles but before `%prep` if not using `%{electron_license}`.
+
+The safest location is under `Name:` and above other preambles. When in doubt, place the macro here.
+
+Example usage:
+```rpmspec
+Name:    electron
+%electronmeta
+Version: 39.2.7
+```
+
+### %electron_arches
+The architectures Electron supports. Automatically set as `ExclusiveArch` when using `%electronmeta`.
+
+As written, the macro expands to:
+- `%{x86_64} %{ix86} %{arm64} armv7l armv7hl armv7hnl %{mips64}`
+
+Which expands fully to:
+- `x86_64 x86_64_v2 x86_64_v3 x86_64_v4 amd64 em64t i386 i486 i586 i686 pentium3 pentium4 athlon geode aarch64 armv7l armv7hl armv7hnl mips64 mips64el mips64r6 mips64r6el`
+
+Which simply means Electron supports [x86_64](https://en.wikipedia.org/wiki/X86-64), [32-bit x86 (AKA: IA-32)](https://en.wikipedia.org/wiki/IA-32), [AArch64/ARM64](https://en.wikipedia.org/wiki/AArch64), [ARMv7 (AKA: `armhf`)](https://en.wikipedia.org/wiki/ARM_architecture_family#Architecture_versions), and [MIPS64](https://en.wikipedia.org/wiki/MIPS_architecture).
+
+However, at this time Terra only supports x86_64, AArch64, and 32-bit x86.
+
+### %electron_license
+The license for bundled Electron.
+NOT set by default in `%electronmeta` because you cannot set the license field twice.
+MAY be used in combination with manually adding the other relevant licenses (if this is done, a proper license tag would be `License: XXX-x.x AND %{electron_license}`.
+
+[`%electronmeta`](#electronmeta) SHOULD be used BEFORE the `License:` preamble but AFTER `Name:` if using this macro.
+
+### Electron Build Macros
+These are macros used to build Electron apps using JavaScript package managers and builders such as [Electron Builder](https://www.electron.build), [Electron Forge](https://www.electronforge.io), and [Electron Vite](https://electron-vite.github.io).
+
+Capital letter flags generally denote options that SHOULD be used with caution or only if necessary for a build.
+
+For more information on each package manager, see [NPM Macros](#npm-macros), [Bun Macros](#bun-macros), [PNPM Macros](#pnpm-macros), and [Yarn Macros](#yarn-macros).
+
+#### %npm_build
+SHOULD be used for building Electron projects with NPM. Has a great deal of flags to work around NPM specific limitations.
+
+Available flags:
+- `-c`: Run `%{__npm} ci` instead of `%{__npm} install`. May be necessary for projects with stricter build dependencies.
+- `-e`: Execute commands and modules within the NPM build environment. Some commands may need `--` in between the command itself and the following arguments.
+- `-r`: Executes `%{__npm} run` for scripts in the `package.json`. Expects an argument.
+- `-E`: Execute Electron Builder/Electron Forge. Will NOT work for projects that require build steps which use Node.js or executing JavaScript scripts directly.
+- `-V`: Execute Electron Vite. Same limitation as with `-E`.
+- `-M`: Mode to use in Electron Vite builds. Accepts `production`, `development`, and `staging`. Note that this differs from `$NODE_ENV` so you can run any combination of Vite environment modes and Node.js environment modes.
+
+#### %bun_build
+SHOULD be used to build Electron projects with Bun.
+
+Available flags:
+- `-c`: Run `%{__bun} ci` instead of `%{__bun} install`. Analogous to `%{__bun} install --frozen-lockfile`. May be necessary for projects with stricter build dependencies.
+- `-e`: Execute commands and modules within the Bun build environment.
+- `-r`: Executes `%{__bun} run` for scripts in the `package.json`. Expects an argument.
+- `-v`: Run Electron Vite build steps. Not needed for all Electron apps.
+- `-F`: Runs `--force` on `%{__bun} install` step. It will make sure all dependencies are the latest versions from the registry, reinstalling them if necessary.
+- `-N`: Runs `--no-save` on `%{__bun} install` step. Prevent updating or (re)creating a lockfile to prevent freezing.
+- `-R`: Remove the bun.lock file. SHOULD only be used if the lockfile is causing build issues.
+
+#### %pnpm_build
+SHOULD be used for building Electron apps with PNPM.
+
+Available flags:
+- `-e`: Execute Node modules or installed programs in the PNPM build environment.
+- `-r`: Executes `%{__pnpm} run` for scripts in the `package.json`. Expects an argument. Not recommended for Electron Builder/Electron Forge or Electron Vite commands.
+- `-v`: Run Electron Vite build steps. Not needed for all Electron apps.
+- `-F`: Executes the `%{__pnpm} install` step with `--frozen-lockfile`. May be necessary for projects expecting very strict build dependencies, but can also override projects that do not enforce a lock.
+- `-N`: Executes the `%{__pnpm} install` step with `--no-frozen-lockfile`. Overrides projects that try to enforce a lockfile.
+- `-R`: Makes `%{__pnpm} exec` run on every project in the worspace recursively. SHOULD be used only if necessary and with caution.
+
+#### %yarn_build
+SHOULD be used to build Electron apps with Yarn or Yarn Berry.
+
+Available flags:
+- `-e`: Execute Node modules or installed programs in the Yarn build environment.
+- `-r`: Executes `%{__yarn} run` for scripts in the `package.json`. Expects an argument. Not recommended for Electron Builder, Electron Forge, or Electron Vite commands.
+- `-v`: Run Electron Vite build steps. Not needed for all Electron apps.
+- `-F`: Executes the `%{__yarn} install` step with `--frozen-lockfile`. May be necessary for projects expecting very strict build dependencies, but can also override projects that do not enforce a lock.
+- `-N`: Executes the `%{__yarn} install` step with `--no-lockfile`. Makes Yarn not update the lockfile on depedency installation.
+
+### %electron_install
+Install files of apps built using Electron Builder or Electron Forge. MUST be used after an appropriate [build macro](#electron-build-macros).
+
+Capital letter flags denote use with [desktop file](https://specifications.freedesktop.org/desktop-entry/latest) installation.
+
+By default, the install steps are:
+1. Make the install directory.
+  - This will be in the `%{_libdir}` (/usr/lib on 32-bit architectures and /usr/lib64 on 64-bit ones).
+  - This is done because programs with bundled dependencies (Electron, Node modules, and more) MUST have these dependencies kept together.
+2. Install the app's files.
+3. Symlink the app's binary to the bin directory.
+4. Install the app's icons.
+
+Available flags:
+- `-b` MUST be used when the app's executable differs from the name of the package.
+- `-d` MAY be used to install the app under a different directory than the name of the package.
+- `-i` MUST be used when the app's desktop file points to an icon name different from the name of the package.
+- `-l` MAY be used to fetch all licenses including the bundled ones and put them in a directory called `bundled_licenses`. You SHOULD then package them in the license directory using `%license bundled_licenses/*` in the `%files` section.
+- `-s` MAY be used to choose the name of the symlink.
+- `-S` MAY be used to create an additional symlink with a different name. Useful when an app has two interchangeable common names.
+- `-D` MAY be used to handle automatic installation of the .desktop file. This ONLY works if Electron Builder builds an AppImage, and should not be used if the source contains a desktop file.
+- `-E` MAY be used to set the "--enable-features" flag in the desktop file. Features to enable MUST be comma separated without spaces.
+- `-O` MAY be used to set the [Ozone platform](https://chromium.googlesource.com/chromium/src/+/lkgr/docs/ozone_overview.md) the Electron app will run on. If no arguments are supplied, it will fall back to `--ozone-platform-hint=auto`. Accepted arguments are `-Ox11` and `-Owayland`
+- `-U` MAY be used to set either `%u` or `%U` in the desktop file. If using this you MUST NOT use `u` as a macro name for any reason.
+  - `%u` means that a desktop file can only read one URL at a time, `%U` means that it can read multiple at a time. These are what are known as [exec keys](https://specifications.freedesktop.org/desktop-entry/latest/exec-variables.html).
+  - Defer to what the desktop file originally contained if you are unsure which to use.
+
+Example usage:
+- The command `%electron_install -b app -i app -s app -S alsoapp -D -Owayland -U %u -E WaylandWindowDecorations` would install the program with:
+  - Icons named `app.png`.
+  - A symlink named `app`.
+  - A second symlink called `alsoapp`.
+  - A desktop file with the `Exec` line reading `Exec=/usr/lib(64)/pkgname/app --enable-features=WaylandWindowDecorations --ozone-platform=wayland %u`.
 
 ## Nim
 These macros assist with building Nim projects.
@@ -330,18 +615,18 @@ Linker flags to Nim.
 These macros assist with building Rust projects.
 
 ### %cargo_prep_online
-Enables internet access for `cargo_prep`. Replaces `%cargo_prep` in `%prep`.
+Enables internet access for `%cargo_prep`. Replaces `%cargo_prep` in `%prep`.
 
 ### %cargo_license_online
-Enables internet access for `cargo_license`.
+Enables internet access for `%cargo_license`.
 Replaces `%cargo_license` in `%build`.
 
 ### %cargo_license_summary_online
-Enables internet access for `cargo_license_summary`.
+Enables internet access for `%cargo_license_summary`.
 Replaces `%cargo_license_summary` in `%build`.
 
 ### %cargo_vendor_manifest_online
-Enables internet access for `cargo_vendor_manifest_online`. 
+Enables internet access for `%cargo_vendor_manifest_online`.
 Replaces `%cargo_vendor_manifest` in `%build`. 
 
 ### %crate_install_bin
@@ -433,7 +718,7 @@ These macros assist with building Zig projects.
 
 ### %zig_build_target
 Many Zig projects rely on ReleaseFast (or more rarely, ReleaseSmall) builds for runtime optimization, and some Zig projects only work correctly when built for certain microarchitectures or higher (usually, this is `x86_64_v2` instead of `baseline` due to reliance on SIMD).
-If either of the above are the case for your package, you can use `%zig_build_target` with appropriate options in the `%build` or `%install` section depending on how the project is built (as some can be built directly into root by setting the `DESTDIR=%{buildroot}` variable).
+If either of the above are the case for your package, you SHOULD use `%zig_build_target` with appropriate options in the `%build` or `%install` section depending on how the project is built (as some can be built directly into root by setting the `DESTDIR=%{buildroot}` variable).
 
 Example:
 
@@ -486,3 +771,6 @@ URL:           https://github.com/ad-oliviero/uwufetch
 ```
 
 `%git_clone` SHOULD only be used when the source tarballs provided by upstream does not include all required sources in the repository (e.g., if the build process expects a Git environment or the tarball doesn't contain submodules).
+
+### %go_task
+SHOULD be used in place of `go-task` if using Go Task.
