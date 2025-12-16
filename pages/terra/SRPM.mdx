@@ -116,17 +116,17 @@ Available flags:
 - `-v` is REQUIRED for this macro to pass the version to NVM. Accepts a full version, the major for the latest of a major version of Node.js (e.g., `24`), or `node` to use the latest version of Node.js available.
 
 Usecase examples:
-- Fedora has not yet packaged the correct version of Node.js or the required version is older than what is supplied
-  - This means that packaged Node modules will probably not meet their runtime requirements, but Electron apps may be fine
-- EL does not yet have the correct version of Node.js
-  - This poses the same concern as above
+- Fedora has not yet packaged the correct version of Node.js or the required version is older than what is supplied.
+  - This means that packaged Node modules will probably not meet their runtime requirements, but Electron apps may be fine.
+- EL does not yet have the correct version of Node.js.
+  - This poses the same concern as above.
 
 For this reason whatever you are packaging SHOULD be tested locally upon a successful build to see if it meets any runtime issues.
 
 What `%vendor_nodejs` does:
-1. Installs the desired Node.js version to `%{_nvm_dir}`
-1. Redefines `%{__nodejs}` to run the vendored version through NVM
-1. Sets a `%bcond` to `vendored_nodejs` so other macros will use the vendored version
+1. Installs the desired Node.js version to `%{_nvm_dir}`.
+1. Redefines `%{__nodejs}` to run the vendored version through NVM.
+1. Sets a `%bcond` to `vendored_nodejs` so other macros will use the vendored version.
 
 Vendored versions of NPM and NPX are subject to limitations in commands as they must be run through `exec`.
 
