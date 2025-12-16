@@ -507,7 +507,9 @@ Which simply means Electron supports [x86_64](https://en.wikipedia.org/wiki/X86-
 However, at this time Terra only supports x86_64, AArch64, and 32-bit x86.
 
 ### Electron build macros
-These are macros used to build software using Electron using JavaScript package managers.
+These are macros used to build Electron apps using JavaScript package managers and builders such as [Electron Builder](https://www.electron.build), [Electron Forge](https://www.electronforge.io), and [Electron Vite](https://electron-vite.github.io).
+
+Capital letter flags generally denote options that SHOULD be used with caution or only if necessary for a build.
 
 For more information on each package manager, see [NPM Macros](#npm-macros), [Bun Macros](#bun-macros), [PNPM Macros](#pnpm-macros), and [Yarn Macros](#yarn-macros).
 
@@ -529,32 +531,36 @@ Available flags:
 - `-c`: Run `%{__bun} ci` instead of `%{__bun} install`. Analogous to `%{__bun} install --frozen-lockfile`. May be necessary for projects with stricter build dependencies.
 - `-e`: Execute commands and modules within the Bun build environment.
 - `-r`: Executes `%{__bun} run` for scripts in the `package.json`. Expects an argument.
-- `-E`: Execute Electron Builder/Electron Forge. Will NOT work for projects that require build steps which use Node.js or executing JavaScript scripts directly.
 - `-v`: Run Electron Vite build steps. Not needed for all Electron apps.
+- `-F`: Runs `--force` on `%{__bun} install` step. It will make sure all dependencies are the latest versions from the registry, reinstalling them if necessary.
+- `-N`: Runs `--no-save` on `%{__bun} install` step. Prevent updating or (re)creating a lockfile to prevent freezing.
+- `-R`: Remove the bun.lock file. SHOULD only be used if the lockfile is causing build issues.
 
 #### %pnpm_build
 SHOULD be used for building Electron apps with PNPM.
 
 Available flags:
 - `-e`: Execute Node modules or installed programs in the PNPM build environment.
+- `-r`: Executes `%{__pnpm} run` for scripts in the `package.json`. Expects an argument. Not recommended for Electron Builder/Electron Forge or Electron Vite commands.
+- `-v`: Run Electron Vite build steps. Not needed for all Electron apps.
 - `-F`: Executes the `%{__pnpm} install` step with `--frozen-lockfile`. May be necessary for projects expecting very strict build dependencies, but can also override projects that do not enforce a lock.
 - `-N`: Executes the `%{__pnpm} install` step with `--no-frozen-lockfile`. Overrides projects that try to enforce a lockfile.
-- `-r`: Executes `%{__pnpm} run` for scripts in the `package.json`. Expects an argument. Not recommended for Electron Builder/Electron Forge or Electron Vite commands.
-- `-R`: Makes `%{__pnpm} exec` run on every project in the worspace recursively. Use with caution.
-- `-v`: Run Electron Vite build steps. Not needed for all Electron apps.
+- `-R`: Makes `%{__pnpm} exec` run on every project in the worspace recursively. SHOULD be used only if necessary and with caution.
 
 #### %yarn_build
 SHOULD be used to build Electron apps with Yarn or Yarn Berry.
 
 Available flags:
 - `-e`: Execute Node modules or installed programs in the Yarn build environment.
-- `-F`: Executes the `%{__yarn} install` step with `--frozen-lockfile`. May be necessary for projects expecting very strict build dependencies, but can also override projects that do not enforce a lock.
-- `-N`: Executes the `%{__yarn} install` step with `--no-lockfile`. Makes Yarn not update the lockfile on depedency installation.
 - `-r`: Executes `%{__yarn} run` for scripts in the `package.json`. Expects an argument. Not recommended for Electron Builder, Electron Forge, or Electron Vite commands.
 - `-v`: Run Electron Vite build steps. Not needed for all Electron apps.
+- `-F`: Executes the `%{__yarn} install` step with `--frozen-lockfile`. May be necessary for projects expecting very strict build dependencies, but can also override projects that do not enforce a lock.
+- `-N`: Executes the `%{__yarn} install` step with `--no-lockfile`. Makes Yarn not update the lockfile on depedency installation.
 
 ### %electron_install
 Install files of apps built using Electron Builder or Electron Forge.
+
+Capital letter flags denote use with [desktop file](https://specifications.freedesktop.org/desktop-entry/latest) installation.
 
 By default, the install steps are:
 1. Make the install directory.
@@ -575,8 +581,8 @@ Available flags:
 - `-E` MAY be used to set the "--enable-features" flag in the desktop file. Features to enable MUST be comma separated without spaces.
 - `-O` MAY be used to set the [Ozone platform](https://chromium.googlesource.com/chromium/src/+/lkgr/docs/ozone_overview.md) the Electron app will run on. If no arguments are supplied, it will fall back to `--ozone-platform-hint=auto`. Accepted arguments are `-Ox11` and `-Owayland`
 - `-U` MAY be used to set either `%u` or `%U` in the desktop file. If using this you MUST NOT use `u` as a macro name for any reason.
-  - `%u` means that a desktop file can only read one URL at a time, `%U` means that it can read multiple at a time.
-  - Defer to what the desktop file originally contained if you are unsure.
+  - `%u` means that a desktop file can only read one URL at a time, `%U` means that it can read multiple at a time. These are what are known as [exec keys](https://specifications.freedesktop.org/desktop-entry/latest/exec-variables.html).
+  - Defer to what the desktop file originally contained if you are unsure which to use.
 
 Example usage:
 - The command `%electron_install -b app -i app -s app -S alsoapp -D -Owayland -U %u -E WaylandWindowDecorations` would install the program with:
