@@ -11,11 +11,11 @@ We provide SPRM macros to ease packaging and better integrate into our workflow.
 
 These are provided in the `anda-srpm-macros` package. If you use them, make sure to add `anda-srpm-macros` as a `BuildRequires:` in the spec file.
 
-You may need to refer to the [miscellaneous packaging guidelines](./policy#miscellaneous-packaging-guidelines) for more details.
+You may need to refer to the [miscellaneous packaging guidelines](./policy#miscellaneous-packaging-guidelines) for non-macro related Terra guidelines.
 
-If you would like to add/fix/update these macros, or need to raise an issue, please do so in the [SRPM macros repository](https://github.com/terrapkg/srpm-macros), or reach out to us [here](https://wiki.ultramarine-linux.org/en/community/community/).
+If you would like to add/fix/update these macros, or need to raise an issue, please do so in the [SRPM macros repository](https://github.com/terrapkg/srpm-macros), or reach out to us somewhere [here](https://wiki.ultramarine-linux.org/en/community/community/).
 
-For other macros available in Fedora/Terra, check out our unofficial [macros list](../rpm/macros).
+For upstream macros available in Fedora/Terra, check out our unofficial [macros list](../rpm/macros).
 
 <Callout type="info">
   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
@@ -32,8 +32,8 @@ These macros define certain system directories, and SHOULD be used in place of t
 [TODO]
 
 ### %_anda_srpm_macros_dir
-Expands to: `/usr/libexec/anda-srpm-macros`.
-Anda directory for scripts such as `find-develinfo.sh` used by Anda macros.
+Expands to: `/usr/libexec/anda-srpm-macros`
+Anda directory for scripts such as `find-develinfo.sh` used by Anda SRPM macros.
 
 ### %__anda_libsfiles
 [TODO]
@@ -43,7 +43,8 @@ Expands to: `%_datadir/applications` or `/usr/share/applications`.
 This may seem like a directory to place the application itself into, but this directory SHOULD ONLY be used for the applicaitons `.desktop` file.
 
 ### %elvish_completions_dir
-`%_datadir/elvish/lib/completions`
+Expands to: `%_datadir/elvish/lib/completions`
+Used in the [`%pkg_completions`](#pkg_completion) macro, or manually used when this macro can not be used.
 
 ### %_hicolordir
 Expands to: `%_iconsdir/hicolor`, or `/usr/share/icons/hicolor`.
@@ -118,7 +119,7 @@ Usecase examples:
 - EL does not yet have the correct version of Node.js.
   - This poses the same concern as above.
 
-For this reason whatever you are packaging SHOULD be tested locally upon a successful build to see if it meets any runtime issues.
+For this reason whatever you are packaging SHOULD be tested locally upon a successful build to see if it has any runtime issues.
 
 What `%vendor_nodejs` does:
 1. Installs the desired Node.js version to `%{_nvm_dir}`.
@@ -128,7 +129,7 @@ What `%vendor_nodejs` does:
 Vendored versions of NPM and NPX are subject to limitations in commands as they must be run through `exec`.
 
 ### Node Module Macros
-"Node modules" refers to JavaScript packages run using a JavaScript runtime (usually Node.js), almost always hosted on the [NPM Registry](https://www.npmjs.com/).
+"Node modules" refer to JavaScript packages run using a JavaScript runtime (usually Node.js), almost always hosted on the [NPM Registry](https://www.npmjs.com/).
 
 #### %npm_prep
 Prepare a Node module for build steps.
@@ -169,7 +170,7 @@ Available flags:
 You MUST use [`%fetch_node_tests`](#fetch_node_tests) first if using this.
 
 #### %__npm_license_checker
-Expands to: `/usr/bin/license-checker`.
+Expands to: `/usr/bin/license-checker`
 Runs the NPM [`license-checker`](https://www.npmjs.com/package/license-checker-rseidelsohn) command.
 
 Example output:
@@ -186,7 +187,7 @@ Example output:
 ```
 
 #### %npm_license
-Expands to: `/usr/bin/license-checker --limitAttributes licenses`.
+Expands to: `/usr/bin/license-checker --limitAttributes licenses`
 Above macro, but limits the output to only the license.
 
 Available flags:
@@ -221,7 +222,7 @@ Outputs a summary of the bundled licenses. Useful for determining what to put in
 
 Expands to: `%{__npm_license_checker} --summary`
 
-### Notes for JavaScript package managers:
+### Notes for JavaScript Package Managers:
 1. The JavaScript package manager cache directories are placed in [`%{rpmbuilddir}`](#rpmbuilddir) because `$HOME` can be different depending on if a build is in Mock or RPM Build.
   - This is very important for consistent macro behavior as well as if the cache must be modified or deleted during build for any reason.
 2. All macros calling the package managers also call NPM environment variables because most of them are using build dependencies from the NPM Registry, and some even wrap NPM commands with their own. This ensures consistent NPM behavior.
@@ -397,7 +398,7 @@ Sets the NPM evironment variables and Yarn's cache folder.
 Expands to: `%{npm_common_envvars} YARN_CACHE_FOLDER=%{_yarn_cache_dir}`
 
 #### %__yarn
-Expands to: `/usr/bin/env %{yarn_common_envvars} /usr/bin/yarn`.
+Expands to: `/usr/bin/env %{yarn_common_envvars} /usr/bin/yarn`
 
 #### %__yarn_dlx
 Remotely execute a Node module with Yarn DLX.
@@ -603,7 +604,7 @@ Set up build environment with required packages via `nimble setup`.
 
 ### %nim_build (or %nim_c)
 Builds a Nim package.
-Requires an argument to `src/pkgname`
+Requires an argument to `src/pkgname`.
 
 ### %nim_tflags
 C Compiler flags for Nim.
@@ -643,7 +644,7 @@ Used in `%prep` for nightly `rustc`/`cargo` from `rustup`.
 These macros are fur using [sccache](https://github.com/mozilla/sccache) in your builds.
 
 ### %_sccache
-Exapnds to: `/usr/bin/sccache`.
+Exapnds to: `/usr/bin/sccache`
 
 ### %sccache_prep
 Sets up environment variables for `sccache`.
@@ -656,7 +657,7 @@ More information on subpackages can be found on the [Fedora Packaging Guidelines
 ### %files_libs
 This macro creates library subpackages and installs the library files.
 
-The default subpackage name will be `%name-libs`, but you can override this with `-n NEWNAME`
+The default subpackage name will be `%name-libs`, but you can override this with `-n NEWNAME`.
 
 [TODO]: Should this even be used? No package uses it and `%pkg_devel_files seems to do the same thing?
 
@@ -741,7 +742,7 @@ Expands to: `%_anda_srpm_macros_dir/find-staticinfo.sh %buildroot > anda-staticf
 Creates anda-staticfiles.list file in `%{buildroot}` to be used by `%pkg_static_files`.
 
 ### %evr
-used for declaring how a package interacts with others, for acampe, in a `Requires:` tag.
+used for declaring how a package interacts with others, for example, in a `Requires:` or `Obsoletes:` tag.
 For example, `Requires: %{name} = %evr`
 expands to `%{?epoch:%{epoch}:}%{version}-%{release}`.
 
