@@ -31,12 +31,16 @@ These macros define certain system directories, and SHOULD be used in place of t
 ### %__anda_develfiles
 [TODO]
 
+### %__anda_libsfiles
+[TODO]
+
 ### %_anda_srpm_macros_dir
 Expands to: `/usr/libexec/anda-srpm-macros`
 Anda directory for scripts such as `find-develinfo.sh` used by Anda SRPM macros.
 
-### %__anda_libsfiles
-[TODO]
+### %__anda_staticfiles
+Expands to: `%_anda_srpm_macros_dir/find-staticinfo.sh %buildroot > anda-staticfiles.list`.
+Creates anda-staticfiles.list file in `%{buildroot}` to be used by `%pkg_static_files`.
 
 ### %_appsdir
 Expands to: `%_datadir/applications` or `/usr/share/applications`.
@@ -736,10 +740,6 @@ More information can be found on our [Zig packaging guidelines](../terra/policy#
 
 ## Miscellaneous
 General macros that do not fit into a specific category.
-
-### %__anda_staticfiles
-Expands to: `%_anda_srpm_macros_dir/find-staticinfo.sh %buildroot > anda-staticfiles.list`.
-Creates anda-staticfiles.list file in `%{buildroot}` to be used by `%pkg_static_files`.
 
 ### %evr
 used for declaring how a package interacts with others, for example, in a `Requires:` or `Obsoletes:` tag.
