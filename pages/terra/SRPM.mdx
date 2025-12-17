@@ -707,8 +707,9 @@ Set the summary & description, then find development `%files`.
 ```
 %package devel
 # generates Summary:, %description devel and the file lists
-# use -F to omit %files
-# use -n to manually specify name other than `%name-%devel`
+# -F to omit %files
+# -n <pkgname>: name of the devel package
+# -N <mainpkg>: name of the main package
 %pkg_devel_files
 ```
 
