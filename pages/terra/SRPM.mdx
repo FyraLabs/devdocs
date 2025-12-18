@@ -145,7 +145,7 @@ Available flags:
 Fetch self-tests from a Git repo. MUST include all necessary test files and folders. If used, SHOULD be used in `%prep`.
 
 Available flags:
-- `-u` MUST be used to define the URL if the one listed in the `URL:` field for the package is not detectable as clonable.
+- `-u` MUST be used to define the URL if the one listed in the `URL:{:rpmspec}` field for the package is not detectable as clonable.
 
 All necessary test files and folders MUST be listed after the macro. Test folders MUST start with `/`.
 
@@ -513,7 +513,7 @@ The license for bundled Electron.
 NOT set by default in `%electronmeta` because you cannot set the license field twice.
 MAY be used in combination with manually adding the other relevant licenses (if this is done, a proper license tag would be `License: XXX-x.x AND %{electron_license}{:rpmspec}`.
 
-[`%electronmeta`](#electronmeta) SHOULD be used BEFORE the `License:{:rpmspec}` preamble but AFTER `Name:` if using this macro.
+[`%electronmeta`](#electronmeta) SHOULD be used BEFORE the `License:{:rpmspec}` preamble but AFTER `Name:{:rpmspec}` if using this macro.
 
 ### Electron Build Macros
 These are macros used to build Electron apps using JavaScript package managers and builders such as [Electron Builder](https://www.electron.build), [Electron Forge](https://www.electronforge.io), and [Electron Vite](https://electron-vite.github.io).
@@ -743,8 +743,8 @@ More information can be found on our [Zig packaging guidelines](../terra/policy#
 General macros that do not fit into a specific category.
 
 ### %evr
-used for declaring how a package interacts with others, for example, in a `Requires:` or `Obsoletes:` tag.
-For example, `Requires: %{name} = %evr`
+Used for declaring how a package interacts with others, for example, in a `Requires:{:rpmspec}` or `Obsoletes:{:rpmspec}` tag.
+For example, `Requires: %{name} = %evr{:rpmspec}`
 expands to `%{?epoch:%{epoch}:}%{version}-%{release}`.
 
 ### %git_clone
