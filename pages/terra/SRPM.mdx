@@ -584,6 +584,8 @@ Available flags:
 - `-d` MAY be used to install the app under a different directory than the name of the package.
 - `-i` MUST be used when the app's desktop file points to an icon name different from the name of the package.
 - `-l` MAY be used to fetch all licenses including the bundled ones and put them in a directory called `bundled_licenses`. You SHOULD then package them in the license directory using `%license bundled_licenses/*` in the `%files` section.
+  - If using this you MUST make sure there are no duplicate license names. For example, if the main application's license file is `LICENSE`, but one of its bundled license files is *also* `LICENSE`, you SHOULD rename the bundled license to an appropriate name indicating it is the license for a bundled dependency.
+  - An appropriate name would be something like `LICENSE.bundleddepname` or `bundleddepname.LICENSE`. Usually, the former is used, but you MAY use either format.
 - `-s` MAY be used to choose the name of the symlink.
 - `-S` MAY be used to create an additional symlink with a different name. Useful when an app has two interchangeable common names.
 - `-D` MAY be used to handle automatic installation of the .desktop file. This ONLY works if Electron Builder builds an AppImage, and should not be used if the source contains a desktop file.
