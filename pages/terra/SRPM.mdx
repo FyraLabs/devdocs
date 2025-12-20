@@ -105,7 +105,7 @@ The location in the `%{rpmbuilddir}{:rpmspec}` what will be passed to `$NVM_DIR{
 Expands to: `%{rpmbuilddir}/.nvm{:rpmspec}`
 
 #### %__nvm
-Calls NVM (Node Version Manager) while setting `$NVM_DIR{:rpmspec}`. Only used if vendoring Node.js.
+Calls NVM (Node Version Manager) while setting `$NVM_DIR{:bash}`. Only used if vendoring Node.js.
 
 Expands to: `/usr/bin/env NVM_DIR=%{_nvm_dir} /usr/bin/nvm{:rpmspec}`
 
