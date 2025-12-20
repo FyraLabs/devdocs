@@ -28,32 +28,16 @@ For upstream macros available in Fedora/Terra, check out our unofficial [macros 
 ## Directories
 These macros define certain system directories, and SHOULD be used in place of the raw directory path.
 
-### %__anda_develfiles
-Expands to: `%_anda_srpm_macros_dir/find-develinfo.sh %buildroot > anda-develfiles.list`
-SHOULD NOT be used in a spec file, only used as a macro within [`%pkg_devel_files`](#pkg_devel_files).
-
-### %__anda_libsfiles
-Expands to: `%_anda_srpm_macros_dir/find-libsinfo.sh %buildroot > anda-libsfiles.list`
-SHOULD NOT be used in a spec file, only used as a macro within [`%pkg_libs_files`](#pkg_libs_files).
-
-### %_anda_srpm_macros_dir
-Expands to: `/usr/libexec/anda-srpm-macros`
-Anda directory for scripts such as `find-develinfo.sh` used by Anda SRPM macros.
-
-### %__anda_staticfiles
-Expands to: `%_anda_srpm_macros_dir/find-staticinfo.sh %buildroot > anda-staticfiles.list{:rpmspec}`.
-Creates anda-staticfiles.list file in `%{buildroot}{:rpmspec}` to be used by `%pkg_static_files{:rpmspec}`.
-
 ### %_appsdir
-Expands to: `%_datadir/applications{:rpmspec}` or `/usr/share/applications{:rpmspec}`.
+Expands to: `%_datadir/applications{:rpmspec}` or `/usr/share/applications{:rpmspec}`
 This may seem like a directory to place the application itself into, but this directory is used for applicaiton's `.desktop` files.
 
 ### %elvish_completions_dir
-Expands to: `%_datadir/elvish/lib/completions{:rpmspec}`.
+Expands to: `%_datadir/elvish/lib/completions{:rpmspec}`
 Used in the [`%pkg_completions{:rpmspec}`](#pkg_completion) macro, or manually when `%pkg_completions{:rpmspec}` cannot be used.
 
 ### %_hicolordir
-Expands to: `%_iconsdir/hicolor{:rpmspec}` or `/usr/share/icons/hicolor{:rpmspec}`.
+Expands to: `%_iconsdir/hicolor{:rpmspec}` or `/usr/share/icons/hicolor{:rpmspec}`
 The directory that SHOULD be used when installing application `.png` files. Note that you then MUST install the (typically app icon) file to the `apps` folder within the fixed-size directory in `%_hicolordir{:rpmspec}`.
 
 For example:
@@ -67,10 +51,10 @@ install -Dm644 icons/64x64.png %{buildroot}%{_hicolordir}/64x64/apps/%{name}.svg
 If the file is a `.svg`, use the [`%_scalableiconsdir{:rpmspec}`](#_scalableiconsdir).
 
 ### %_pkgconfigdir
-Expands to: `%{_libdir}/pkgconfig`.
+Expands to: `%{_libdir}/pkgconfig`
 
 ### %_scalableiconsdir
-Expands to: `%_hicolordir/scalable/apps{:rpmspec}` or `/usr/share/icons/hicolor/scalable/apps{:rpmspec}`.
+Expands to: `%_hicolordir/scalable/apps{:rpmspec}` or `/usr/share/icons/hicolor/scalable/apps{:rpmspec}`
 The directory that SHOULD be used when installing application `.svg` files to.
 You do not need to specify any folders for this macro, the file can be added to the end of this macro.
 For example:
@@ -165,7 +149,7 @@ Example usage:
 Install a Node module to `%{npm_sitelib}{:rpmspec}` and symlink its executable.
 
 #### %npm_test
-Runs generic NPM tests. This will not be applicable to all Node modules. For use in `%check{:rpmspec}`.
+Runs generic NPM tests. This will not be applicable to all Node modules. For use in the `%check{:rpmspec}` section.
 
 Expands to: `%{__npm} test{:rpmspec}`
 
@@ -294,7 +278,8 @@ LIMITATION: Cannot be used on modules installed using the `-g{:rpmspec}` flag (w
 Macros for using [Bun](https://bun.com).
 
 #### %__bun_home
-Unfortunately, Bun doesn't actually have a way to enforce this yet. However the proposed environment variable is `$BUN_HOME`, so we have this for the future.
+Unfortunately, Bun doesn't actually have a way to enforce this yet.
+However the proposed environment variable is `$BUN_HOME`, so we have this for the future.
 
 Expands to: `%{rpmbuilddir}/.bun{:rpmspec}`
 
@@ -352,6 +337,7 @@ Expands to: `%{npm_common_envvars} PNPM_HOME=%{_pnpm_home}{:rpmspec}`
 #### %__pnpm
 
 Expands to: `/usr/bin/env %{pnpm_common_envvars} %{?with_vendored_pnpm:%{rpmbuilddir}/pnpm/pnpm}%{!?with_vendored_pnpm:/usr/bin/pnpm}{:rpmspec}`
+Should be used in place of calling `pnpm` itself.
 
 #### %__pnpx
 Remotely execute Node modules using PNPX.
@@ -770,13 +756,42 @@ More information can be found on our [Zig packaging guidelines](../terra/policy#
 General macros that do not fit into a specific category.
 
 ### %evr
-Used for declaring how a package interacts with others, for example, in a `Requires:{:rpmspec}` or `Obsoletes:{:rpmspec}` tag.
-For example, `Requires: %{name} = %evr{:rpmspec}`
-expands to `%{?epoch:%{epoch}:}%{version}-%{release}`.
+Used for declaring how a package interacts with others, such as, in a `Requires:{:rpmspec}` or `Obsoletes:{:rpmspec}` tag.
+For example, `Requires: %{name} = %evr{:rpmspec}`.
+Expands to: `%{?epoch:%{epoch}:}%{version}-%{release}`.
+Real package examples:
+
+`Requires:` example:
+
+```rpmspec
+BuildRequires:  pkgconfig(pkgconf)
+BuildRequires:  pkgconfig(zlib)
+BuildRequires:  pkgconfig(openssl)
+BuildRequires:  pkgconfig(libarchive) >= 3.3.3
+Requires:       %name-lib = %evr
+```
+
+`Recommends:` example:
+
+```rpmspec
+Name:           rnote
+License:        GPL-3.0
+Recommends:     rnote-cli = %evr
+```
+
+`Provides:` example:
+
+```rpmspec
+%package devel
+Summary:        Development files for %{name}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Provides:		%realname-devel = %evr
+Conflicts:		%realname-devel
+```
 
 ### %git_clone
 Downloads the source code via `git clone`, and passes useful (in this situation) flags such as`--depth 1`, `-q`, `--recursive-submodules`, and `-j${RPM_BUILD_NCPUS}`.
-A git URL and a `%version` or `%commit` SHOULD be passed to this macro.
+A git URL and a `%version{:rpmspec}` or `%commit{:rpmspec}` SHOULD be passed to this macro.
 Below is an example of how a spec that tracks version tages from a GitHub repo, and needs to git clone the source could handle this:
 
 ```rpmspec
@@ -802,4 +817,25 @@ URL:           https://github.com/ad-oliviero/uwufetch
 `%git_clone` SHOULD only be used when the source tarballs provided by upstream does not include all required sources in the repository (e.g., if the build process expects a Git environment or the tarball doesn't contain submodules).
 
 ### %go_task
+Expands to: `go-task --parallel --verbose --yes`
 SHOULD be used in place of `go-task` if using Go Task.
+
+## Unused in spec Files
+These macros are ONLY used by other macros in their expansion processes, as programmed [here](https://github.com/terrapkg/srpm-macros).
+These are documented ONLY for development and completion sake.
+
+### %__anda_develfiles
+Expands to: `%_anda_srpm_macros_dir/find-develinfo.sh %buildroot > anda-develfiles.list{:rpmspec}`
+Used as a macro within [`%pkg_devel_files{:rpmspec}`](#pkg_devel_files).
+
+### %__anda_libsfiles
+Expands to: `%_anda_srpm_macros_dir/find-libsinfo.sh %buildroot > anda-libsfiles.list{:rpmspec}`
+Used as a macro within [`%pkg_libs_files{:rpmspec}`](#pkg_libs_files).
+
+### %_anda_srpm_macros_dir
+Expands to: `/usr/libexec/anda-srpm-macros`
+Anda directory for scripts such as `find-develinfo.sh` used by `%__anda_develfiles{:rpmspec}`, which is jused by [`%pkg_devel_files{:rpmspec}`](#pkg_devel_files).
+
+### %__anda_staticfiles
+Expands to: `%_anda_srpm_macros_dir/find-staticinfo.sh %buildroot > anda-staticfiles.list{:rpmspec}`
+Creates anda-staticfiles.list file in `%{buildroot}{:rpmspec}` to be used by [`%pkg_static_files{:rpmspec}`](#pkg_static_files).
