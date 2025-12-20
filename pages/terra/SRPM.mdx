@@ -254,17 +254,17 @@ What these do:
 #### %npm_buildflags
 Explicit NPM configuration flags of the environment variables set by the Macros.
 
-Expands to: `--userconfig=%{rpmbuilddir}/.npmrc --globalconfig=%{rpmbuilddir}/npmrc --cache=%{rpmbuilddir}/.npm --loglevel=error --fund=false --update-notifier=false --color=always --init-module=%{rpmbuilddir}/.npm-init.js`
+Expands to: `--userconfig=%{rpmbuilddir}/.npmrc --globalconfig=%{rpmbuilddir}/npmrc --cache=%{rpmbuilddir}/.npm --loglevel=error --fund=false --update-notifier=false --color=always --init-module=%{rpmbuilddir}/.npm-init.js{:rpmspec}`
 
 #### %__npm
 Macro to call NPM with predetermined enviroment variables.
 
-Expands to: `/usr/bin/env %{npm_common_envvars} %{?with_vendored_nodejs:%{__nvm} exec npm --}%{!?with_vendored_nodejs:/usr/bin/npm}`
+Expands to: `/usr/bin/env %{npm_common_envvars} %{?with_vendored_nodejs:%{__nvm} exec npm --}%{!?with_vendored_nodejs:/usr/bin/npm}{:rpmspec}`
 
 #### %__npx
 Remotely run Node modules with NPX.
 
-Expands to: `/usr/bin/env %{npm_common_envvars} %{?with_vendored_nodejs:%{__nvm} exec npx --}%{!?with_vendored_nodejs:/usr/bin/npx}`
+Expands to: `/usr/bin/env %{npm_common_envvars} %{?with_vendored_nodejs:%{__nvm} exec npx --}%{!?with_vendored_nodejs:/usr/bin/npx}{:rpmspec}`
 
 #### %npm_audit
 Audit with NPM if package uses bundled Node dependencies. For use in the `%check{:rpmspec}` section.
