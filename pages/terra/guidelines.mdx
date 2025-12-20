@@ -199,7 +199,7 @@ These packages SHOULD NOT contain anything **except**:
 
 #### Patches
 
-- A packages' `%autosetup{:rpmspec}` macro SHOULD use the `-p1{:rpmspec}` flag only if patches are being applied.
+- A package's `%autosetup{:rpmspec}` macro SHOULD use the `-p1{:rpmspec}` flag only if patches are being applied.
 - Packages SHOULD apply patches during `%autosetup{:rpmspec}`. If this is not possible (typically when `%autosetup{:rpmspec}` is not used), you SHOULD use [`%autopatch{:rpmspec}`](../rpm/macros#autopatch).
 
 #### Fixing Packages
