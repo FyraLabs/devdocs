@@ -337,7 +337,7 @@ Expands to: `%{npm_common_envvars} PNPM_HOME=%{_pnpm_home}{:rpmspec}`
 #### %__pnpm
 
 Expands to: `/usr/bin/env %{pnpm_common_envvars} %{?with_vendored_pnpm:%{rpmbuilddir}/pnpm/pnpm}%{!?with_vendored_pnpm:/usr/bin/pnpm}{:rpmspec}`
-Should be used in place of calling `pnpm` itself.
+SHOULD be used in place of calling `pnpm` itself.
 
 #### %__pnpx
 Remotely execute Node modules using PNPX.
@@ -771,7 +771,7 @@ BuildRequires:  pkgconfig(libarchive) >= 3.3.3
 Requires:       %name-lib = %evr
 ```
 
-`Recommends:` example:
+`Recommends:{:rpmspec}` example:
 
 ```rpmspec
 Name:           rnote
@@ -779,7 +779,7 @@ License:        GPL-3.0
 Recommends:     rnote-cli = %evr
 ```
 
-`Provides:` example:
+`Provides:{:rpmspec}` example:
 
 ```rpmspec
 %package devel
