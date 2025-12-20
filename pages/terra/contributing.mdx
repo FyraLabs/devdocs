@@ -313,7 +313,7 @@ Version:  %{unreleased_version}~%{commit_date}git.%{shortcommit}
 `git` SHOULD be replaced with the correct _VCS identifier_ for **(b)** and **(c)** as listed on the right.
 
 If either commit tracking option is used, you MUST also include `labels { nightly = 1 }{:hcl}` in `anda.hcl` unless there is no `update.rhai`,
-as these 2 formats rely on the assumption that there is 1 `%shortcommit` for each `%commit_date` (and vice versa).
+as these two formats rely on the assumption that there is one `%shortcommit` for each `%commit_date` (and vice versa).
 
 `%unreleased_version` refers to the expected version number for the next stable (or a more stable _tag_ than `nightly`) release,
 while `%latest_stable_version` refers to the current latest released version number, preferably stable.
