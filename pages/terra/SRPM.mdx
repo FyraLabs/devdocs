@@ -736,19 +736,24 @@ For example:
 These macros assist with building Zig projects.
 
 ### %zig_build_target
-Many Zig projects rely on ReleaseFast (or more rarely, ReleaseSmall) builds for runtime optimization, and some Zig projects only work correctly when built for certain microarchitectures or higher (usually, this is `x86_64_v2` instead of `baseline` due to reliance on SIMD).
-If either of the above are the case for your package, you SHOULD use `%zig_build_target` with appropriate options in the `%build` or `%install` section depending on how the project is built (as some can be built directly into root by setting the `DESTDIR=%{buildroot}` variable).
+Build Zig projects with a specified architecture and build mode.
+
+Available flags:
+- `-c` is used to set a specific CPU (micro)architecture to build for. If no argument is supplied, it will fall back to the `%{_target_cpu}` set by the build. You MUST specify a CPU architecture manually in cases where Zig's architecture format and RPM's do not match (e.g., `aarch64`).
+  - SHOULD ONLY be used in projects that would not perform correctly when built for baseline.
+  - For more information on x86_64 microarchitectures, see [here](https://en.wikipedia.org/wiki/X86-64#Microarchitecture_levels).
+- `-r` is used to set the [release/build mode](https://zig.guide/build-system/build-modes). Accepted arguments are `fast`, `small`, `safe`, and `slow`.
+  - SHOULD be used if a project would have performance issues if built for `safe` (what Fedora sets by default).
+- `-s` is used to allow the project to link statically.
+  - SHOULD ONLY be used if a project either has no dependencies to link, OR dependencies from the repos either aren't present or are incompatible versions.
+  - You SHOULD still dynamically link compatible dependencies using `-fsys=pkgname`.
 
 Example:
-
 ```rpmspec
 %build
 %{zig_build_target -r fast -c x86_64_v2} \
   -Demit-docs
 ```
-
-Note that `-c` also works as a fallback option to the target architecture set by RPM if no following argument is supplied. However, this can **_only_** be used when RPM and Zig's architecture formats are the same, otherwise the build will fail.
-For projects where dynamic linking of all dependencies is simply not possible (such as the version in the Fedora repos being too new or too old) or that have no dependencies to link, you can pass the `-s` flag. You can (and should) still dynamically link compatible dependencies by using `-fsys=pkgname`.
 
 More information can be found on our [Zig packaging guidelines](../terra/policy#zig).
 
