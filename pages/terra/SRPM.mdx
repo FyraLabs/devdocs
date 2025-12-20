@@ -79,7 +79,7 @@ If the file is a `.png`, use the macro above.
 ### %rpmbuilddir
 This macro exists because Terra supports EL distributions (Red Hat Enterprise Linux, Alma Linux, etc.) which currently have an RPM version from before the `%{builddir}` change to address issues [like this](https://github.com/rpm-software-management/rpm/issues/3151).
 
-The common, albeit clunky, solution is to define `%{builddir}` manually as `%{_builddir}` in specs targeting distros with different versions of RPM where one has a version older than 4.20. We have this macro instead to make the process easier without overriding any Fedora macros.
+One, albeit clunky, solution is to define `%{builddir}` manually as `%{_builddir}` in specs targeting distros with different versions of RPM where one has a version older than 4.20. We have this macro instead to make the process easier without overriding any builtin RPM macros. For more information on this solution, see [these](https://github.com/rpm-software-management/rpm/issues/3151#issuecomment-2154550735) [comments](https://github.com/rpm-software-management/rpm/issues/3151#issuecomment-2154639192) in the issue linked above.
 
 This macro is subject to being retired once all EL distributions with an RPM version older than 4.20 are end of life (likely when EL10 is end of life), or in the event we can no longer support EL distributions this old.
 
