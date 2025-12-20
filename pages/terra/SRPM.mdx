@@ -29,10 +29,12 @@ For upstream macros available in Fedora/Terra, check out our unofficial [macros 
 These macros define certain system directories, and SHOULD be used in place of the raw directory path.
 
 ### %__anda_develfiles
-[TODO]
+Expands to: `%_anda_srpm_macros_dir/find-develinfo.sh %buildroot > anda-develfiles.list`
+SHOULD NOT be used in a spec file, only used as a macro within [`%pkg_devel_files`](#pkg_devel_files).
 
 ### %__anda_libsfiles
-[TODO]
+Expands to: `%_anda_srpm_macros_dir/find-libsinfo.sh %buildroot > anda-libsfiles.list`
+SHOULD NOT be used in a spec file, only used as a macro within [`%pkg_libs_files`](#pkg_libs_files).
 
 ### %_anda_srpm_macros_dir
 Expands to: `/usr/libexec/anda-srpm-macros`
@@ -47,7 +49,7 @@ Expands to: `%_datadir/applications{:rpmspec}` or `/usr/share/applications{:rpms
 This may seem like a directory to place the application itself into, but this directory is used for applicaiton's `.desktop` files.
 
 ### %elvish_completions_dir
-Expands to: `%_datadir/elvish/lib/completions{:rpmspec}`
+Expands to: `%_datadir/elvish/lib/completions{:rpmspec}`.
 Used in the [`%pkg_completions{:rpmspec}`](#pkg_completion) macro, or manually when `%pkg_completions{:rpmspec}` cannot be used.
 
 ### %_hicolordir
@@ -63,6 +65,9 @@ install -Dm644 icons/64x64.png %{buildroot}%{_hicolordir}/64x64/apps/%{name}.svg
 ```
 
 If the file is a `.svg`, use the [`%_scalableiconsdir{:rpmspec}`](#_scalableiconsdir).
+
+### %_pkgconfigdir
+Expands to: `%{_libdir}/pkgconfig`.
 
 ### %_scalableiconsdir
 Expands to: `%_hicolordir/scalable/apps{:rpmspec}` or `/usr/share/icons/hicolor/scalable/apps{:rpmspec}`.
@@ -645,10 +650,10 @@ Can be used instead of `%cargo_install` when [this](https://github.com/terrapkg/
 Used in `%prep` for nightly `rustc`/`cargo` from `rustup`.
 
 ### %cargo_prep_online_sccache
-[TODO]
+Configures cargo sccache. Generally should not be needed.
 
 ## sccache
-These macros are fur using [sccache](https://github.com/mozilla/sccache) in your builds.
+These macros are fur using [sccache](https://github.com/mozilla/sccache).
 
 ### %_sccache
 Exapnds to: `/usr/bin/sccache`
@@ -663,10 +668,7 @@ More information on subpackages can be found on the [Fedora Packaging Guidelines
 
 ### %files_libs
 This macro creates library subpackages and installs the library files.
-
-The default subpackage name will be `%name-libs`, but you can override this with `-n NEWNAME`.
-
-[TODO]: Should this even be used? No package uses it and `%pkg_devel_files seems to do the same thing?
+This is only for use in the [`%pkg_devel_files`](#pkg_devel_files) macro.
 
 ### %pkg_completion
 This macro creates shell completion subpackages and installs the shell completion files.
@@ -704,10 +706,12 @@ yadm-zsh-completion-x.x.x-x.fcxx.noarch.rpm - contains `/usr/share/zsh/site-func
 ```
 
 ### %pkg_devel_files
-[TODO]: flesh this out lol
-Set the summary & description, then find development `%files`.
+Set the summary & description, then find development files and install them to a subpackages `%files`.
+SHOULD be used in place of manually creating `-devel` subpackages.
+Note: You still need to define a `%package devel`, and then use this macro below this.
+For example:
 
-```
+```rpmspec
 %package devel
 # generates Summary:, %description devel and the file lists
 # -F to omit %files
@@ -718,9 +722,29 @@ Set the summary & description, then find development `%files`.
 
 ### %pkg_static_files
 Set the summary & description, then find static libraries.
+SHOULD be used in place of manually creating `-static` subpackages.
+Note: You still need to define a `%package static`, and then use this macro below this.
+For example:
+
+```rpmspec
+%package static
+# -n <pkgname>: name of the static package
+# -N <mainpkg>: name of the main package
+%pkg_static_files
+```
 
 ### %pkg_libs_files
-Set the summary & description, then find dynamic library files (`%_libdir/*.so.*`).
+Set the summary & description, then find dynamic library files (will be placed as `%_libdir/*.so.*`).
+SHOULD be used in place of manually creating `-libs` subpackages.
+Note: You still need to define a `%package libs`, and then use this macro below this.
+For example:
+
+```rpmspec
+%package libs
+# -n <pkgname>: name of the static package
+# -N <mainpkg>: name of the main package
+%pkg_static_files
+```
 
 ## Zig
 These macros assist with building Zig projects.
