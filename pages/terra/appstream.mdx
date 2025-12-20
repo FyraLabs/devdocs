@@ -8,10 +8,77 @@ import { Callout } from "nextra/components";
 # Appstream Metainfo in Terra packages
 
 Appstream metainfo enables your package to be picked up by graphical software 'store' applications.
-This page will cover creating and installing appstream metainfo to your package, but we also highly encourage you to read over the documentation [here](https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html).
+This page will cover creating and installing appstream metainfo to your package, but we also highly encourage you to read over the documentation [here](https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html).
 
 ## When Should I use Appstream Metainfo?
 
-## Macros
+If the application provides a .metainfo.xml you SHOULD install this.
+In this case, you do not neede to make your own.
+
+All graphical/TUI applications SHOULD have metainfo.
+All other packages MAY have metainfo.
 
 ## Creating the metainfo.xml File
+
+Start with the template below.
+Everything in this example SHOULD be in your metainfo.xml, but there are many optional sections not included that you may want.
+We will go over some of these sections later.
+
+### Example metainfo.xml
+
+```xml
+<!-- All uppercase words MUST be replaced with a package-specific value. -->
+<?xml version="1.0" encoding="UTF-8" ?>
+<component type="TYPE">
+  <id>APPID</id>
+  <metadata_license>CC0-1.0</metadata_license> <!-- You SHOULD license your metainfo.xml as CC0-1.0 -->
+  <project_license>LICENSE</project_license>
+  <icon type="local">ICON DIRECTORY</icon> <!-- For now, the icon type MUST be local due to a bug where remote icon files do not work. -->
+
+  <name>NAME</name>
+  <summary>SUMMARY</summary> <!-- SHOULD be the same as the `Summary:` in your .spec file. -->
+
+  <description> <!-- SHOULD be the same as the `%description` in your .spec file. -->
+    <p>
+        DESCRIPTION.
+    </p>
+  </description>
+
+  <launchable type="desktop-id">NAME.desktop</launchable>
+
+  <url type="homepage">URL</url>
+
+  <releases>
+    <release version="PACKAGE VERISON"/>
+  </releases>
+</component>
+```
+
+### Optional metainfo.xml sections
+
+These metainfo tags are optional, but you SHOULD use as many as you can to properly flesh out the metainfo.
+All information is pulled from the Freedesktop specification.
+Again, we highly recommend you read through that [here](https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html) and [here](https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html).
+
+#### Provides Tag
+
+If your application ships a binary in the default PATH (typically `/usr/bin`), you SHOULD put this binary name here.
+If there are more then one binary, list them all.
+You can also use this for libraries. More information for tags within the `</provides>` tag can be found in the documentation [here](https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html#tag-provides).
+
+```xml
+<provides>
+  <binary>BINARY NAME</binary>
+</provides>
+```
+Or, you can provides specific media types, libraries, etc.
+
+```xml
+<provides>
+    <mediatype>text/html</mediatype>
+    <mediatype>image/jpeg</mediatype>
+    <library>/usr/lib/libappstream.so.1</library>
+ </provides>
+```
+
+### Macros
