@@ -141,24 +141,24 @@ echo "this will also run when building pkg but for installing it into %{buildroo
 ```
 
 - Add `Source0` or `Source1` or more.
-  These preambles should link to a compressed file (preferably a tarball) and will be extracted during `%prep`.
+  These preambles should link to a compressed file (preferably a tarball) and will be extracted during `%prep{:rpmspec}`.
   You should've had the link prepared during [#Preparation](#preparation) :3
-- Add a new line `%prep`
+- Add a new line `%prep{:rpmspec}`
   - The source file will be automatically downloaded and
-    extracted with `%autosetup -n <root dir name in tar file>` inside `%prep`.
+    extracted with `%autosetup -n <root dir name in tar file>` inside `%prep{:rpmspec}`.
     Check out `blackbox-terminal.spec` as an example
   - If it is not a tar archive, extract the file manually with a command.
     See `authy.spec` as an example (`unsquashfs`)
-- Inside `%build`, you might need to build the package.
-  Macros like `%meson` and `%cmake` are supported.
+- Inside `%build{:rpmspec}`, you might need to build the package.
+  Macros like `%meson{:rpmspec}` and `%cmake{:rpmspec}` are supported.
   Check out `blackbox-terminal` or `prismlauncher`
   - if not, manually state the command
-- List out all the files to be included inside `%files`
-  - Use `%doc` to state the README file (if it exists)
-  - Use `%license` to state the COPYING or LICENSE file (if it exists)
+- List out all the files to be included inside `%files{:rpmspec}`
+  - Use `%doc{:rpmspec}` to state the README file (if it exists)
+  - Use `%license{:rpmspec}` to state the COPYING or LICENSE file (if it exists)
   - TIP: If you are unsure about the files to install, run the build first.
     `mock` will show you the files not packaged but installed via an error
-- Add `%changelog` (message preferably "Initial Package")
+- Add `%changelog{:rpmspec}` (message preferably "Initial Package")
 
 ## Building
 
@@ -313,14 +313,14 @@ Version:  %{unreleased_version}~%{commit_date}git.%{shortcommit}
 `git` SHOULD be replaced with the correct _VCS identifier_ for **(b)** and **(c)** as listed on the right.
 
 If either commit tracking option is used, you MUST also include `labels { nightly = 1 }{:hcl}` in `anda.hcl` unless there is no `update.rhai`,
-as these two formats rely on the assumption that there is one `%shortcommit` for each `%commit_date` (and vice versa).
+as these two formats rely on the assumption that there is one `%shortcommit{:rpmspec}` for each `%commit_date{:rpmspec}` (and vice versa).
 
-`%unreleased_version` refers to the expected version number for the next stable (or a more stable _tag_ than `nightly`) release,
-while `%latest_stable_version` refers to the current latest released version number, preferably stable.
+`%unreleased_version{:rpmspec}` refers to the expected version number for the next stable (or a more stable _tag_ than `nightly{:rpmspec}`) release,
+while `%latest_stable_version{:rpmspec}` refers to the current latest released version number, preferably stable.
 
 `Commit tacking (nightly off version tag)` SHOULD be used when there is a stable and nightly version of a package.
 
-If upstream does not provide a version, use `Commit tacking (no stable version tag)` and replace `%unreleased_version` as `0`.
+If upstream does not provide a version, use `Commit tacking (no stable version tag)` and replace `%unreleased_version{:rpmspec}` as `0{:rpmspec}`.
 
 ### Release Field
 
