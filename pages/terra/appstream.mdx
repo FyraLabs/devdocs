@@ -82,3 +82,27 @@ Or, you can provides specific media types, libraries, etc.
 ```
 
 ### Macros
+
+#### %terra_appstream
+
+### Installing your Metainfo File
+
+To properly install your metainfo file, you need to add these four lines to your spec file:
+
+```rpmspec
+%global appid [your package's app ID]   # This defines a macro appid as your package's appid.
+
+...
+
+Source1: %appid.metainfo.xml   # This specifies your metainfo.xml file as a source in your spec file.
+
+...
+
+%install
+...
+%terra_appstream -o %{SOURCE1} # Runs the %terra_appstream macro on your metainfo.xml file.
+
+%files
+...
+%{_metainfodir}/%appid.metainfo.xml # Lists your installed metainfo.xml file to be included in the package.
+```
