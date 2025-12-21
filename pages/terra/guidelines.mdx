@@ -105,7 +105,7 @@ In some rare cases, you may need to use `%cargo_build{:rpmspec}` and `%crate_ins
 
 If Rust nightly is required, add the `%rustup_nightly{:rpmspec}` macro to `%prep{:rpmspec}`.
 
-Check the [Rust section on the SRPM page](../terra/SRPM#rust) for more information on these macros.
+Check the [Rust section on the SRPM page](../terra/srpm#rust) for more information on these macros.
 
 #### Go
 These are guidelines for packaging projects written in [Go](https://go.dev).
@@ -127,7 +127,7 @@ For the official Nim language documentation, [see here](https://nim-lang.org/doc
 - You SHOULD add (at least!) the following build dependencies to your spec file:
   - `BuildRequires: anda-srpm-macros{:rpmspec}`
   - `BuildRequires: nim{:rpmspec}`
-- You SHOULD use our [Nim macros](../terra/SRPM#nim).
+- You SHOULD use our [Nim macros](../terra/srpm#nim).
 
 #### Zig
 These are guidelines for packaging projects written in [Zig](https://ziglang.org).
@@ -142,7 +142,7 @@ For the official Zig language documentation, [see here](https://ziglang.org/lear
 - For these reasons, you SHOULD refer to upstream guidance when packaging Zig projects.
 - If any of the scenarios above apply, you MAY use `%zig_build_target` with appropriate flags instead of `%zig_build`. You however SHOULD use `%zig_build` instead if none of the above apply.
   - If using `%zig_build_target`, you SHOULD add `BuildRequires: anda-srpm-macros{:rpmspec}` to your spec.
-  - For more information on `%zig_build_target`, please see its documentation on our [macros page](../terra/SRPM#zig_build_target).
+  - For more information on `%zig_build_target`, please see its documentation on our [macros page](../terra/srpm#zig_build_target).
 
 Regardless of build macro in use, they should be used in either the `%build{:rpmspec}` or `%install{:rpmspec}` section depending on how the project is built (as some can be built directly into root by setting the `DESTDIR=%{buildroot}{:rpmspec}` variable).
 
@@ -169,11 +169,11 @@ For projects where dynamic linking of all dependencies is simply not possible (s
 ### Shell Completions
 
 - SHOULD be a subpackage.
-- SHOULD use the [`%pkg_completion{:rpmspec}` macro](../terra/SRPM#pkg_completion).
+- SHOULD use the [`%pkg_completion{:rpmspec}` macro](../terra/srpm#pkg_completion).
 
 ### Development and Shared Libraries
 
-You SHOULD try to use the [`%pkg_devel_files{:rpmspec}`, `%pkg_libs_files{:rpmspec}` and `%pkg_static_files{:rpmspec}` macros](../terra/SRPM#subpackages).
+You SHOULD try to use the [`%pkg_devel_files{:rpmspec}`, `%pkg_libs_files{:rpmspec}` and `%pkg_static_files{:rpmspec}` macros](../terra/srpm#subpackages).
 
 Shared library packages SHOULD be suffixed with `-libs{:rpmspec}`.
 These packages SHOULD NOT contain anything **except**:
