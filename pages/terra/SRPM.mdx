@@ -101,7 +101,7 @@ Expands to: `/usr/bin/env NVM_DIR=%{_nvm_dir} /usr/bin/nvm{:rpmspec}`
 #### %vendor_nodejs
 this maco SHOULD only be used if Node.js packages available from the repos are not usable for some reason.
 
-You MUST add `nvm` as a build dependancy: `BuildRequires: nvm{:rpmspec}`.
+You MUST add `nvm` as a build dependency: `BuildRequires: nvm{:rpmspec}`.
 
 Available flags:
 - `-v{:rpmspec}` is REQUIRED for this macro to pass the version to NVM. This flag accepts a full version, the major for the latest of a major version of Node.js (e.g., `24`), or `node` to use the latest version of Node.js available.
