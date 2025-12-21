@@ -221,7 +221,7 @@ These packages SHOULD NOT contain anything **except**:
 
 #### Usage of %elifarch
 
-To make specs easier to read, you SHOULD use `%elifarch{:rpmspec}` instead of `%endif{:rpmspec}` followed by `%ifarch{:rpmspec}`
+To make specs easier to read, you SHOULD use `%ifarch{:rpmspec}` followed by `%elifarch{:rpmspec}` before `%endif{:rpmspec}` in specs where build steps are arch dependent.
 
 Incorrect:
 
