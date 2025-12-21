@@ -210,7 +210,7 @@ These packages SHOULD NOT contain anything **except**:
     - Adding a package to the `Requires:`.
     - Changing any user-facing tags (`URL:{:rpmspec}`, `License:{:rpmspec}`, `Summary:{:rpmspec}`, etc.).
 - If a package fix PR is fixing/changing anything build-facing, the `Release:{:rpmspec}` tag SHOULD NOT need to be bumped.
-  - Some (not all!) examples of 'user-facing' fixes requiring a `Release:` bump:
+  - Some (not all!) examples of 'user-facing' fixes requiring a `Release:{:rpmspec}` bump:
     - Adding a package to the `BuildRequires:{:rpmspec}`.
     - Fixing a package that failed to build when the `Version:{:rpmspec}` tag is bumped.
     - Adding/changing new macros, build steps, install steps, or general source code handing during build time (assuming this does not affect the installed files the user will see).
