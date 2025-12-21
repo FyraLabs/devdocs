@@ -86,7 +86,7 @@ If not/using a different IDE, we suggest installing language support for each of
 1. Edit `anda.hcl`, which tells [Andaman] how to build the package:
 
    ```hcl
-   project pkg {
+   project pkg { # NOTE - 'pkg' is NOT reffering to the package name, rather, it needs to be verbatim `pkg`.
        rpm {
            spec = "<packagename>.spec"
        }
