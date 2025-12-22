@@ -346,6 +346,12 @@ Prefix/Suffix the packages in the following order
 - If necessary, suffix `-bash-completion` (or other shells) and `-doc`.
 - Postfix a _tag_ if necessary (e.g. `.nightly`).
 
+### Testing
+
+You MUST test your package locally.
+You can install the built `.rpm` file by running `dnf install path/to/package.rpm`.
+An example of why this needs to be done is, a package could build, but then run into runtime dependancy error.
+
 ## Miscellaneous Terra Policies
 
 ### Security Policy

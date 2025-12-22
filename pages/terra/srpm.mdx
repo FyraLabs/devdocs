@@ -7,14 +7,14 @@ import { Callout } from "nextra/components";
 
 # SRPM Macros
 
-We provide SPRM macros to ease packaging and better integrate into our workflow. Please use these macros when possible when contributing to Terra.
+We provide custom SRPM macros to ease packaging and better integrate into our workflow. Please use these macros when possible when contributing to Terra.
 
 These are provided in the `anda-srpm-macros` package. If you use them, make sure to add `anda-srpm-macros` as a `BuildRequires:{:rpmspec}` in the spec file.
 
 You may need to refer to the [Terra packaging guidelines](./guidelines) for non-macro related Terra guidelines.
 If looking for documentation on our metainfo macros, check that out [here](./appstream).
 
-If you would like to add/fix/update these macros, or MUST raise an issue, please do so in the [SRPM macros repository](https://github.com/terrapkg/srpm-macros), or reach out to us somewhere [here](https://wiki.ultramarine-linux.org/en/community/community/).
+If you would like to contribute to these macros, check out the [SRPM macros repository](https://github.com/terrapkg/srpm-macros).
 
 For upstream macros available in Fedora/Terra, check out our unofficial [macros list](../rpm/macros).
 
@@ -49,10 +49,10 @@ install -Dm644 icons/16x16.png %{buildroot}%{_hicolordir}/16x16/apps/%{name}.svg
 install -Dm644 icons/64x64.png %{buildroot}%{_hicolordir}/64x64/apps/%{name}.svg
 ```
 
-If the file is a `.svg`, use the [`%_scalableiconsdir{:rpmspec}`](#_scalableiconsdir).
+If the file is an `.svg`, use the [`%_scalableiconsdir{:rpmspec}`](#_scalableiconsdir).
 
 ### %_pkgconfigdir
-Expands to: `%{_libdir}/pkgconfig`
+Expands to: `%{_libdir}/pkgconfig{:rpmspec}`
 
 ### %_scalableiconsdir
 Expands to: `%_hicolordir/scalable/apps{:rpmspec}` or `/usr/share/icons/hicolor/scalable/apps{:rpmspec}`
@@ -64,14 +64,14 @@ For example:
 install -Dm644 icons/%{name}.svg %{buildroot}%{_scalableiconsdir}/%{name}.svg
 ```
 
-If the file is a `.png`, use the [`%_hicolordir{:rpmspec}`](#_hicolordir) detailed above.
+If the file is a `.png`, use the [`%_hicolordir{:rpmspec}` macro](#_hicolordir) detailed above.
 
 ### %rpmbuilddir
 This macro exists because Terra supports EL distributions (Red Hat Enterprise Linux, Alma Linux, etc.) which currently have an RPM version from before the `%{builddir}{:rpmspec}` change to address issues [like this](https://github.com/rpm-software-management/rpm/issues/3151).
 
 One, albeit clunky, solution is to define `%{builddir}{:rpmspec}` manually as `%{_builddir}{:rpmspec}` in specs targeting distros with different versions of RPM where one has a version older than 4.20. We have this macro instead to make the process easier without overriding any builtin RPM macros. For more information on this solution, see [these](https://github.com/rpm-software-management/rpm/issues/3151#issuecomment-2154550735) [comments](https://github.com/rpm-software-management/rpm/issues/3151#issuecomment-2154639192) on the issue linked above.
 
-This macro is subject to being retired once all EL distributions with an RPM version older than 4.20 are end-of-life (likely when EL10 is end-of-life), or in the event we can no longer support EL distributions this old.
+This macro is subject to deprecation once all EL distributions with an RPM version older than 4.20 are end-of-life (likely when EL10 is end-of-life), or in the event we can no longer support EL distributions this old.
 
 Expands to: `%{?builddir}%{?!builddir:%{_builddir}}{:rpmspec}`
 
@@ -85,12 +85,12 @@ MAY be used to prep a Go package for online builds. Replaces `%goprep{:rpmspec}`
 These are macros to assist with the general packaging of applications that use JavaScript runtimes, such as Node.js or Bun.
 
 ### Node.js Macros
-Macros for using [Node.js](https://nodejs.org). These require use of the [Fedora Node.js macros](https://docs.fedoraproject.org/en-US/packaging-guidelines/Node.js/#_macros) in the `nodejs-packaging` package.
+Macros for using [Node.js](https://nodejs.org). These require the use of [Fedora Node.js macros](https://docs.fedoraproject.org/en-US/packaging-guidelines/Node.js/#_macros) in the `nodejs-packaging` package.
 
-You MUST either set `%global npm_name pkgname{:rpmspec}` or use `%npm_prep -n pkgname{:rpmspec}` when packaging Node modules directly. This MUST be defined as the canonical name of the module as listed on the NPM Registry.
+You MUST either set `%global npm_name pkgname{:rpmspec}` or use `%npm_prep -n pkgname{:rpmspec}` when packaging Node modules directly. This MUST be defined as the canonical name of the module as listed on the [NPM Registry](https://www.npmjs.com/).
 
 #### %_nvm_dir
-The location in the `%{rpmbuilddir}{:rpmspec}` what will be passed to `$NVM_DIR{:rpmspec}`.
+The location in the `%{rpmbuilddir}{:rpmspec}` what will be passed to `$NVM_DIR{:bash}`.
 
 Expands to: `%{rpmbuilddir}/.nvm{:rpmspec}`
 
@@ -100,7 +100,7 @@ Calls NVM (Node Version Manager) while setting `$NVM_DIR{:bash}`. Only used if v
 Expands to: `/usr/bin/env NVM_DIR=%{_nvm_dir} /usr/bin/nvm{:rpmspec}`
 
 #### %vendor_nodejs
-this maco SHOULD only be used if Node.js packages available from the repos are not usable for some reason.
+This macro SHOULD only be used if Node.js packages available from the repos are not usable for some reason.
 
 You MUST add `nvm` as a build dependency: `BuildRequires: nvm{:rpmspec}`.
 
@@ -132,7 +132,7 @@ Available flags:
 - `-n{:rpmspec}` MUST be used to define `%{npm_name}{:rpmspec}` if it was not defined as a global macro.
 
 #### %fetch_node_tests
-Fetch self-tests from a Git repo. MUST include all necessary test files and folders. If used, SHOULD be used in `%prep{:rpmspec}`.
+Fetch self-tests from a Git repo. MUST include all necessary test files and folders. If used, it SHOULD be placed in the `%prep{:rpmspec}` section.
 
 Available flags:
 - `-u{:rpmspec}` MUST be used to define the URL if the one listed in the `URL:{:rpmspec}` tag for the package is not detectable as clonable.
@@ -182,7 +182,7 @@ Example output:
 
 #### %npm_license
 Expands to: `/usr/bin/license-checker --limitAttributes licenses`
-Above macro, but limits the output to only the license.
+This is similar to [`%__npm_license_checker{:rpmspec}`](#__npm_license_checker), but limits the output to only the license.
 
 Available flags:
 - `-o{:rpmspec}` MAY be used as a shorthand for `--out{:rpmspec}`.
@@ -217,7 +217,7 @@ Outputs a summary of the bundled licenses. Useful for determining what to put in
 Expands to: `%{__npm_license_checker} --summary`
 
 ### Notes for JavaScript Package Managers:
-1. The JavaScript package manager cache directories are placed in [`%{rpmbuilddir}{:rpmspec}`](#rpmbuilddir) because `$HOME` can be different depending on if a build is in Mock or RPM Build.
+1. The JavaScript package manager cache directories are placed in [`%{rpmbuilddir}{:rpmspec}`](#rpmbuilddir) because `$HOME{:bash}` can be different depending on if a build is in Mock or RPM Build.
   - This is very important for consistent macro behavior as well as if the cache must be modified or deleted during build for any reason.
 2. All macros calling the package managers also call NPM environment variables because most of them are using build dependencies from the NPM Registry, some even wrap NPM commands with their own. This ensures consistent NPM behavior.
 
@@ -280,7 +280,7 @@ Macros for using [Bun](https://bun.com).
 
 #### %__bun_home
 Unfortunately, Bun doesn't actually have a way to enforce this yet.
-However the proposed environment variable is `$BUN_HOME`, so we have this for the future.
+However the proposed environment variable is `$BUN_HOME{:bash}`, so we have this for the future.
 
 Expands to: `%{rpmbuilddir}/.bun{:rpmspec}`
 
@@ -290,7 +290,7 @@ Directory that Bun cache files are stored in.
 Expands to: `%{_bun_home}/install/cache{:rpmspec}`
 
 #### %bun_common_envvars
-Sets the `$BUN_HOME` for future use and sets the cache dir.
+Sets the `$BUN_HOME{:bash}` for future use and sets the cache dir.
 
 Expands to: `%{npm_common_envvars} BUN_HOME=%{_bun_home} BUN_INSTALL_CACHE_DIR=%{_bun_cache_dir} BUN_RUNTIME_TRANSPILER_CACHE_PATH=%{_bun_cache_dir} FORCE_COLOR=1{:rpmspec}`
 
@@ -310,7 +310,7 @@ Audit with Bun if package uses bundled Node dependencies. For use in the `%check
 You SHOULD NOT need to fix vulnerabilities for Node modules that are __not bundled in the final package__. This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
 
 #### %bun_pm_trust
-Add Node modules to trusted dependencies so their postinstall scripts may be run. Should only be used if necessary.
+Add Node modules to trusted dependencies so their postinstall scripts can be run. SHOULD only be used if necessary.
 
 Available flags:
 - `-a{:rpmspec}` can be used to trust all dependencies, otherwise simply list the dependencies you want to trust after the command.
@@ -331,7 +331,7 @@ Where Node modules installed by PNPM usually go. This will usually not be produc
 Expands to: `%{_pnpm_home}/store{:rpmspec}`
 
 #### %pnpm_common_envvars
-Sets the NPM evironment variables and the PNPM home dir.
+Sets the NPM environment variables and the PNPM home directory.
 
 Expands to: `%{npm_common_envvars} PNPM_HOME=%{_pnpm_home}{:rpmspec}`
 
@@ -362,7 +362,7 @@ Usecase examples:
     ```
 
 #### %pnpm_audit
-Audit with PNPM if package uses bundled Node dependencies. For use in the `%check{:rpmspec}` section.
+Audit with PNPM if the package uses bundled Node dependencies. For use in the `%check{:rpmspec}` section.
 
 You SHOULD NOT need to fix vulnerabilities for Node modules that are __not bundled in the final package__. This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
 
@@ -377,7 +377,7 @@ Approve dependency scripts with PNPM if needed.
 Available flags:
 - `-g{:rpmspec}` can be used to trust depdendencies of globally installed packages.
 
-Expands to `%{__pnpm} approve-builds{:rpmspec}`
+Expands to: `%{__pnpm} approve-builds{:rpmspec}`
 
 ### Yarn Macros
 Macros for using [Yarn (Yarn Classic/Yarn v1)](https://classic.yarnpkg.com) and [Yarn Berry/Yarn Modern/Yarn v2+](https://yarnpkg.com).
@@ -399,17 +399,17 @@ Expands to: `/usr/bin/env %{yarn_common_envvars} /usr/bin/yarn{:rpmspec}`
 #### %__yarn_dlx
 Remotely execute a Node module with Yarn DLX.
 
-Expands to: `/usr/bin/env %{yarn_common_envvars} /usr/bin/yarn dlx`
+Expands to: `/usr/bin/env %{yarn_common_envvars} /usr/bin/yarn dlx{:rpmspec}`
 
 **NOTE:** REQUIRES `yarnpkg-berry` instead of `yarnpkg` as a build dependency.
 
 #### %yarn_audit
-Audit Yarn if package uses bundled Node dependencies. For use in the `%check{:rpmspec}` section.
+Audit Yarn if the package uses bundled Node dependencies. For use in the `%check{:rpmspec}` section.
 
 You SHOULD NOT need to fix vulnerabilities for Node modules that are __not bundled in the final package__. This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
 
 ### Other
-JavaScript related macros that apply to all of, or do not fit into any of, the above categories.
+JavaScript related macros that apply to all or do not fit into any of the above categories.
 
 #### %set_node_build_flags
 Set the flags and environment variables used for JavaScript package manager builds.
@@ -435,7 +435,7 @@ YARN_CACHE_FOLDER="%{_yarn_cache_dir}" ; export YARN_CACHE_FOLDER ; \
 NPMFLAGS="${NPMFLAGS:-%{npm_buildflags} }" ; export NPMFLAGS
 ```
 
-This ensures the environment variables are explicitly exported and are more likely to be picked up by all shell processes. It also creates an environment variable called `$NPMFLAGS` which can be passed to NPM in lieu of the macro `%{npm_buildflags}{:rpmspec}` to force our config, if necessary.
+This ensures the environment variables are explicitly exported and therefor are more likely to be picked up by all shell processes. It also creates an environment variable called `$NPMFLAGS{:bash}` which can be passed to NPM in lieu of the macro `%{npm_buildflags}{:rpmspec}` to force our config, if necessary.
 
 This should only be needed in the event you are using [`%__npx`](#__npx), [`%__pnpx`](#__pnpx), [`%__bunx`](#__bunx), or [`%__yarn_dlx`](#__yarn_dlx).
 
@@ -445,7 +445,7 @@ These macros assist with the general packaging of applications that use [Electro
 ### %electronmeta
 Set up all basic requirements including build macros for building an Electron app.
 
-Does NOT install the JavaScript package managers used for builds (e.g., `nodejs-npm`, `bun`, `pnpm`, `yarnpkg`, `yarnpkg-berry`). These must still be specified in the `BuildRequires:{:rpmspec}` tag manually.
+**NOTE:** `This macro does NOT install the JavaScript package managers used for builds (e.g., `nodejs-npm`, `bun`, `pnpm`, `yarnpkg`, `yarnpkg-berry`). These must still be specified in the `BuildRequires:{:rpmspec}` tag manually.
 
 Available flags:
 - `-a{:rpmspec}` will pull in additional build dependencies often needed particularly when building with NPM.
@@ -498,7 +498,7 @@ Which expands fully to:
 
 Which simply means Electron supports [x86_64](https://en.wikipedia.org/wiki/X86-64), [32-bit x86 (AKA: IA-32)](https://en.wikipedia.org/wiki/IA-32), [AArch64/ARM64](https://en.wikipedia.org/wiki/AArch64), [ARMv7 (AKA: `armhf`)](https://en.wikipedia.org/wiki/ARM_architecture_family#Architecture_versions), and [MIPS64](https://en.wikipedia.org/wiki/MIPS_architecture).
 
-However, at this time Terra only supports x86_64, AArch64, and 32-bit x86.
+However, at this time, Terra only supports x86_64, AArch64, and 32-bit x86.
 
 ### %electron_license
 The license for bundled Electron.
@@ -523,18 +523,18 @@ Available flags:
 - `-r{:rpmspec}`: Executes `%{__npm} run{:rpmspec}` for scripts in the `package.json`. Expects an argument.
 - `-E{:rpmspec}`: Execute Electron Builder/Electron Forge. Will NOT work for projects that require build steps which use Node.js or executing JavaScript scripts directly.
 - `-V{:rpmspec}`: Execute Electron Vite. Same limitation as with `-E{:rpmspec}`.
-- `-M{:rpmspec}`: Mode to use in Electron Vite builds. Accepts `production`, `development`, and `staging`. Note that this differs from `$NODE_ENV` so you can run any combination of Vite environment modes and Node.js environment modes.
+- `-M{:rpmspec}`: Mode to use in Electron Vite builds. Accepts `production`, `development`, and `staging`. Note that this differs from `$NODE_ENV{:bash}` so you can run any combination of Vite environment modes and Node.js environment modes.
 
 #### %bun_build
-SHOULD be used to build Electron projects with Bun.
+SHOULD be used to build Electron projects with [Bun](https://bun.sh/).
 
 Available flags:
 - `-c{:rpmspec}`: Run `%{__bun} ci{:rpmspec}` instead of `%{__bun} install{:rpmspec}`. Analogous to `%{__bun} install --frozen-lockfile{:rpmspec}`. May be necessary for projects with stricter build dependencies.
 - `-e{:rpmspec}`: Execute commands and modules within the Bun build environment.
+- `-v{:rpmspec}`: Run [Electron Vite](https://electron-vite.org/) build steps. Not needed for all Electron apps.
+- `-N{:rpmspec}`: Runs `--no-save{:rpmspec}` on the `%{__bun} install{:rpmspec}` step. This prevents updating or (re)creating a lockfile to prevent freezing.
 - `-r <argument>{:rpmspec}`: Executes `%{__bun} run{:rpmspec}` for scripts in the `package.json`. Expects an argument in place of `<argument>`.
-- `-v{:rpmspec}`: Run Electron Vite build steps. Not needed for all Electron apps.
 - `-F{:rpmspec}`: Runs `--force{:rpmspec}` on the `%{__bun} install{:rpmspec}` step. This will assure all dependencies are the latest versions from the registry, reinstalling them if necessary.
-- `-N{:rpmspec}`: Runs `--no-save{:rpmspec}` on `%{__bun} install{:rpmspec}` step. Prevent updating or (re)creating a lockfile to prevent freezing.
 - `-R{:rpmspec}`: Remove the bun.lock file. SHOULD only be used if the lockfile is causing build issues.
 
 #### %pnpm_build
@@ -689,7 +689,7 @@ For specifying the name (the default will be your `%name`) of the shell completi
 Can also pass `cmd1`, etc. as the commands the completion files are for.
 
 Example using all flags:
-```
+```rpmspec
 %pkg_completion -Bbefz -n pkgname cmd1 cmd2 ...
 ```
 
@@ -706,7 +706,7 @@ yadm-zsh-completion-x.x.x-x.fcxx.noarch.rpm - contains `/usr/share/zsh/site-func
 ### %pkg_devel_files
 Set the summary & description, then find development files and install them to a subpackages `%files`.
 SHOULD be used in place of manually creating `-devel` subpackages.
-**NOTE:** You still need to define a `%package devel`, and then use this macro below this.
+**NOTE:** You still need to define a `%package devel{:rpmspec}`, and then use this macro below this.
 For example:
 
 ```rpmspec
@@ -721,7 +721,7 @@ For example:
 ### %pkg_static_files
 Set the summary & description, then find static libraries.
 SHOULD be used in place of manually creating `-static` subpackages.
-**NOTE:** You still need to define a `%package static`, and then use this macro below this.
+**NOTE:** You still need to define a `%package static{:rpmspec}`, and then use this macro below this.
 For example:
 
 ```rpmspec
@@ -734,7 +734,7 @@ For example:
 ### %pkg_libs_files
 Set the summary & description, then find dynamic library files (will be placed as `%_libdir/*.so.*`).
 SHOULD be used in place of manually creating `-libs` subpackages.
-**NOTE:** You still need to define a `%package libs`, and then use this macro below this.
+**NOTE:** You still need to define a `%package libs{:rpmspec}`, and then use this macro below this.
 For example:
 
 ```rpmspec
@@ -808,7 +808,7 @@ Conflicts:		%realname-devel
 
 ### %git_clone
 Downloads the source code via `git clone`, and passes useful (in this situation) flags such as`--depth 1`, `-q`, `--recursive-submodules`, and `-j${RPM_BUILD_NCPUS}`.
-A git URL and a `%version{:rpmspec}` or `%commit{:rpmspec}` SHOULD be passed to this macro.
+A git URL and a `%version{:rpmspec}` or `%commit{:rpmspec}` MAY be passed to this macro.
 Below is an example of how a spec that tracks version tages from a GitHub repo, and needs to git clone the source could handle this:
 
 ```rpmspec
