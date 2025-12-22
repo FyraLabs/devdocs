@@ -7,7 +7,7 @@ import { Callout } from "nextra/components";
 
 # SRPM Macros
 
-We provide custom SRPM macros to ease packaging and better integrate into our workflow. Please use these macros when possible when contributing to Terra.
+We provide custom SRPM macros to ease packaging and better integrate our workflow. Please use these macros when possible in Terra.
 
 These are provided in the `anda-srpm-macros` package. If you use them, make sure to add `anda-srpm-macros` as a `BuildRequires:{:rpmspec}` in the spec file.
 
@@ -259,7 +259,7 @@ Expands to: `/usr/bin/env %{npm_common_envvars} %{?with_vendored_nodejs:%{__nvm}
 #### %npm_audit
 Audit with NPM if package uses bundled Node dependencies. For use in the `%check{:rpmspec}` section.
 
-You SHOULD NOT need to fix vulnerabilities for Node modules that are __not bundled in the final package.__ This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
+Vulnerabilities for Node modules __not bundled in the final package__ SHOULD NOT be fixed. If a vulnerability is found *only* in build dependencies, you are fine to leave it as is.
 
 #### %npm_audit_fix
 Fix vulnerabilities found using `%npm_audit{:rpmspec}` Should be used in `%prep{:rpmspec}` section.
@@ -449,7 +449,7 @@ These macros assist with the general packaging of applications that use [Electro
 ### %electronmeta
 Set up all basic requirements including build macros for building an Electron app.
 
-<Callout type="hint">
+<Callout>
   This does NOT install the JavaScript package managers used for builds (e.g., `nodejs-npm`, `bun`, `pnpm`, `yarnpkg`, `yarnpkg-berry`).
   Specify these `BuildRequires:{:rpmspec}` manually.
 </Callout>
@@ -458,18 +458,18 @@ Available flags:
 - `-a{:rpmspec}` will pull in additional build dependencies often needed particularly when building with NPM.\
   Currently, this includes `nodejs-devel`, `nodejs-packaging`, and `typescript`.
 
-<div style={{ float: "right", margin: "1em" }}>
-  | `%{_target_cpu}` | `%{_electron_cpu}{:rpmspec}` |
-  |------------------|------------------------------|
-  | `x86_64`         | `x64`                        |
-  | `aarch64`        | `arm64`                      |
-  | `x86`            | `ia32`                       |
-  | `armv7l`         | `armv7l`                     |
-  | `mips64`         | `mips64el`                   |
+<div style={{ float: "right", margin: "1em 0em 1em 0.5em" }}>
+  | `%_target_cpu` | `%_electron_cpu` |
+  |----------------|------------------|
+  | `x86_64`       | `x64`            |
+  | `aarch64`      | `arm64`          |
+  | `x86`          | `ia32`           |
+  | `armv7l`       | `armv7l`         |
+  | `mips64`       | `mips64el`       |
 </div>
 
 Rundown of what all `%electronmeta{:rpmspec}` does:
-- Converts `%{_target_cpu}{:rpmspec}` (the RPM build architecture) into `%{_electron_cpu}{:rpmspec}`, the Electron format for architectures it is compatible with.
+- Converts `%_target_cpu{:rpmspec}` (the RPM build architecture) into `%_electron_cpu{:rpmspec}`, the Electron format for compatible architectures.
   - These are defined because Electron names the build files and directories after the architecture.
   - The macros used to build Electron apps (`%npm_build{:rpmspec}`, `%bun_build{:rpmspec}`, `%pnpm_build{:rpmspec}`, and `%yarn_build{:rpmspec}`) all require this to be set.
   - In some cases, these architectures are used in the source tarballs for Electron projects.
