@@ -7,8 +7,18 @@ import { Callout } from "nextra/components";
 
 # Appstream Metainfo in Terra packages
 
-Appstream metainfo enables your package to be picked up by graphical software 'store' applications.
+Terra supports Appstream metainfo, which enables your package to be picked up by graphical software 'store' applications, such as [KDE Plasma's Discover](https://apps.kde.org/discover/) or [GNOME's Software app](https://apps.gnome.org/Software/).
 This page will cover creating and installing appstream metainfo to your package, but we also highly encourage you to read over the documentation [here](https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html).
+
+If you have difficulty making the metainfo.xml file, please ask for support in our [discord](https://fyralabs.com/discord) server, or make a draft pull request asking for assistance.
+
+<Callout type="info">
+  The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+  NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and
+  "OPTIONAL" in this document are to be interpreted as described in
+  [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and
+  [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
+</Callout>
 
 ## When Should I use Appstream Metainfo?
 
@@ -20,20 +30,33 @@ All other packages MAY have metainfo.
 
 ## Creating the metainfo.xml File
 
-Start with the template below.
-Everything in this example SHOULD be in your metainfo.xml, but there are many optional sections not included that you may want.
-We will go over some of these sections later.
+Determine your package's app ID, then start with the template below.
+The metainfo file MUST be named 'appid.metainfo.xml`.
+For example, `com.github.neohtop.metainfo.xml`.
 
-### Example metainfo.xml
+### Determining the App ID
+
+If your package has an App ID that it uses for file names, or references an App ID in any way, you MUST use this as the App ID in your spec.
+See [here](#installing-your-metainfo-file) to learn how to define the App ID in your spec file.
+
+If you do not know what the App ID of the package is, the App ID is determined using [reverse domain name notation](https://en.wikipedia.org/wiki/Reverse_domain_name_notation).
+
+- If your package is only hosted on GitHub (no website, is not a GitHub mirror), then the App ID MUST be `com.github.PACKAGE-NAME`.
+- If your package has it's own website, or the organization that creates it does, you MUST use it's website in the App ID. Using Microsoft Edit as an example, then App ID will be `com.microsoft.edit`
+
+### metainfo.xml Template
+
+Everything in this template SHOULD be in your metainfo.xml, but there are many optional sections not included that you may want.
+We will go over the important ones in the next section.
 
 ```xml
-<!-- All uppercase words MUST be replaced with a package-specific value. -->
+<!-- All uppercase words MUST be replaced with the package-specific value. -->
 <?xml version="1.0" encoding="UTF-8" ?>
 <component type="TYPE">
   <id>APPID</id>
   <metadata_license>CC0-1.0</metadata_license> <!-- You SHOULD license your metainfo.xml as CC0-1.0 -->
   <project_license>LICENSE</project_license>
-  <icon type="local">ICON DIRECTORY</icon> <!-- For now, the icon type MUST be local due to a bug where remote icon files do not work. -->
+  <icon type="local">ICON DIRECTORY</icon> <!-- For now, the icon type MUST be local due to a bug where remote icon files do not work. This should be a .png or .svg application icon that gets installed by your package. -->
 
   <name>NAME</name>
   <summary>SUMMARY</summary> <!-- SHOULD be the same as the `Summary:` in your .spec file. -->
@@ -46,7 +69,7 @@ We will go over some of these sections later.
 
   <launchable type="desktop-id">NAME.desktop</launchable>
 
-  <url type="homepage">URL</url>
+  <url type="homepage">URL</url> <!-- Can be the GitHub page if need be. -->
 
   <releases>
     <release version="PACKAGE VERISON"/>
@@ -56,35 +79,98 @@ We will go over some of these sections later.
 
 ### Optional metainfo.xml sections
 
-These metainfo tags are optional, but you SHOULD use as many as you can to properly flesh out the metainfo.
-All information is pulled from the Freedesktop specification, and each section links to it's Freedesktop page for more info.
+These metainfo tags are optional, but it is RECOMMENDED to use as many as you can to properly flesh out the metainfo.
+Other tags exist that are not listed, you are free to use them but, but are typically not useful.
+
+All information based on the Freedesktop specification, and each section links to it's Freedesktop page for more info.
 Again, we highly recommend you read through the entire spec [here](https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html) and [here](https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html).
 
-#### Provides Tag
+#### Provides
 
 If your application ships a binary in the default PATH (typically `/usr/bin`), you SHOULD put this binary name here.
 If there are more then one binary, list them all.
-You can also use this for libraries. More information on the `</provides>` tag can be found in the documentation [here](https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html#tag-provides).
+You can also use this for libraries. More information on the `<provides/>{:xml}` tag can be found in the documentation [here](https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html#tag-provides).
 
-Basic `<provides>{:xml}` tag:
+Basic `<provides/>{:xml}` tag example:
 ```xml
 <provides>
   <binary>BINARY NAME</binary>
 </provides>
 ```
-Or, you can provides specific media types, libraries, etc.
+
+#### Keywords
+
+The `<keywords/>{:xml}` tag will make your package easier find when users search these terms.
+More information can be found [here](https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html#tag-keywords).
+
+Freedesktop's example:
 
 ```xml
-<provides>
-    <mediatype>text/html</mediatype>
-    <mediatype>image/jpeg</mediatype>
-    <library>/usr/lib/libappstream.so.1</library>
- </provides>
+<keywords>
+  <keyword translate="no">IDE</keyword>
+  <keyword>development</keyword>
+  <keyword>programming</keyword>
+  <keyword xml:lang="de">entwicklung</keyword>
+  <keyword xml:lang="de">programmierung</keyword>
+</keywords>
 ```
+
+#### Developer
+
+This tag is to specify the developer/s of your package. This can be a person or group/organization.
+Information on this tag can be found [here](https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html#tag-developer).
+
+NOTE - You MUST NOT use the `<developer_name/>{:xml}` tag.
+
+#### Screenshots
+
+This tag can be either a video or picture, and is used to showcase the package in software stores.
+You can (and should) use full URLs to screenshots.
+More information can be found [here](https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html#tag-screenshots).
+
+Freedesktop's example:
+
+```xml
+<screenshots>
+  <screenshot type="default">
+    <caption>The FooBar main window.</caption>
+    <image type="source" width="1600" height="900">https://example.com/foobar/screenshot-1.png</image>
+  </screenshot>
+  <screenshot>
+    <caption>Foobar showing the frobnicate functionality.</caption>
+    <image type="source" width="1600" height="900">https://example.com/foobar/screenshot-2.png</image>
+  </screenshot>
+  <screenshot>
+    <video codec="av1" width="1600" height="900">https://example.com/foobar/screencast.mkv</video>
+  </screenshot>
+
+  <screenshot environment="plasma-mobile">
+    <caption>The FooBar main window, but on Plasma Mobile</caption>
+    <image type="source" width="1600" height="900">https://example.com/foobar/screenshot-1_plasma-mobile.png</image>
+  </screenshot>
+
+  <screenshot environment="gnome:dark">
+    <caption>The FooBar main window, on GNOME in dark mode</caption>
+    <image type="source" width="1600" height="900">https://example.com/foobar/screenshot-1_gnome_dark.png</image>
+  </screenshot>
+ </screenshots>
+ ```
 
 ### Macros
 
 #### %terra_appstream
+
+In short, `%terra_appstream{:rpmspec` assists with installing your metainfo.xml file.
+You SHOULD use it when installing your own metainfo.xml file.
+You MAY need to add this line to your spec file: `BuildRequires: terra-appstream-helper{:rpmspec}`
+
+You SHOULD also define a `%appid{:rpmspec}` at the top of your spec file.
+More information can be found in the section below.
+This SHOULD be used in the spec file anywhere the metainfo file name is used, for example:
+
+```rpmspec
+%{_metainfodir}/%appid.metainfo.xml
+```
 
 ### Installing your Metainfo File
 
