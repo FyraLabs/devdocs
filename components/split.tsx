@@ -31,9 +31,10 @@ function Split({ children }: React.PropsWithChildren) {
   // -- mado
   return (
     <div className="flex">
-      {React.Children.map(children, (child: React.ReactElement) => {
+      {React.Children.map(children, (child: React.ReactElement<HTMLDivElement>) => {
         if (child.type == Split.Left) {
-          return React.cloneElement(child, { width: leftWidth });
+          // @ts-ignore
+          return React.cloneElement(child, { style: { width: leftWidth.toString() } });
         }
         if (child.type == Split.Right) {
           return (
@@ -46,7 +47,8 @@ function Split({ children }: React.PropsWithChildren) {
                 <div className="flex-1 border-l border-l-white/0 h-full w-0" />
                 <div className="flex-1 border-l group-hover:border-l-white border-l-white/50 h-full w-0" />
               </div>
-              {React.cloneElement(child, { width: 100 - leftWidth })}
+              {/* @ts-ignore */}
+              {React.cloneElement(child, { style: { width: (100 - leftWidth).toString() } })}
             </>
           );
         }

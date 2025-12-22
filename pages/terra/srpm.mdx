@@ -445,7 +445,7 @@ These macros assist with the general packaging of applications that use [Electro
 ### %electronmeta
 Set up all basic requirements including build macros for building an Electron app.
 
-**NOTE:** `This macro does NOT install the JavaScript package managers used for builds (e.g., `nodejs-npm`, `bun`, `pnpm`, `yarnpkg`, `yarnpkg-berry`). These must still be specified in the `BuildRequires:{:rpmspec}` tag manually.
+**NOTE:** This macro does NOT install the JavaScript package managers used for builds (e.g., `nodejs-npm`, `bun`, `pnpm`, `yarnpkg`, `yarnpkg-berry`). These must still be specified in the `BuildRequires:{:rpmspec}` tag manually.
 
 Available flags:
 - `-a{:rpmspec}` will pull in additional build dependencies often needed particularly when building with NPM.
