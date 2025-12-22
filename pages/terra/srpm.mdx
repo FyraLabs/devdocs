@@ -33,6 +33,22 @@ These macros define certain system directories, and SHOULD be used in place of t
 Expands to: `%_datadir/applications{:rpmspec}` or `/usr/share/applications{:rpmspec}`
 This may seem like a directory to place the application itself into, but this directory is used for application's `.desktop` files.
 
+### %_bun_cache_dir
+The directory where Bun cache files are stored in.
+
+Expands to: `%{_bun_home}/install/cache{:rpmspec}`
+
+Used for [Bun macros](#bun-macros).
+
+### %_bun_home
+The directory where Bun files are stored in.
+Unfortunately, Bun doesn't actually have a way to enforce this yet.
+However the proposed environment variable is `$BUN_HOME`, so we have this for the future.
+
+Expands to: `%{rpmbuilddir}/.bun{:rpmspec}`
+
+Used for [Bun macros](#bun-macros).
+
 ### %elvish_completions_dir
 Expands to: `%_datadir/elvish/lib/completions{:rpmspec}`
 Used in the [`%pkg_completions{:rpmspec}`](#pkg_completion) macro, or manually when `%pkg_completions{:rpmspec}` cannot be used.
@@ -55,6 +71,32 @@ If the file is an `.svg`, use the [`%_scalableiconsdir{:rpmspec}`](#_scalableico
 Expands to: `%{_libdir}/pkgconfig{:rpmspec}`
 Used in the `%files{:rpmspec}` section.
 
+### %_npm_cache_dir
+Expands to: `%{rpmbuilddir}/.npm{:rpmspec}`
+
+Used with [JavaScript package manager macros](#javascript-runtimes), especially [NPM macros](#npm-macros).
+
+### %_nvm_dir
+The location in the `%{rpmbuilddir}{:rpmspec}` what will be passed to `$NVM_DIR{:rpmspec}`, which is where vendored Node.js installs and cache are stored.
+
+Expands to: `%{rpmbuilddir}/.nvm{:rpmspec}`
+
+Only used for for [`%{__nvm}`](#__nvm).
+
+### %_pnpm_home
+The directory where PNPM files and cache are stored.
+
+Expands to: `%{rpmbuilddir}/.pnpm{:rpmspec}`
+
+Used for [PNPM macros](#pnpm-macros).
+
+### %_pnpm_store
+The directory where Node modules installed by PNPM usually go. This will usually not be produced when using PNPM as a build tool, but exists for rare builds it may be created in.
+
+Expands to: `%{_pnpm_home}/store{:rpmspec}`
+
+Used for [PNPM macros](#pnpm-macros).
+
 ### %_scalableiconsdir
 Expands to: `%_hicolordir/scalable/apps{:rpmspec}` or `/usr/share/icons/hicolor/scalable/apps{:rpmspec}`
 The directory that SHOULD be used when installing application `.svg` files to.
@@ -75,48 +117,6 @@ One, albeit clunky, solution is to define `%{builddir}{:rpmspec}` manually as `%
 This macro is subject to deprecation once all EL distributions with an RPM version older than 4.20 are end-of-life (likely when EL10 is end-of-life), or in the event we can no longer support EL distributions this old.
 
 Expands to: `%{?builddir}%{?!builddir:%{_builddir}}{:rpmspec}`
-
-### %_npm_cache_dir
-Expands to: `%{rpmbuilddir}/.npm{:rpmspec}`
-
-Used with [JavaScript package manager macros](#javascript-runtimes), especially [NPM macros](#npm-macros).
-
-### %_nvm_dir
-The location in the `%{rpmbuilddir}{:rpmspec}` what will be passed to `$NVM_DIR{:rpmspec}`, which is where vendored Node.js installs and cache are stored.
-
-Expands to: `%{rpmbuilddir}/.nvm{:rpmspec}`
-
-Only used for for [`%{__nvm}`](#__nvm).
-
-### %__bun_home
-The directory where Bun files are stored in.
-Unfortunately, Bun doesn't actually have a way to enforce this yet.
-However the proposed environment variable is `$BUN_HOME`, so we have this for the future.
-
-Expands to: `%{rpmbuilddir}/.bun{:rpmspec}`
-
-Used for [Bun macros](#bun-macros).
-
-### %_bun_cache_dir
-The directory where Bun cache files are stored in.
-
-Expands to: `%{_bun_home}/install/cache{:rpmspec}`
-
-Used for [Bun macros](#bun-macros).
-
-### %_pnpm_home
-The directory where PNPM files and cache are stored.
-
-Expands to: `%{rpmbuilddir}/.pnpm{:rpmspec}`
-
-Used for [PNPM macros](#pnpm-macros).
-
-### %_pnpm_store
-The directory where Node modules installed by PNPM usually go. This will usually not be produced when using PNPM as a build tool, but exists for rare builds it may be created in.
-
-Expands to: `%{_pnpm_home}/store{:rpmspec}`
-
-Used for [PNPM macros](#pnpm-macros).
 
 ### %_yarn_cache_dir
 The directory where Yarn cache files are stored in.
