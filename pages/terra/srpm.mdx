@@ -441,7 +441,7 @@ NPMFLAGS="${NPMFLAGS:-%{npm_buildflags} }" ; export NPMFLAGS
 
 This ensures the environment variables are explicitly exported and therefor are more likely to be picked up by all shell processes. It also creates an environment variable called `$NPMFLAGS{:bash}` which can be passed to NPM in lieu of the macro `%{npm_buildflags}{:rpmspec}` to force our config, if necessary.
 
-This should only be needed in the event you are using [%__npx](#__npx), [%__pnpx](#__pnpx), [%__bunx](#__bunx), or [%__yarn_dlx](#__yarn_dlx).
+This should only be needed in the event you are using [`%__npx`](#__npx), [`%__pnpx`](#__pnpx), [`%__bunx`](#__bunx), or [`%__yarn_dlx`](#__yarn_dlx).
 
 ## Electron
 These macros assist with the general packaging of applications that use [Electron](https://www.electronjs.org).
