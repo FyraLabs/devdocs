@@ -401,7 +401,7 @@ Remotely execute a Node module with Yarn DLX.
 
 Expands to: `/usr/bin/env %{yarn_common_envvars} /usr/bin/yarn dlx{:rpmspec}`
 
-NOTE: REQUIRES `yarnpkg-berry` instead of `yarnpkg` as a build dependency.
+**NOTE:** REQUIRES `yarnpkg-berry` instead of `yarnpkg` as a build dependency.
 
 #### %yarn_audit
 Audit Yarn if the package uses bundled Node dependencies. For use in the `%check{:rpmspec}` section.
@@ -468,7 +468,7 @@ Rundown of what all `%electronmeta{:rpmspec}` does:
 - Sets the build and runtime dependencies.
 - Sets the `ExclusiveArch:{:rpmspec}` tag to only the architectures Electron supports.
 - Defines a `%bcond{:rpmspec}` for whether or not Electron is bundled for other macros.
-- Defines the bundled dependencies as bundled. NOTE: This only defines Electron's bundled dependencies, not any Node modules the app may also bundle.
+- Defines the bundled dependencies as bundled. **NOTE:** This only defines Electron's bundled dependencies, not any Node modules the app may also bundle.
 
 This ensures packagers do not need to manually set these for every Electron app's spec, hopefully eliminating depsolver problems and helping reduce common build issues.
 
@@ -531,10 +531,17 @@ SHOULD be used to build Electron projects with [Bun](https://bun.sh/).
 Available flags:
 - `-c{:rpmspec}`: Run `%{__bun} ci{:rpmspec}` instead of `%{__bun} install{:rpmspec}`. Analogous to `%{__bun} install --frozen-lockfile{:rpmspec}`. May be necessary for projects with stricter build dependencies.
 - `-e{:rpmspec}`: Execute commands and modules within the Bun build environment.
+<<<<<<< HEAD
 - `-r{:rpmspec}`: Executes `%{__bun} run{:rpmspec}` for scripts in the `package.json`. Expects an argument.
 - `-v{:rpmspec}`: Run [Electron Vite](https://electron-vite.org/) build steps. Not needed for all Electron apps.
 - `-F{:rpmspec}`: Runs `--force{:rpmspec}` on `%{__bun} install{:rpmspec}` step. It will make sure all dependencies are the latest versions from the registry, reinstalling them if necessary.
 - `-N{:rpmspec}`: Runs `--no-save{:rpmspec}` on the `%{__bun} install{:rpmspec}` step. This prevents updating or (re)creating a lockfile to prevent freezing.
+=======
+- `-r <argument>{:rpmspec}`: Executes `%{__bun} run{:rpmspec}` for scripts in the `package.json`. Expects an argument in place of `<argument>`.
+- `-v{:rpmspec}`: Run Electron Vite build steps. Not needed for all Electron apps.
+- `-F{:rpmspec}`: Runs `--force{:rpmspec}` on the `%{__bun} install{:rpmspec}` step. This will assure all dependencies are the latest versions from the registry, reinstalling them if necessary.
+- `-N{:rpmspec}`: Runs `--no-save{:rpmspec}` on `%{__bun} install{:rpmspec}` step. Prevent updating or (re)creating a lockfile to prevent freezing.
+>>>>>>> e71f8f7ed041580a9626c344506d417c9d35cf64
 - `-R{:rpmspec}`: Remove the bun.lock file. SHOULD only be used if the lockfile is causing build issues.
 
 #### %pnpm_build
@@ -597,19 +604,30 @@ Example usage:
 
 ## Nim
 These macros assist with building Nim projects.
+Currently `atlas` is not directly supported by the macros, but you can run it directly in `%build{:rpmspec}`:
+```rpmspec
+%build
+atlas init
+atlas rep atlas.lock
+%nim_c src/my_project
+```
 
 ### %nim_prep
 Set up build environment with required packages via `nimble setup`.
+
+This also adds the configuration for enabling mold automatically if found in the build environment.
 
 ### %nim_build (or %nim_c)
 Builds a Nim package.
 Requires an argument to `src/pkgname`.
 
+Note that this does not invoke `nimble`. All dependencies SHOULD be ready before `%build`.
+
 ### %nim_tflags
-C compiler flags for Nim.
+C compiler flags used in `%nim_c`.
 
 ### %nim_lflags
-Linker flags for Nim.
+Linker flags used in `%nim_c`.
 
 ## Rust
 These macros assist with building Rust projects.
@@ -695,7 +713,7 @@ yadm-zsh-completion-x.x.x-x.fcxx.noarch.rpm - contains `/usr/share/zsh/site-func
 ### %pkg_devel_files
 Set the summary & description, then find development files and install them to a subpackages `%files`.
 SHOULD be used in place of manually creating `-devel` subpackages.
-Note: You still need to define a `%package devel`, and then use this macro below this.
+**NOTE:** You still need to define a `%package devel`, and then use this macro below this.
 For example:
 
 ```rpmspec
@@ -710,7 +728,7 @@ For example:
 ### %pkg_static_files
 Set the summary & description, then find static libraries.
 SHOULD be used in place of manually creating `-static` subpackages.
-Note: You still need to define a `%package static`, and then use this macro below this.
+**NOTE:** You still need to define a `%package static`, and then use this macro below this.
 For example:
 
 ```rpmspec
@@ -723,7 +741,7 @@ For example:
 ### %pkg_libs_files
 Set the summary & description, then find dynamic library files (will be placed as `%_libdir/*.so.*`).
 SHOULD be used in place of manually creating `-libs` subpackages.
-Note: You still need to define a `%package libs`, and then use this macro below this.
+**NOTE:** You still need to define a `%package libs`, and then use this macro below this.
 For example:
 
 ```rpmspec
