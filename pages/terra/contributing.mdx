@@ -41,8 +41,8 @@ If you ever need help, hop into [our Discord server](https://fyralabs.com/discor
 
 - Install [Andaman] and its Mock configs on your system:
   - `[1;32msudo dnf[97m install [0;97;mterra-mock-configs{:ansi}` via Terra
-  - anda is also available via rust crates.io
-  - If on an atomic system, this command works using podman: `podman run --rm --cap-add=SYS_ADMIN --privileged --volume ./:/anda --volume mock_cache:/var/lib/mock --workdir /anda ghcr.io/terrapkg/builder:frawhide anda`
+  - Anda is also available via rust [crates.io](https://crates.io/crates/anda)
+  - If on an atomic system, this command works using Podman: `podman run --rm --cap-add=SYS_ADMIN --privileged --volume ./:/anda --volume mock_cache:/var/lib/mock --workdir /anda ghcr.io/terrapkg/builder:frawhide anda`
 - Fork the [Terra sources repo](https://github.com/terrapkg/packages), and then `git clone` your fork.
 - You are now ready for the [Writing Sources]([contributing#writing-sources](https://developer.fyralabs.com/terra/contributing#writing-sources)) section below.
   
@@ -148,25 +148,22 @@ echo "this will also run when building pkg but for installing it into %{buildroo
 - Description on what you've done
 ```
 
-- Add `Source0` or `Source1` or more.
+- Add `Source0:{:rpmspec}` or `Source1:{:rpmspec}` or more.
   These preambles should link to a compressed file (preferably a tarball) and will be extracted during `%prep{:rpmspec}`.
-  You should've had the link prepared during [#Preparation](#preparation) :3
+  You can find this by looking at the GitHub releases page (usually a .tar.gz link).
 - Add a new line `%prep{:rpmspec}`
   - The source file will be automatically downloaded and
     extracted with `%autosetup -n <root dir name in tar file>` inside `%prep{:rpmspec}`.
-    Check out `blackbox-terminal.spec` as an example
   - If it is not a tar archive, extract the file manually with a command.
-    See `authy.spec` as an example (`unsquashfs`)
 - Inside `%build{:rpmspec}`, you might need to build the package.
   Macros like `%meson{:rpmspec}` and `%cmake{:rpmspec}` are supported.
-  Check out `blackbox-terminal` or `prismlauncher`
-  - if not, manually state the command
-- List out all the files to be included inside `%files{:rpmspec}`
-  - Use `%doc{:rpmspec}` to state the README file (if it exists)
-  - Use `%license{:rpmspec}` to state the COPYING or LICENSE file (if it exists)
+  - If not, manually state the command.
+- List out all the files to be included inside `%files{:rpmspec}`.
+  - Use `%doc{:rpmspec}` to state the README file (if it exists).
+  - Use `%license{:rpmspec}` to state the COPYING or LICENSE file (if it exists).
   - TIP: If you are unsure about the files to install, run the build first.
-    `mock` will show you the files not packaged but installed via an error
-- Add `%changelog{:rpmspec}` (message preferably "Initial Package")
+    `mock` will show you the files not packaged but installed via an error.
+- Add `%changelog{:rpmspec}` (message preferably "Initial Package").
 
 ## Building
 
@@ -199,7 +196,7 @@ The system regarding automatic updates [are described here](autoupdate). Here is
 [Andaman] supports updating via `.rhai` packages.
 See the "book" (more like guide) for [Rhai].
 
-- Create `update.rhai` inside the package folder.
+- Create an `update.rhai` file inside the folder of your package alongside your `.spec` file.
 - See references from other packages.
 - You also need to add `labels { nightly = "1" }{:hcl}` in `anda.hcl` for nightly packages.
 
@@ -238,7 +235,7 @@ Packagers and maintainers MUST follow the policies listed in this document.
     | Libraries required to build or use the aforementioned packages | These libraries are required to build or use the aforementioned packages, and are usually not sandboxed. |
     
     Other applications that are not specified here may be allowed on a case-by-case basis.
-- You MUST have the rights or permission to redistribute the packaged software. Besides that, there is no prohibition on proprietary licenses.
+- You MUST have the rights or permission to redistribute the packaged software. Please check the license of the software. Besides that, there is no prohibition on proprietary licenses.
 - Submissions must be maintained. We will reject submissions of unmaintained software.
 - Submissions MUST NOT be malicious.
 - Submissions that may introduce breaking changes must be included in "Terra Extras" instead via the `subrepo = "extras"` label in `anda.hcl`.
@@ -247,7 +244,7 @@ Packagers and maintainers MUST follow the policies listed in this document.
   - Example: `yt-dlp-nightly` **can be included normally** because it has no common provides with Fedora's `yt-dlp`.
   - If you are in doubt whether your submission should be in extra instead, ask and we will decide.
 - Submissions SHOULD include an auto-update script (`update.rhai`).
-- Submissions SHOULD be placed in the corresponding directory in `anda/`.
+- Submissions SHOULD be placed in the corresponding directory in [`anda/`](https://github.com/terrapkg/packages/tree/frawhide/anda).
   - Each folder MUST either contain folders and no source files (other files are exempted), or contain multiple files and no folders.
   - The following directories have a higher priority. Categorize your new package in the following order:
     1. `fonts/`
@@ -277,8 +274,8 @@ This section describes the guidelines for naming and versioning packages correct
 ### Tags
 
 First of all, the term "_tag_" is used to refer to different versions of the same software, as in their release schedule/model.
-For example, the `zed` package has 3 _tags_: stable, preview and nightly. (Some packages use `tip` instead of `nightly`.)
-_Tags_ may be named after git branches from upstream.
+For example, the `zed` package has 3 _tags_: `stable`, `preview` and `nightly`. (Some packages use `tip` instead of `nightly`.)
+_Tags_ may be named after Git branches from upstream.
 
 Having a different _tag_ of the same software warrants a separate package,
 i.e., they MUST have separate spec files with separate `Name:{:rpmspec}`s.
@@ -341,10 +338,9 @@ The release number SHOULD be incremented if changes are made to the package, unl
 ### Naming
 
 Prefix/Suffix the packages in the following order
-(that means nightly fonts should end with `-fonts.nightly`)
 
 - Fonts MUST be suffixed with `-fonts`.
-- Shared libraries SHOULD be either suffixed with `-libs`.
+- Shared libraries SHOULD be suffixed with `-libs`.
   - Alternatively, the `lib` prefix is also allowed, but they SHOULD still provide `-libs`.
 - Development libraries SHOULD be suffixed with `-devel`.
 - If necessary, suffix `-bash-completion` (or other shells) and `-doc`.
