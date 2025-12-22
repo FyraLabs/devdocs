@@ -306,7 +306,7 @@ Expands to: `/usr/bin/env %{bun_common_envvars} /usr/bin/bunx`
 Audit with Bun if package uses bundled Node dependencies. For use in the `%check{:rpmspec}` section.
 
 <Callout>
-  `bun audit` is a currently just a wrapper for NPM audit but lacks the `fix` option; use `%npm_audit_fix{:rpmspec}` to fix vulnerabilities.
+  `bun audit` is currently just a wrapper for NPM audit but lacks the `fix` option; use `%npm_audit_fix{:rpmspec}` to fix vulnerabilities.
 </Callout>
 
 You SHOULD NOT need to fix vulnerabilities for Node modules that are __not bundled in the final package__. This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
