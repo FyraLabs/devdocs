@@ -97,6 +97,15 @@ Expands to: `%{_pnpm_home}/store{:rpmspec}`
 
 Used for [PNPM macros](#pnpm-macros).
 
+### %rpmbuilddir
+This macro exists because Terra supports EL distributions (Red Hat Enterprise Linux, Alma Linux, etc.) which currently have an RPM version from before the `%{builddir}{:rpmspec}` change to address issues [like this](https://github.com/rpm-software-management/rpm/issues/3151).
+
+One, albeit clunky, solution is to define `%{builddir}{:rpmspec}` manually as `%{_builddir}{:rpmspec}` in specs targeting distros with different versions of RPM where one has a version older than 4.20. We have this macro instead to make the process easier without overriding any builtin RPM macros. For more information on this solution, see [these](https://github.com/rpm-software-management/rpm/issues/3151#issuecomment-2154550735) [comments](https://github.com/rpm-software-management/rpm/issues/3151#issuecomment-2154639192) on the issue linked above.
+
+This macro is subject to deprecation once all EL distributions with an RPM version older than 4.20 are end-of-life (likely when EL10 is end-of-life), or in the event we can no longer support EL distributions this old.
+
+Expands to: `%{?builddir}%{?!builddir:%{_builddir}}{:rpmspec}`
+
 ### %_scalableiconsdir
 Expands to: `%_hicolordir/scalable/apps{:rpmspec}` or `/usr/share/icons/hicolor/scalable/apps{:rpmspec}`
 The directory that SHOULD be used when installing application `.svg` files to.
@@ -108,15 +117,6 @@ install -Dm644 icons/%{name}.svg %{buildroot}%{_scalableiconsdir}/%{name}.svg
 ```
 
 If the file is a `.png`, use the [`%_hicolordir{:rpmspec}` macro](#_hicolordir) detailed above.
-
-### %rpmbuilddir
-This macro exists because Terra supports EL distributions (Red Hat Enterprise Linux, Alma Linux, etc.) which currently have an RPM version from before the `%{builddir}{:rpmspec}` change to address issues [like this](https://github.com/rpm-software-management/rpm/issues/3151).
-
-One, albeit clunky, solution is to define `%{builddir}{:rpmspec}` manually as `%{_builddir}{:rpmspec}` in specs targeting distros with different versions of RPM where one has a version older than 4.20. We have this macro instead to make the process easier without overriding any builtin RPM macros. For more information on this solution, see [these](https://github.com/rpm-software-management/rpm/issues/3151#issuecomment-2154550735) [comments](https://github.com/rpm-software-management/rpm/issues/3151#issuecomment-2154639192) on the issue linked above.
-
-This macro is subject to deprecation once all EL distributions with an RPM version older than 4.20 are end-of-life (likely when EL10 is end-of-life), or in the event we can no longer support EL distributions this old.
-
-Expands to: `%{?builddir}%{?!builddir:%{_builddir}}{:rpmspec}`
 
 ### %_yarn_cache_dir
 The directory where Yarn cache files are stored in.
