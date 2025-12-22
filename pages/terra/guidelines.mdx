@@ -129,6 +129,33 @@ For the official Nim language documentation, [see here](https://nim-lang.org/doc
   - `BuildRequires: nim{:rpmspec}`
 - You SHOULD use our [Nim macros](../terra/srpm#nim).
 
+In most cases, use `nimble` to download dependencies in `%prep{:rpmspec}`,
+then `%build{:rpmspec}` with `nim`, e.g.[^1]:
+
+```rpmspec
+%prep
+%autosetup
+%nim_prep
+
+%build
+%nim_c src/dive
+
+%install
+install -Dm755 src/dive -t %buildroot%_bindir
+```
+
+The use of the [`atlas`](https://github.com/nim-lang/atlas) package cloner is also recognized, e.g.[^2]:
+
+```rpmspec
+%prep
+%autosetup -Sgit
+
+%build
+atlas init
+atlas rep atlas.lock
+%nim_c src/netto
+```
+
 #### Zig
 These are guidelines for packaging projects written in [Zig](https://ziglang.org).
 
@@ -250,5 +277,12 @@ Correct:
 %define arch arm64-
 %endif
 ```
+
+---
+
+# Footnotes
+
+[^1]: https://github.com/terrapkg/packages/blob/e65a762352246f918d12e7c5a0e032ba0b1be73b/anda/langs/nim/dive/umdive.spec
+[^2]: https://github.com/terrapkg/packages/blob/e65a762352246f918d12e7c5a0e032ba0b1be73b/anda/langs/nim/netto/netto.spec
 
 [Fedora Packaging Guidelines]: https://docs.fedoraproject.org/en-US/packaging-guidelines/
