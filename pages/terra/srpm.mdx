@@ -597,19 +597,30 @@ Example usage:
 
 ## Nim
 These macros assist with building Nim projects.
+Currently `atlas` is not directly supported by the macros, but you can run it directly in `%build{:rpmspec}`:
+```rpmspec
+%build
+atlas init
+atlas rep atlas.lock
+%nim_c src/my_project
+```
 
 ### %nim_prep
 Set up build environment with required packages via `nimble setup`.
+
+This also adds the configuration for enabling mold automatically if found in the build environment.
 
 ### %nim_build (or %nim_c)
 Builds a Nim package.
 Requires an argument to `src/pkgname`.
 
+Note that this does not invoke `nimble`. All dependencies SHOULD be ready before `%build`.
+
 ### %nim_tflags
-C compiler flags for Nim.
+C compiler flags used in `%nim_c`.
 
 ### %nim_lflags
-Linker flags for Nim.
+Linker flags used in `%nim_c`.
 
 ## Rust
 These macros assist with building Rust projects.
