@@ -10,7 +10,7 @@ import { Callout } from "nextra/components";
 Terra supports Appstream metainfo, which enables your package to be picked up by graphical software 'store' applications, such as [KDE Plasma's Discover](https://apps.kde.org/discover/) or [GNOME's Software app](https://apps.gnome.org/Software/).
 This page will cover creating and installing appstream metainfo to your package, but we also highly encourage you to read over the documentation [here](https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html).
 
-If you have difficulty making the metainfo.xml file, please ask for support in our [discord](https://fyralabs.com/discord) server, or make a draft pull request asking for assistance.
+If you have difficulty populating the `.metainfo.xml` file, please seek support in our [Discord](https://fyralabs.com/discord) server, or make a draft pull request asking for assistance.
 
 <Callout type="info">
   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
@@ -20,29 +20,31 @@ If you have difficulty making the metainfo.xml file, please ask for support in o
   [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
 </Callout>
 
-## When Should I use Appstream Metainfo?
+## When Should I Use Appstream Metainfo?
 
-If the application provides a .metainfo.xml you SHOULD install this.
-In this case, you do not neede to make your own.
+Packages satisfying any of the following cases are RECOMMENDED to provide the metainfo file.
 
-All graphical/TUI applications SHOULD have metainfo.
-All other packages MAY have metainfo.
+- If upstream already provides the metainfo file, you SHOULD `install` it instead of making your own
+- Graphical applications
+- TUI applications that make sense to be opened in a graphical environment
 
-## Creating the metainfo.xml File
+Other packages MAY also provide appstream metadata files.
+
+## Creating the `metainfo.xml` File
 
 Determine your package's app ID, then start with the template below.
-The metainfo file MUST be named 'appid.metainfo.xml`.
+The metainfo file MUST be named `[1;3mapp_id[0m.metainfo.xml{:ansi}`.
 For example, `com.github.neohtop.metainfo.xml`.
 
 ### Determining the App ID
 
-If your package has an App ID that it uses for file names, or references an App ID in any way, you MUST use this as the App ID in your spec.
-See [here](#installing-your-metainfo-file) to learn how to define the App ID in your spec file.
+If your package has an app ID used in file names, or references an app ID in any way, you MUST use this as the app ID in your spec.
+See [here](#installing-your-metainfo-file) to learn how to define the app ID in your spec file.
 
-If you do not know what the App ID of the package is, the App ID is determined using [reverse domain name notation](https://en.wikipedia.org/wiki/Reverse_domain_name_notation).
+If you do not know what the app ID of the package is, determine it using the [reverse domain name notation](https://en.wikipedia.org/wiki/Reverse_domain_name_notation).
 
-- If your package is only hosted on GitHub (no website, is not a GitHub mirror), then the App ID MUST be `com.github.PACKAGE-NAME`.
-- If your package has it's own website, or the organization that creates it does, you MUST use it's website in the App ID. Using Microsoft Edit as an example, then App ID will be `com.microsoft.edit`
+- If your package is only hosted on GitHub (no website, not a GitHub mirror), then the app ID MUST be `com.github.[1;3mAPP-NAME{:ansi}`.
+- If your package has its own website, or the organization that creates it does, you MUST use its website in the app ID. Using Microsoft Edit as an example, the app ID will be `com.microsoft.edit`.
 
 ### metainfo.xml Template
 
@@ -82,16 +84,14 @@ We will go over the important ones in the next section.
 These metainfo tags are optional, but it is RECOMMENDED to use as many as you can to properly flesh out the metainfo.
 Other tags exist that are not listed, you are free to use them but, but are typically not useful.
 
-All information based on the Freedesktop specification, and each section links to it's Freedesktop page for more info.
+All information based on the freedesktop specification, and each section links to it's freedesktop page for more info.
 Again, we highly recommend you read through the entire spec [here](https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html) and [here](https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html).
 
 #### Provides
 
-If your application ships a binary in the default PATH (typically `/usr/bin`), you SHOULD put this binary name here.
-If there are more then one binary, list them all.
-You can also use this for libraries. More information on the `<provides/>{:xml}` tag can be found in the documentation [here](https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html#tag-provides).
+All binary names in the default PATH (typically `/usr/bin`) SHOULD be listed here.
 
-Basic `<provides/>{:xml}` tag example:
+Basic `<provides/>{:xml}` tag[^1] example:
 ```xml
 <provides>
   <binary>BINARY NAME</binary>
@@ -100,10 +100,7 @@ Basic `<provides/>{:xml}` tag example:
 
 #### Keywords
 
-The `<keywords/>{:xml}` tag will make your package easier find when users search these terms.
-More information can be found [here](https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html#tag-keywords).
-
-Freedesktop's example:
+The `<keywords/>{:xml}` tag[^2] will make your package easier find when users search these terms:
 
 ```xml
 <keywords>
@@ -117,16 +114,16 @@ Freedesktop's example:
 
 #### Developer
 
-This tag is to specify the developer/s of your package. This can be a person or group/organization.
-Information on this tag can be found [here](https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html#tag-developer).
+This tag[^3] is to specify the developer/s of your package. This can be a person or group/organization.
 
-**NOTE:** You MUST NOT use the `<developer_name/>{:xml}` tag.
+<Callout type="warning">
+  You MUST NOT use the `<developer_name/>{:xml}` tag.
+</Callout>
 
 #### Screenshots
 
-This tag can be either a video or picture, and is used to showcase the package in software stores.
+This tag[^4] can be either a video or a picture, and is used to showcase the package in software stores.
 You can (and should) use full URLs to screenshots.
-More information can be found [here](https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html#tag-screenshots).
 
 Freedesktop's example:
 
@@ -164,9 +161,7 @@ In short, `%terra_appstream{:rpmspec}` assists with installing your metainfo.xml
 You SHOULD use it when installing your own metainfo.xml file.
 You MAY need to add this line to your spec file: `BuildRequires: terra-appstream-helper{:rpmspec}`
 
-You SHOULD also define a `%appid{:rpmspec}` at the top of your spec file.
-More information can be found in the section below.
-This SHOULD be used in the spec file anywhere the metainfo file name is used, for example:
+`%appid{:rpmspec}` SHOULD be defined at the top of your spec file (preamble), and used in references to the metainfo file name, for example:
 
 ```rpmspec
 %{_metainfodir}/%appid.metainfo.xml
@@ -174,7 +169,7 @@ This SHOULD be used in the spec file anywhere the metainfo file name is used, fo
 
 ### Installing your Metainfo File
 
-To properly install your metainfo file, you need to add these four lines to your spec file:
+To properly install your metainfo file:
 
 ```rpmspec
 %global appid [your package's app ID]   # This defines a macro "appid" as your package's appid.
@@ -193,3 +188,12 @@ Source1: %appid.metainfo.xml   # This specifies your metainfo.xml file as a sour
 ...
 %{_metainfodir}/%appid.metainfo.xml # Lists your installed metainfo.xml file to be included in the package.
 ```
+
+---
+
+# Footnotes
+
+[^1]: libraries are also supported, see freedesktop docs for tag provides: https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html#tag-provides
+[^2]: https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html#tag-keywords
+[^3]: https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html#tag-developer
+[^4]: https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html#tag-screenshots
