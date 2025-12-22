@@ -164,7 +164,7 @@ Example using `%zig_build_target`:
 - Some Zig projects have enabled build flags to override this and those SHOULD be used if available (this will usually be `-Dstrip=false`).
 - If they are not, you may need to disable debug packages using the global variable `%global debug_package %{nil}{:rpmspec}` if not enough debug info is preserved to strip.
 
-For projects where dynamic linking of all dependencies is simply not possible (such as the version in the Fedora repos is too new or too old) or that have no dependencies to link, you MAY use the `-s` flag. You SHOULD still dynamically link compatible dependencies by using `-fsys=pkgname{:rpmspec}`.
+For projects where dynamic linking of all dependencies is simply not possible (such as the version in the Fedora repos is too new or too old) or that have no dependencies to link, you MAY use `%zig_build_target` with the `-s` flag. You SHOULD still dynamically link compatible dependencies by using `-fsys=pkgname{:rpmspec}`.
 
 ### Shell Completions
 
