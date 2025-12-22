@@ -468,7 +468,7 @@ Rundown of what all `%electronmeta{:rpmspec}` does:
 - Sets the build and runtime dependencies.
 - Sets the `ExclusiveArch:{:rpmspec}` tag to only the architectures Electron supports.
 - Defines a `%bcond{:rpmspec}` for whether or not Electron is bundled for other macros.
-- Defines the bundled dependencies as bundled. NOTE: This only defines Electron's bundled dependencies, not any Node modules the app may also bundle.
+- Defines the bundled dependencies as bundled. **NOTE:** This only defines Electron's bundled dependencies, not any Node modules the app may also bundle.
 
 This ensures packagers do not need to manually set these for every Electron app's spec, hopefully eliminating depsolver problems and helping reduce common build issues.
 
