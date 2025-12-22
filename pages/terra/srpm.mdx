@@ -53,6 +53,7 @@ If the file is a `.svg`, use the [`%_scalableiconsdir{:rpmspec}`](#_scalableicon
 
 ### %_pkgconfigdir
 Expands to: `%{_libdir}/pkgconfig`
+Used in the `%files{:rpmspec}` section.
 
 ### %_scalableiconsdir
 Expands to: `%_hicolordir/scalable/apps{:rpmspec}` or `/usr/share/icons/hicolor/scalable/apps{:rpmspec}`
@@ -75,6 +76,58 @@ This macro is subject to being retired once all EL distributions with an RPM ver
 
 Expands to: `%{?builddir}%{?!builddir:%{_builddir}}{:rpmspec}`
 
+### %_npm_cache_dir
+Expands to: `%{rpmbuilddir}/.npm{:rpmspec}`
+
+Used with [JavaScript package manager macros](#javascript-runtimes), especially [NPM macros](#npm-macros).
+
+### %_nvm_dir
+The location in the `%{rpmbuilddir}{:rpmspec}` what will be passed to `$NVM_DIR{:rpmspec}`, which is where vendored Node.js installs and cache are stored.
+
+Expands to: `%{rpmbuilddir}/.nvm{:rpmspec}`
+
+Only used for for [`%{__nvm}`](#__nvm).
+
+### %__bun_home
+The directory where Bun files are stored in.
+Unfortunately, Bun doesn't actually have a way to enforce this yet.
+However the proposed environment variable is `$BUN_HOME`, so we have this for the future.
+
+Expands to: `%{rpmbuilddir}/.bun{:rpmspec}`
+
+Used for [Bun macros](#bun-macros).
+
+### %_bun_cache_dir
+The directory where Bun cache files are stored in.
+
+Expands to: `%{_bun_home}/install/cache{:rpmspec}`
+
+Used for [Bun macros](#bun-macros).
+
+### %_pnpm_home
+The directory where PNPM files and cache are stored.
+
+Expands to: `%{rpmbuilddir}/.pnpm{:rpmspec}`
+
+Used for [PNPM macros](#pnpm-macros).
+
+### %_pnpm_store
+The directory where Node modules installed by PNPM usually go. This will usually not be produced when using PNPM as a build tool, but exists for rare builds it may be created in.
+
+Expands to: `%{_pnpm_home}/store{:rpmspec}`
+
+Used for [PNPM macros](#pnpm-macros).
+
+### %_yarn_cache_dir
+The directory where Yarn cache files are stored in.
+
+Expands to: `%{rpmbuilddir}/.yarn{:rpmspec}`
+
+Used for [Yarn macros](#yarn-macros).
+
+## Environment Variables
+While not macros proper, some Terra, Fedora, and even builtin RPM macros define environment variables which may be of use in specs. These can be as simple as defining a string of text, to being commands or directories.
+
 ## Go
 These macros assist with building Go projects.
 
@@ -88,11 +141,6 @@ These are macros to assist with the general packaging of applications that use J
 Macros for using [Node.js](https://nodejs.org). These require use of the [Fedora Node.js macros](https://docs.fedoraproject.org/en-US/packaging-guidelines/Node.js/#_macros) in the `nodejs-packaging` package.
 
 You MUST either set `%global npm_name pkgname{:rpmspec}` or use `%npm_prep -n pkgname{:rpmspec}` when packaging Node modules directly. This MUST be defined as the canonical name of the module as listed on the NPM Registry.
-
-#### %_nvm_dir
-The location in the `%{rpmbuilddir}{:rpmspec}` what will be passed to `$NVM_DIR{:rpmspec}`.
-
-Expands to: `%{rpmbuilddir}/.nvm{:rpmspec}`
 
 #### %__nvm
 Calls NVM (Node Version Manager) while setting `$NVM_DIR{:bash}`. Only used if vendoring Node.js.
@@ -148,6 +196,20 @@ Example usage:
 
 #### %npm_install
 Install a Node module to `%{npm_sitelib}{:rpmspec}` and symlink its executable.
+
+NOTE: This macro sets the environment variable `$_js`. This environment variable has a very simple purpose: It is defined as `.js` if a Node module's executable ends in a `.js` extension.
+
+How this is used: If for any reason you need to execute a Node module itself as part of the build, you SHOULD do `/path/to/%{npm_name}$_js{:rpmspec}` after using `%npm_install{:rpmspec}`. `$_js` will expand to nothing if not defined and will expand to the `.js` extension if defined.
+
+Real package example:
+```rpmspec
+%install
+%npm_install -s license-checker
+
+# Bootstrap the license fetching
+# Environment variable is one set during execution of %%npm_install
+./bin/%{npm_name}$_js --limitAttributes licenses --out LICENSE.modules
+```
 
 #### %npm_test
 Runs generic NPM tests. This will not be applicable to all Node modules. For use in the `%check{:rpmspec}` section.
@@ -224,9 +286,6 @@ Expands to: `%{__npm_license_checker} --summary`
 ### NPM Macros
 Macros for using [NPM](https://www.npmjs.com).
 
-#### %_npm_cache_dir
-Expands to: `%{rpmbuilddir}/.npm{:rpmspec}`
-
 #### %npm_common_envvars
 **NOTE:** NPM environment variables written in uppercase will be __ignored__ if the project sets different ones explicitly. This is intentional behavior which these macros do not override in order to avoid build issues. For more information, please see [this issue](https://github.com/npm/npm/issues/14528) in the original NPM GitHub repository.
   - If for any reason you need to hardcode an environment override, use a flag passed to NPM or manually set the environment variable in all lowercase.
@@ -278,17 +337,6 @@ LIMITATION: Cannot be used on modules installed using the `-g{:rpmspec}` flag (w
 ### Bun Macros
 Macros for using [Bun](https://bun.com).
 
-#### %__bun_home
-Unfortunately, Bun doesn't actually have a way to enforce this yet.
-However the proposed environment variable is `$BUN_HOME`, so we have this for the future.
-
-Expands to: `%{rpmbuilddir}/.bun{:rpmspec}`
-
-#### %_bun_cache_dir
-Directory that Bun cache files are stored in.
-
-Expands to: `%{_bun_home}/install/cache{:rpmspec}`
-
 #### %bun_common_envvars
 Sets the `$BUN_HOME` for future use and sets the cache dir.
 
@@ -319,16 +367,6 @@ Expands to: `%{__bun} pm trust{:rpmspec}`
 
 ### PNPM Macros
 Macros for using [PNPM](https://pnpm.io).
-
-#### %_pnpm_home
-Where PNPM files and cache are stored.
-
-Expands to: `%{rpmbuilddir}/.pnpm{:rpmspec}`
-
-#### %_pnpm_store
-Where Node modules installed by PNPM usually go. This will usually not be produced when using PNPM as a build tool, but exists for rare builds it may be created in.
-
-Expands to: `%{_pnpm_home}/store{:rpmspec}`
 
 #### %pnpm_common_envvars
 Sets the NPM evironment variables and the PNPM home dir.
@@ -383,10 +421,6 @@ Expands to `%{__pnpm} approve-builds{:rpmspec}`
 Macros for using [Yarn (Yarn Classic/Yarn v1)](https://classic.yarnpkg.com) and [Yarn Berry/Yarn Modern/Yarn v2+](https://yarnpkg.com).
 
 You SHOULD use `yarnpkg` (Yarn Classic) unless you need `yarnpkg-berry` (Yarn Berry) specifically.
-
-#### %_yarn_cache_dir
-
-Expands to: `%{rpmbuilddir}/.yarn{:rpmspec}`
 
 #### %yarn_common_envvars
 Sets the NPM evironment variables and Yarn's cache folder.
@@ -514,6 +548,8 @@ Capital letter flags generally denote options that SHOULD be used with caution o
 
 For more information on each package manager, see [NPM Macros](#npm-macros), [Bun Macros](#bun-macros), [PNPM Macros](#pnpm-macros), and [Yarn Macros](#yarn-macros).
 
+NOTE: All of the following macros set the environment variable `$BUILDER` to either `electron-builder` or `electron-forge` depending on which the app is built with. SHOULD NOT need to be used manually, but MAY be if needed for any reason.
+
 #### %npm_build
 SHOULD be used for building Electron projects with NPM. Has a great deal of flags to work around NPM specific limitations.
 
@@ -594,6 +630,8 @@ Example usage:
   - A symlink named `app`.
   - A second symlink called `alsoapp`.
   - A desktop file with the `Exec` line reading `Exec=/usr/lib(64)/pkgname/app --enable-features=WaylandWindowDecorations --ozone-platform=wayland %u`.
+
+NOTE: Like the Electron build macros, this macro sets the environment variable `$BUILDER` to either `electron-builder` or `electron-forge` depending on which the app is built with. SHOULD NOT need to be used manually, but MAY be if needed for any reason.
 
 ## Nim
 These macros assist with building Nim projects.
@@ -826,7 +864,7 @@ URL:           https://github.com/ad-oliviero/uwufetch
 Expands to: `go-task --parallel --verbose --yes`
 SHOULD be used in place of `go-task` if using Go Task.
 
-## Unused in spec Files
+## Unused in Spec Files
 These macros are ONLY used by other macros in their expansion processes, as programmed [here](https://github.com/terrapkg/srpm-macros).
 These are documented ONLY for development and completion sake.
 
@@ -845,3 +883,7 @@ Anda directory for scripts such as `find-develinfo.sh` used by `%__anda_develfil
 ### %__anda_staticfiles
 Expands to: `%_anda_srpm_macros_dir/find-staticinfo.sh %buildroot > anda-staticfiles.list{:rpmspec}`
 Creates anda-staticfiles.list file in `%{buildroot}{:rpmspec}` to be used by [`%pkg_static_files{:rpmspec}`](#pkg_static_files).
+
+### %is_electron_bundled
+Expands to `%bcond bundled_electron %["%{name}" != "electron"]{:rpmspec}`
+A functional macro that tells other macros if Electron is bundled or if the package being worked with is Electron itself. Used by [`%electronmeta{:rpmspec}`](#electronmeta) and [`%electron_license{:rpmspec}`](#electron_license).
