@@ -57,15 +57,16 @@ We will go over some of these sections later.
 ### Optional metainfo.xml sections
 
 These metainfo tags are optional, but you SHOULD use as many as you can to properly flesh out the metainfo.
-All information is pulled from the Freedesktop specification.
-Again, we highly recommend you read through that [here](https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html) and [here](https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html).
+All information is pulled from the Freedesktop specification, and each section links to it's Freedesktop page for more info.
+Again, we highly recommend you read through the entire spec [here](https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html) and [here](https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html).
 
 #### Provides Tag
 
 If your application ships a binary in the default PATH (typically `/usr/bin`), you SHOULD put this binary name here.
 If there are more then one binary, list them all.
-You can also use this for libraries. More information for tags within the `</provides>` tag can be found in the documentation [here](https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html#tag-provides).
+You can also use this for libraries. More information on the `</provides>` tag can be found in the documentation [here](https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html#tag-provides).
 
+Basic `<provides>{:xml}` tag:
 ```xml
 <provides>
   <binary>BINARY NAME</binary>
