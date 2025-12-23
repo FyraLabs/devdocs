@@ -52,12 +52,8 @@ Used for [Bun macros](#bun-macros).
 
 ### %elvish_completions_dir
 Expands to: `%_datadir/elvish/lib/completions{:rpmspec}`
-<<<<<<< HEAD
-Used in [`%pkg_completions`](#pkg_completion), or manually when cannot be used.
-=======
 
-Used in the [`%pkg_completions{:rpmspec}` macro](#pkg_completion) macro, or manually when `%pkg_completions{:rpmspec}` cannot be used.
->>>>>>> a5c749c343cc3b402888732d6434ffecd21beef8
+Used in [`%pkg_completions`](#pkg_completion), or manually when cannot be used.
 
 ### %_hicolordir
 Expands to: `%_iconsdir/hicolor{:rpmspec}` or `/usr/share/icons/hicolor{:rpmspec}`
@@ -228,11 +224,7 @@ Available flags:
 - `-R{:rpmspec}`: Direct duplicate of an `-R{:rpmspec}` flag. Project dependent.
 - `-v{:rpmspec}`: Direct duplicate of a `-v{:rpmspec}` flag. Project dependent.
 
-<<<<<<< HEAD
 You MUST use [`%fetch_node_tests`](#fetch_node_tests) first if using this.
-=======
-You MUST use [`%fetch_node_tests{:rpmspec}` macro](#fetch_node_tests) first if using this.
->>>>>>> a5c749c343cc3b402888732d6434ffecd21beef8
 
 #### %__npm_license_checker
 Expands to: `/usr/bin/license-checker`
@@ -254,12 +246,8 @@ Example output:
 
 #### %npm_license
 Expands to: `/usr/bin/license-checker --limitAttributes licenses`
-<<<<<<< HEAD
-This is similar to [`%__npm_license_checker`](#__npm_license_checker), but limits the output to only the license.
-=======
 
-This is similar to [%__npm_license_checker](#__npm_license_checker), but limits the output to only the license.
->>>>>>> a5c749c343cc3b402888732d6434ffecd21beef8
+This is similar to [`%__npm_license_checker`](#__npm_license_checker), but limits the output to only the license.
 
 Available flags:
 - `-o{:rpmspec}` MAY be used as a shorthand for `--out{:rpmspec}`.
@@ -294,12 +282,8 @@ Outputs a summary of the bundled licenses. Useful for determining what to put in
 Expands to: `%{__npm_license_checker} --summary`
 
 ### Notes for JavaScript Package Managers:
-<<<<<<< HEAD
 1. The JavaScript package manager cache directories are placed in [`%{rpmbuilddir}`](#rpmbuilddir) because `$HOME{:bash}` can be different depending on if a build is in Mock or RPM Build.
   - This is very important for consistent macro behavior as well as if the cache must be modified or deleted during build for any reason.
-=======
-1. The JavaScript package manager cache directories are placed in [the `%{rpmbuilddir}{:rpmspec}`](#rpmbuilddir) because `$HOME{:bash}` can be different depending on if a build is in Mock or RPM Build. - This is very important for consistent macro behavior as well as if the cache must be modified or deleted during build for any reason.
->>>>>>> a5c749c343cc3b402888732d6434ffecd21beef8
 2. All macros calling the package managers also call NPM environment variables because most of them are using build dependencies from the NPM Registry, some even wrap NPM commands with their own. This ensures consistent NPM behavior.
 
 ### NPM Macros
@@ -542,13 +526,8 @@ This ensures packagers do not need to manually set these for every Electron app'
 
 Like other meta macros (e.g., `%forgemeta{:rpmspec}` from Fedora), you MUST be mindful of where in the spec this macro should be placed.
 - MUST always come after `Name:{:rpmspec}` is defined and before the `%prep{:rpmspec}` section.
-<<<<<<< HEAD
 - SHOULD come before the `License:{:rpmspec}` field if using [`%{electron_license}`](#electron_license).
-- MAY need to come before the sources if an upstream provides sources named after the Electron architecture.
-=======
-- SHOULD come before the `License:{:rpmspec}` field if using the [`%{electron_license}{:rpmspec}` macro](#electron_license).
 - SHOULD come before the `License:{:rpmspec}` field if using [`%{electron_license}{:rpmspec}`](#electron_license).
->>>>>>> a5c749c343cc3b402888732d6434ffecd21beef8
 - MAY be used under preambles but before `%prep{:rpmspec}` if not using `%{electron_license}{:rpmspec}`.
 
 The safest location is under `Name:{:rpmspec}` and above other preambles. When in doubt, place the macro here.
