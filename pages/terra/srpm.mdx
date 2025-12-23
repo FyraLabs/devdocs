@@ -548,7 +548,7 @@ However, at this time, Terra only supports x86_64, AArch64, and 32-bit x86.
 ### %electron_license
 The license for bundled Electron.
 NOT set by default in `%electronmeta{:rpmspec}` because you cannot set the license field twice.
-MAY be used in combination with manually adding the other relevant licenses (if this is done, a proper license tag would be `License: XXX-x.x AND %{electron_license}{:rpmspec}`.
+MAY be used in combination with manually adding the other relevant licenses (if this is done, a proper license tag would be `License: XXX-x.x AND %{electron_license}{:rpmspec}`).
 
 [`%electronmeta`](#electronmeta) SHOULD be used BEFORE the `License:{:rpmspec}` preamble but AFTER `Name:{:rpmspec}` if using this macro.
 
