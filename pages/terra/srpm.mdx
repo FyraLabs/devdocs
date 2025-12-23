@@ -35,7 +35,7 @@ This may seem like a directory to place the application itself into, but this di
 
 ### %elvish_completions_dir
 Expands to: `%_datadir/elvish/lib/completions{:rpmspec}`
-Used in the [`%pkg_completions{:rpmspec}` macro](#pkg_completion), or manually when `%pkg_completions{:rpmspec}` cannot be used.
+Used in the [`%pkg_completions{:rpmspec}`](#pkg_completion) macro, or manually when `%pkg_completions{:rpmspec}` cannot be used.
 
 ### %_hicolordir
 Expands to: `%_iconsdir/hicolor{:rpmspec}` or `/usr/share/icons/hicolor{:rpmspec}`
@@ -49,7 +49,7 @@ install -Dm644 icons/16x16.png %{buildroot}%{_hicolordir}/16x16/apps/%{name}.svg
 install -Dm644 icons/64x64.png %{buildroot}%{_hicolordir}/64x64/apps/%{name}.svg
 ```
 
-If the file is an `.svg`, use the [`%_scalableiconsdir{:rpmspec}` macro](#_scalableiconsdir).
+If the file is an `.svg`, use the [`%_scalableiconsdir{:rpmspec}`](#_scalableiconsdir).
 
 ### %_pkgconfigdir
 Expands to: `%{_libdir}/pkgconfig{:rpmspec}`
@@ -161,11 +161,11 @@ Available flags:
 - `-R{:rpmspec}`: Direct duplicate of an `-R{:rpmspec}` flag. Project dependent.
 - `-v{:rpmspec}`: Direct duplicate of a `-v{:rpmspec}` flag. Project dependent.
 
-You MUST use the [`%fetch_node_tests{:rpmspec}` macro](#fetch_node_tests) first if using this.
+You MUST use [`%fetch_node_tests{:rpmspec}`](#fetch_node_tests) first if using this.
 
 #### %__npm_license_checker
 Expands to: `/usr/bin/license-checker`
-Runs the NPM `license-checker` command, documented [here](https://www.npmjs.com/package/license-checker-rseidelsohn).
+Runs the NPM [`license-checker`](https://www.npmjs.com/package/license-checker-rseidelsohn) command.
 
 Example output:
 
@@ -182,7 +182,7 @@ Example output:
 
 #### %npm_license
 Expands to: `/usr/bin/license-checker --limitAttributes licenses`
-This is similar to [%__npm_license_checker{:rpmspec}](#__npm_license_checker), but limits the output to only the license.
+This is similar to [`%__npm_license_checker{:rpmspec}`](#__npm_license_checker), but limits the output to only the license.
 
 Available flags:
 - `-o{:rpmspec}` MAY be used as a shorthand for `--out{:rpmspec}`.
@@ -217,8 +217,7 @@ Outputs a summary of the bundled licenses. Useful for determining what to put in
 Expands to: `%{__npm_license_checker} --summary`
 
 ### Notes for JavaScript Package Managers:
-1. The JavaScript package manager cache directories are placed in [%{rpmbuilddir}{:rpmspec}](#rpmbuilddir) because `$HOME{:bash}` can be different depending on if a build is in Mock or RPM Build.
-  - This is very important for consistent macro behavior as well as if the cache must be modified or deleted during build for any reason.
+1. The JavaScript package manager cache directories are placed in [`%{rpmbuilddir}{:rpmspec}`](#rpmbuilddir) because `$HOME{:bash}` can be different depending on if a build is in Mock or RPM Build. - This is very important for consistent macro behavior as well as if the cache must be modified or deleted during build for any reason.
 2. All macros calling the package managers also call NPM environment variables because most of them are using build dependencies from the NPM Registry, some even wrap NPM commands with their own. This ensures consistent NPM behavior.
 
 ### NPM Macros
@@ -441,7 +440,7 @@ NPMFLAGS="${NPMFLAGS:-%{npm_buildflags} }" ; export NPMFLAGS
 
 This ensures the environment variables are explicitly exported and therefor are more likely to be picked up by all shell processes. It also creates an environment variable called `$NPMFLAGS{:bash}` which can be passed to NPM in lieu of the macro `%{npm_buildflags}{:rpmspec}` to force our config, if necessary.
 
-This should only be needed in the event you are using [%__npx](#__npx), [%__pnpx](#__pnpx), [%__bunx](#__bunx), or [%__yarn_dlx](#__yarn_dlx).
+This should only be needed in the event you are using [`%__npx`](#__npx), [`%__pnpx`](#__pnpx), [`%__bunx`](#__bunx), or [`%__yarn_dlx`](#__yarn_dlx).
 
 ## Electron
 These macros assist with the general packaging of applications that use [Electron](https://www.electronjs.org).
@@ -490,7 +489,7 @@ This ensures packagers do not need to manually set these for every Electron app'
 Like other meta macros (e.g., `%forgemeta{:rpmspec}` from Fedora), you MUST be mindful of where in the spec this macro should be placed.
 - MUST always come after `Name:{:rpmspec}` is defined and before the `%prep{:rpmspec}` section.
 - SHOULD come before the `License:{:rpmspec}` field if using the [`%{electron_license}{:rpmspec}` macro](#electron_license).
-- MAY need to come before the sources if an upstream provides sources named after the Electron architecture.
+- SHOULD come before the `License:{:rpmspec}` field if using [`%{electron_license}{:rpmspec}`](#electron_license).
 - MAY be used under preambles but before `%prep{:rpmspec}` if not using `%{electron_license}{:rpmspec}`.
 
 The safest location is under `Name:{:rpmspec}` and above other preambles. When in doubt, place the macro here.
@@ -520,7 +519,7 @@ The license for bundled Electron.
 NOT set by default in `%electronmeta{:rpmspec}` because you cannot set the license field twice.
 MAY be used in combination with manually adding the other relevant licenses (if this is done, a proper license tag would be `License: XXX-x.x AND %{electron_license}{:rpmspec}`.
 
-[%electronmeta](#electronmeta) SHOULD be used BEFORE the `License:{:rpmspec}` preamble but AFTER `Name:{:rpmspec}` if using this macro.
+[`%electronmeta`](#electronmeta) SHOULD be used BEFORE the `License:{:rpmspec}` preamble but AFTER `Name:{:rpmspec}` if using this macro.
 
 ### Electron Build Macros
 These are macros used to build Electron apps using JavaScript package managers and builders such as [Electron Builder](https://www.electron.build), [Electron Forge](https://www.electronforge.io), and [Electron Vite](https://electron-vite.github.io).
@@ -681,7 +680,7 @@ More information on subpackages can be found on the [Fedora Packaging Guidelines
 
 ### %files_libs
 This macro creates library subpackages and installs the library files.
-This is only for use in the [`%pkg_devel_files` macro](#pkg_devel_files).
+This is only for use in the [`%pkg_devel_files`](#pkg_devel_files) macro.
 
 ### %pkg_completion
 This macro creates shell completion subpackages and installs the shell completion files.
@@ -858,15 +857,15 @@ These are documented ONLY for development and completion sake.
 
 ### %__anda_develfiles
 Expands to: `%_anda_srpm_macros_dir/find-develinfo.sh %buildroot > anda-develfiles.list{:rpmspec}`
-Used as a macro within the [`%pkg_devel_files{:rpmspec}` macro](#pkg_devel_files).
+Used as a macro within [`%pkg_devel_files{:rpmspec}`](#pkg_devel_files).
 
 ### %__anda_libsfiles
 Expands to: `%_anda_srpm_macros_dir/find-libsinfo.sh %buildroot > anda-libsfiles.list{:rpmspec}`
-Used as a macro within the [`%pkg_libs_files{:rpmspec}` macro](#pkg_libs_files).
+Used as a macro within [`%pkg_libs_files{:rpmspec}`](#pkg_libs_files).
 
 ### %_anda_srpm_macros_dir
 Expands to: `/usr/libexec/anda-srpm-macros`
-Anda directory for scripts such as `find-develinfo.sh` used by `%__anda_develfiles{:rpmspec}`, which is used by the [`%pkg_devel_files{:rpmspec}` macro](#pkg_devel_files).
+Anda directory for scripts such as `find-develinfo.sh` used by `%__anda_develfiles{:rpmspec}`, which is jused by [`%pkg_devel_files{:rpmspec}`](#pkg_devel_files).
 
 ### %__anda_staticfiles
 Expands to: `%_anda_srpm_macros_dir/find-staticinfo.sh %buildroot > anda-staticfiles.list{:rpmspec}`
