@@ -31,11 +31,12 @@ These macros define certain system directories, and SHOULD be used in place of t
 
 ### %_appsdir
 Expands to: `%_datadir/applications{:rpmspec}` or `/usr/share/applications{:rpmspec}`
+
 This may seem like a directory to place the application itself into, but this directory is used for application's `.desktop` files.
 
 ### %elvish_completions_dir
 Expands to: `%_datadir/elvish/lib/completions{:rpmspec}`
-Used in the [`%pkg_completions`](#pkg_completion) macro, or manually when `%pkg_completions{:rpmspec}` cannot be used.
+Used in [`%pkg_completions`](#pkg_completion), or manually when cannot be used.
 
 ### %_hicolordir
 Expands to: `%_iconsdir/hicolor{:rpmspec}` or `/usr/share/icons/hicolor{:rpmspec}`
@@ -45,8 +46,8 @@ For example:
 
 ```bash
 # Lets say package 'foo' has a 16x16 and 64x64 .png
-install -Dm644 icons/16x16.png %{buildroot}%{_hicolordir}/16x16/apps/%{name}.svg
-install -Dm644 icons/64x64.png %{buildroot}%{_hicolordir}/64x64/apps/%{name}.svg
+install -Dm644 icons/16x16.png %{buildroot}%{_hicolordir}/16x16/apps/%{name}.png
+install -Dm644 icons/64x64.png %{buildroot}%{_hicolordir}/64x64/apps/%{name}.png
 ```
 
 If the file is an `.svg`, use the [`%_scalableiconsdir`](#_scalableiconsdir).
@@ -64,7 +65,7 @@ For example:
 install -Dm644 icons/%{name}.svg %{buildroot}%{_scalableiconsdir}/%{name}.svg
 ```
 
-If the file is a `.png`, use the [`%_hicolordir{:rpmspec}` macro](#_hicolordir) detailed above.
+If the file is a `.png`, use [`%_hicolordir{:rpmspec}`](#_hicolordir).
 
 ### %rpmbuilddir
 This macro exists because Terra supports EL distributions (Red Hat Enterprise Linux, Alma Linux, etc.) which currently have an RPM version from before the `%{builddir}{:rpmspec}` change to address issues [like this](https://github.com/rpm-software-management/rpm/issues/3151).
