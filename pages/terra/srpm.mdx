@@ -493,11 +493,11 @@ Available flags:
 <div style={{ float: "right", margin: "1em 0em 1em 0.5em" }}>
   | `%_target_cpu` | `%_electron_cpu` |
   |:--------------:|:----------------:|
-  | [%{x86_64}](https://github.com/rpm-software-management/rpm/blob/4a9b7b5908d8b463a836b51322242677677bd8b7/macros.in#L1126)    | `x64`            |
-  | [%{arm64}](https://github.com/rpm-software-management/rpm/blob/4a9b7b5908d8b463a836b51322242677677bd8b7/macros.in#L1138)     | `arm64`          |
-  | [%{ix86}](https://github.com/rpm-software-management/rpm/blob/4a9b7b5908d8b463a836b51322242677677bd8b7/macros.in#L1122)      | `ia32`           |
+  | `%{x86_64}`    | `x64`            |
+  | `%{arm64}`     | `arm64`          |
+  | `%{ix86}`      | `ia32`           |
   |`armv7l`, `armv7hl`, `armv7hnl`| `armv7l`         |
-  | [%{mips64}](https://github.com/rpm-software-management/rpm/blob/4a9b7b5908d8b463a836b51322242677677bd8b7/macros.in#L1146)    | `mips64el`       |
+  | `%{mips64}`    | `mips64el`       |
 </div>
 
 Rundown of what all `%electronmeta{:rpmspec}` does:
