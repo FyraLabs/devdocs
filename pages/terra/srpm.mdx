@@ -7,7 +7,7 @@ import { Callout } from "nextra/components";
 
 # SRPM Macros
 
-We provide custom SRPM macros to ease packaging and better integrate into our workflow. Please use these macros when possible when contributing to Terra.
+We provide custom SRPM macros to ease packaging and better integrate our workflow. Please use these macros when possible in Terra.
 
 These are provided in the `anda-srpm-macros` package. If you use them, make sure to add `anda-srpm-macros` as a `BuildRequires:{:rpmspec}` in the spec file.
 
@@ -276,8 +276,7 @@ Outputs a summary of the bundled licenses. Useful for determining what to put in
 Expands to: `%{__npm_license_checker} --summary`
 
 ### Notes for JavaScript Package Managers:
-1. The JavaScript package manager cache directories are placed in [`%{rpmbuilddir}{:rpmspec}`](#rpmbuilddir) because `$HOME{:bash}` can be different depending on if a build is in Mock or RPM Build.
-  - This is very important for consistent macro behavior as well as if the cache must be modified or deleted during build for any reason.
+1. The JavaScript package manager cache directories are placed in [`%{rpmbuilddir}{:rpmspec}`](#rpmbuilddir) because `$HOME{:bash}` can be different depending on if a build is in Mock or RPM Build. - This is very important for consistent macro behavior as well as if the cache must be modified or deleted during build for any reason.
 2. All macros calling the package managers also call NPM environment variables because most of them are using build dependencies from the NPM Registry, some even wrap NPM commands with their own. This ensures consistent NPM behavior.
 
 ### NPM Macros
@@ -315,7 +314,7 @@ Expands to: `/usr/bin/env %{npm_common_envvars} %{?with_vendored_nodejs:%{__nvm}
 #### %npm_audit
 Audit with NPM if package uses bundled Node dependencies. For use in the `%check{:rpmspec}` section.
 
-You SHOULD NOT need to fix vulnerabilities for Node modules that are __not bundled in the final package.__ This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
+Vulnerabilities for Node modules __not bundled in the final package__ SHOULD NOT be fixed. If a vulnerability is found *only* in build dependencies, you are fine to leave it as is.
 
 #### %npm_audit_fix
 Fix vulnerabilities found using `%npm_audit{:rpmspec}` Should be used in `%prep{:rpmspec}` section.
@@ -350,7 +349,9 @@ Expands to: `/usr/bin/env %{bun_common_envvars} /usr/bin/bunx`
 #### %bun_audit
 Audit with Bun if package uses bundled Node dependencies. For use in the `%check{:rpmspec}` section.
 
-**NOTE:** Bun audit is a currently a wrapper for NPM audit but lacks the `fix` option, in order to fix vulnerabilities you need to use `%npm_audit_fix{:rpmspec}`.
+<Callout>
+  `bun audit` is currently just a wrapper for NPM audit but lacks the `fix` option; use `%npm_audit_fix{:rpmspec}` to fix vulnerabilities.
+</Callout>
 
 You SHOULD NOT need to fix vulnerabilities for Node modules that are __not bundled in the final package__. This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
 
@@ -432,7 +433,9 @@ Remotely execute a Node module with Yarn DLX.
 
 Expands to: `/usr/bin/env %{yarn_common_envvars} /usr/bin/yarn dlx{:rpmspec}`
 
-**NOTE:** REQUIRES `yarnpkg-berry` instead of `yarnpkg` as a build dependency.
+<Callout>
+  `yarnpkg-berry` is REQUIRED as a build dependency instead of `yarnpkg`.
+</Callout>
 
 #### %yarn_audit
 Audit Yarn if the package uses bundled Node dependencies. For use in the `%check{:rpmspec}` section.
@@ -476,37 +479,48 @@ These macros assist with the general packaging of applications that use [Electro
 ### %electronmeta
 Set up all basic requirements including build macros for building an Electron app.
 
-**NOTE:** `This macro does NOT install the JavaScript package managers used for builds (e.g., `nodejs-npm`, `bun`, `pnpm`, `yarnpkg`, `yarnpkg-berry`). These must still be specified in the `BuildRequires:{:rpmspec}` tag manually.
+<Callout>
+  This does NOT install the JavaScript package managers used for builds (e.g., `nodejs-npm`, `bun`, `pnpm`, `yarnpkg`, `yarnpkg-berry`).
+  Specify these `BuildRequires:{:rpmspec}` manually.
+</Callout>
 
 Available flags:
-- `-a{:rpmspec}` will pull in additional build dependencies often needed particularly when building with NPM.
-  - Currently, this includes `nodejs-devel`, `nodejs-packaging`, and `typescript`.
+- `-a{:rpmspec}` will pull in additional build dependencies often needed particularly when building with NPM.\
+  Currently, this includes `nodejs-devel`, `nodejs-packaging`, and `typescript`.
+
+<div style={{ float: "right", margin: "1em 0em 1em 0.5em" }}>
+  | `%_target_cpu` | `%_electron_cpu` |
+  |----------------|------------------|
+  | `x86_64`       | `x64`            |
+  | `aarch64`      | `arm64`          |
+  | `x86`          | `ia32`           |
+  | `armv7l`       | `armv7l`         |
+  | `mips64`       | `mips64el`       |
+</div>
 
 Rundown of what all `%electronmeta{:rpmspec}` does:
-- Converts `%{_target_cpu}{:rpmspec}` (the RPM build architecture) into `%{_electron_cpu}{:rpmspec}`, the Electron format for architectures it is compatible with.
-  - Defines `%{_electron_cpu}{:rpmspec}` for x86_64 architectures as `x64`.
-  - Defines `%{_electron_cpu}{:rpmspec}` for aarch64 architectures as `arm64`.
-  - Defines `%{_electron_cpu}{:rpmspec}` for x86 architectures as `ia32`.
-  - Defines `%{_electron_cpu}{:rpmspec}` for armv7l architectures as `armv7l`.
-  - Defines `%{_electron_cpu}{:rpmspec}` for mips64 architectures as `mips64el`.
-    - These are defined because Electron names the build files and directories after the architecture.
-    - The macros used to build Electron apps (`%npm_build{:rpmspec}`, `%bun_build{:rpmspec}`, `%pnpm_build{:rpmspec}`, and `%yarn_build{:rpmspec}`) all require this to be set.
-    - In some cases, these architectures are used in the source tarballs for Electron projects.
-    - This can also be used to help work with the files if you need to do anything manually.
+- Converts `%_target_cpu{:rpmspec}` (the RPM build architecture) into `%_electron_cpu{:rpmspec}`, the Electron format for compatible architectures.
+  - These are defined because Electron names the build files and directories after the architecture.
+  - The macros used to build Electron apps (`%npm_build{:rpmspec}`, `%bun_build{:rpmspec}`, `%pnpm_build{:rpmspec}`, and `%yarn_build{:rpmspec}`) all require this to be set.
+  - In some cases, these architectures are used in the source tarballs for Electron projects.
+  - This can also be used to help work with the files if you need to do anything manually.
 - Defines `%__provides_excludes{:rpmspec}` to make sure Electron apps are not flagged as providers of their bundled dependencies, such as FFmpeg libraries.
 - Defines `%__requires_excludes{:rpmspec}` based on architecture to prevent Electron projects' cross-platform builds from causing false dependency positives from RPM.
 - Sets `%debug_package{:rpmspec}` to `%{nil}{:rpmspec}` to prevent stripping of bundled libraries and/or build failures due to not enough data to strip.
 - Sets the build and runtime dependencies.
 - Sets the `ExclusiveArch:{:rpmspec}` tag to only the architectures Electron supports.
 - Defines a `%bcond{:rpmspec}` for whether or not Electron is bundled for other macros.
-- Defines the bundled dependencies as bundled. **NOTE:** This only defines Electron's bundled dependencies, not any Node modules the app may also bundle.
+- Defines the bundled dependencies as bundled.
+  <Callout type="warning">
+    This only defines Electron's bundled dependencies, not any Node modules the app may also bundle.
+  </Callout>
 
 This ensures packagers do not need to manually set these for every Electron app's spec, hopefully eliminating depsolver problems and helping reduce common build issues.
 
 Like other meta macros (e.g., `%forgemeta{:rpmspec}` from Fedora), you MUST be mindful of where in the spec this macro should be placed.
 - MUST always come after `Name:{:rpmspec}` is defined and before the `%prep{:rpmspec}` section.
+- SHOULD come before the `License:{:rpmspec}` field if using the [`%{electron_license}{:rpmspec}` macro](#electron_license).
 - SHOULD come before the `License:{:rpmspec}` field if using [`%{electron_license}{:rpmspec}`](#electron_license).
-- MAY need to come before the sources if an upstream provides sources named after the Electron architecture.
 - MAY be used under preambles but before `%prep{:rpmspec}` if not using `%{electron_license}{:rpmspec}`.
 
 The safest location is under `Name:{:rpmspec}` and above other preambles. When in doubt, place the macro here.
