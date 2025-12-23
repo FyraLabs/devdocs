@@ -373,7 +373,7 @@ Expands to: `%{npm_common_envvars} PNPM_HOME=%{_pnpm_home}{:rpmspec}`
 
 #### %__pnpm
 
-Expands to: `/usr/bin/env %{pnpm_common_envvars} %{?with_vendored_pnpm:%{rpmbuilddir}/pnpm/pnpm}%{!?with_vendored_pnpm:/usr/bin/pnpm}{:rpmspec}`
+Expands to: `/usr/bin/env %{pnpm_common_envvars} %{?with_vendored_pnpm:%{_pnpm_home}/pnpm}%{!?with_vendored_pnpm:/usr/bin/pnpm}{:rpmspec}`
 SHOULD be used in place of calling `pnpm` itself.
 
 #### %__pnpx
