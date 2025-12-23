@@ -53,7 +53,7 @@ Used for [Bun macros](#bun-macros).
 ### %elvish_completions_dir
 Expands to: `%_datadir/elvish/lib/completions{:rpmspec}`
 
-Used in [`%pkg_completions`](#pkg_completion), or manually when cannot be used.
+Used in [`%pkg_completions`](#pkg_completion), or manually when `%pkg_completions` cannot be used.
 
 ### %_hicolordir
 Expands to: `%_iconsdir/hicolor{:rpmspec}` or `/usr/share/icons/hicolor{:rpmspec}`
@@ -69,6 +69,11 @@ install -Dm644 icons/64x64.png %{buildroot}%{_hicolordir}/64x64/apps/%{name}.png
 ```
 
 If the file is an `.svg`, use the [`%_scalableiconsdir`](#_scalableiconsdir).
+
+### %nushell_completions_dir
+Expands to: `%_datadir/nushell/vendor/autoload{:rpmspec}`
+
+Used in [`%pkg_completions`](#pkg_completion), or manually when `%pkg_completions` cannot be used.
 
 ### %_pkgconfigdir
 Expands to: `%{_libdir}/pkgconfig{:rpmspec}`
@@ -734,6 +739,7 @@ Use the below flags according to the shell completion files your package uses:
 -b: bash
 -e: elvish
 -f: fish
+-N: nushell
 -z: zsh
 ```
 
@@ -746,7 +752,7 @@ Can also pass `cmd1`, etc. as the commands the completion files are for.
 
 Example using all flags:
 ```rpmspec
-%pkg_completion -Bbefz -n pkgname cmd1 cmd2 ...
+%pkg_completion -BbefNz -n pkgname cmd1 cmd2 ...
 ```
 
 A good example spec that uses this macro is [yadm](https://github.com/terrapkg/packages/blob/d861164790b3d77f5ee094d303de2dfc3299ef8b/anda/devs/yadm/yadm.spec#L22).
