@@ -501,9 +501,9 @@ Available flags:
 </div>
 
 Rundown of what all `%electronmeta{:rpmspec}` does:
-- Converts `%_target_cpu{:rpmspec}` (the RPM build architecture) into `%_electron_cpu{:rpmspec}`, the Electron format for compatible architectures.
+- Converts `%_target_cpu{:rpmspec}` (the RPM build architecture) into `%_electron_cpu{:rpmspec}`, the Electron format for compatible architectures. See the table to the right for conversions.
   - These are defined because Electron names the build files and directories after the architecture.
-  - The macros used to build Electron apps (`%npm_build{:rpmspec}`, `%bun_build{:rpmspec}`, `%pnpm_build{:rpmspec}`, and `%yarn_build{:rpmspec}`) all require this to be set.
+  - The [macros used to build Electron apps](#electron-build-macros) all require this to be set.
   - In some cases, these architectures are used in the source tarballs for Electron projects.
   - This can also be used to help work with the files if you need to do anything manually.
 - Defines `%__provides_excludes{:rpmspec}` to make sure Electron apps are not flagged as providers of their bundled dependencies, such as FFmpeg libraries.
