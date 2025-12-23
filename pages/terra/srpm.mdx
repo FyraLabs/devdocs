@@ -224,6 +224,7 @@ You MUST use [`%fetch_node_tests{:rpmspec}` macro](#fetch_node_tests) first if u
 
 #### %__npm_license_checker
 Expands to: `/usr/bin/license-checker`
+
 Runs the NPM `license-checker` command, documented [here](https://www.npmjs.com/package/license-checker-rseidelsohn).
 
 Example output:
@@ -241,6 +242,7 @@ Example output:
 
 #### %npm_license
 Expands to: `/usr/bin/license-checker --limitAttributes licenses`
+
 This is similar to [%__npm_license_checker](#__npm_license_checker), but limits the output to only the license.
 
 Available flags:
