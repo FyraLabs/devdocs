@@ -51,10 +51,12 @@ Used for [Bun macros](#bun-macros).
 
 ### %elvish_completions_dir
 Expands to: `%_datadir/elvish/lib/completions{:rpmspec}`
+
 Used in the [`%pkg_completions{:rpmspec}` macro](#pkg_completion) macro, or manually when `%pkg_completions{:rpmspec}` cannot be used.
 
 ### %_hicolordir
 Expands to: `%_iconsdir/hicolor{:rpmspec}` or `/usr/share/icons/hicolor{:rpmspec}`
+
 The directory that SHOULD be used when installing application `.png` files. Note that you then MUST install the (typically app icon) file to the `apps` folder within the fixed-size directory in `%_hicolordir{:rpmspec}`.
 
 For example:
@@ -69,6 +71,7 @@ If the file is an `.svg`, use the [`%_scalableiconsdir{:rpmspec}`](#_scalableico
 
 ### %_pkgconfigdir
 Expands to: `%{_libdir}/pkgconfig{:rpmspec}`
+
 Used in the `%files{:rpmspec}` section.
 
 ### %_npm_cache_dir
