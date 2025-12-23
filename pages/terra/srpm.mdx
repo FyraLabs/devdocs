@@ -317,7 +317,7 @@ Audit with NPM if package uses bundled Node dependencies. For use in the `%check
 Vulnerabilities for Node modules __not bundled in the final package__ SHOULD NOT be fixed. If a vulnerability is found *only* in build dependencies, you are fine to leave it as is.
 
 #### %npm_audit_fix
-Fix vulnerabilities found using `%npm_audit{:rpmspec}` Should be used in `%prep{:rpmspec}` section.
+Fix vulnerabilities found using `%npm_audit{:rpmspec}`. Should be used in `%prep{:rpmspec}` section.
 
 Installed packages with fixed dependencies SHOULD be tested first to make sure the applied fix did not cause any issues.
 
