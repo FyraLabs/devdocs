@@ -51,7 +51,7 @@ Used for [Bun macros](#bun-macros).
 
 ### %elvish_completions_dir
 Expands to: `%_datadir/elvish/lib/completions{:rpmspec}`
-Used in the [`%pkg_completions{:rpmspec}`](#pkg_completion) macro, or manually when `%pkg_completions{:rpmspec}` cannot be used.
+Used in the [`%pkg_completions{:rpmspec}` macro](#pkg_completion) macro, or manually when `%pkg_completions{:rpmspec}` cannot be used.
 
 ### %_hicolordir
 Expands to: `%_iconsdir/hicolor{:rpmspec}` or `/usr/share/icons/hicolor{:rpmspec}`
@@ -220,11 +220,11 @@ Available flags:
 - `-R{:rpmspec}`: Direct duplicate of an `-R{:rpmspec}` flag. Project dependent.
 - `-v{:rpmspec}`: Direct duplicate of a `-v{:rpmspec}` flag. Project dependent.
 
-You MUST use [`%fetch_node_tests{:rpmspec}`](#fetch_node_tests) first if using this.
+You MUST use [`%fetch_node_tests{:rpmspec}` macro](#fetch_node_tests) first if using this.
 
 #### %__npm_license_checker
 Expands to: `/usr/bin/license-checker`
-Runs the NPM [`license-checker`](https://www.npmjs.com/package/license-checker-rseidelsohn) command.
+Runs the NPM `license-checker` command, documented [here](https://www.npmjs.com/package/license-checker-rseidelsohn).
 
 Example output:
 
@@ -241,7 +241,7 @@ Example output:
 
 #### %npm_license
 Expands to: `/usr/bin/license-checker --limitAttributes licenses`
-This is similar to [`%__npm_license_checker{:rpmspec}`](#__npm_license_checker), but limits the output to only the license.
+This is similar to [%__npm_license_checker](#__npm_license_checker), but limits the output to only the license.
 
 Available flags:
 - `-o{:rpmspec}` MAY be used as a shorthand for `--out{:rpmspec}`.
@@ -276,7 +276,7 @@ Outputs a summary of the bundled licenses. Useful for determining what to put in
 Expands to: `%{__npm_license_checker} --summary`
 
 ### Notes for JavaScript Package Managers:
-1. The JavaScript package manager cache directories are placed in [`%{rpmbuilddir}{:rpmspec}`](#rpmbuilddir) because `$HOME{:bash}` can be different depending on if a build is in Mock or RPM Build. - This is very important for consistent macro behavior as well as if the cache must be modified or deleted during build for any reason.
+1. The JavaScript package manager cache directories are placed in [the `%{rpmbuilddir}{:rpmspec}`](#rpmbuilddir) because `$HOME{:bash}` can be different depending on if a build is in Mock or RPM Build. - This is very important for consistent macro behavior as well as if the cache must be modified or deleted during build for any reason.
 2. All macros calling the package managers also call NPM environment variables because most of them are using build dependencies from the NPM Registry, some even wrap NPM commands with their own. This ensures consistent NPM behavior.
 
 ### NPM Macros
@@ -471,7 +471,7 @@ NPMFLAGS="${NPMFLAGS:-%{npm_buildflags} }" ; export NPMFLAGS
 
 This ensures the environment variables are explicitly exported and therefor are more likely to be picked up by all shell processes. It also creates an environment variable called `$NPMFLAGS{:bash}` which can be passed to NPM in lieu of the macro `%{npm_buildflags}{:rpmspec}` to force our config, if necessary.
 
-This should only be needed in the event you are using [`%__npx`](#__npx), [`%__pnpx`](#__pnpx), [`%__bunx`](#__bunx), or [`%__yarn_dlx`](#__yarn_dlx).
+This should only be needed in the event you are using [%__npx](#__npx), [%__pnpx](#__pnpx), [%__bunx](#__bunx), or [%__yarn_dlx](#__yarn_dlx).
 
 ## Electron
 These macros assist with the general packaging of applications that use [Electron](https://www.electronjs.org).
@@ -663,38 +663,38 @@ This also adds the configuration for enabling mold automatically if found in the
 Builds a Nim package.
 Requires an argument to `src/pkgname`.
 
-Note that this does not invoke `nimble`. All dependencies SHOULD be ready before `%build`.
+Note that this does not invoke `nimble`. All dependencies SHOULD be ready before `%build{:rpmspec}`.
 
 ### %nim_tflags
-C compiler flags used in `%nim_c`.
+C compiler flags used in `%nim_c{:rpmspec}`.
 
 ### %nim_lflags
-Linker flags used in `%nim_c`.
+Linker flags used in `%nim_c{:rpmspec}`.
 
 ## Rust
 These macros assist with building Rust projects.
 
 ### %cargo_prep_online
-Enables internet access for `%cargo_prep`. Replaces `%cargo_prep` in `%prep`.
+Enables internet access for `%cargo_prep{:rpmspec}`. Replaces `%cargo_prep{:rpmspec}` in `%prep{:rpmspec}`.
 
 ### %cargo_license_online
-Enables internet access for `%cargo_license`.
-Replaces `%cargo_license` in `%build`.
+Enables internet access for `%cargo_license{:rpmspec}`.
+Replaces `%cargo_license{:rpmspec}` in `%build{:rpmspec}`.
 
 ### %cargo_license_summary_online
-Enables internet access for `%cargo_license_summary`.
-Replaces `%cargo_license_summary` in `%build`.
+Enables internet access for `%cargo_license_summary{:rpmspec}`.
+Replaces `%cargo_license_summary{:rpmspec}` in `%build{:rpmspec}`.
 
 ### %cargo_vendor_manifest_online
-Enables internet access for `%cargo_vendor_manifest_online`.
-Replaces `%cargo_vendor_manifest` in `%build`.
+Enables internet access for `%cargo_vendor_manifest_online{:rpmspec}`.
+Replaces `%cargo_vendor_manifest{:rpmspec}` in `%build{:rpmspec}`.
 
 ### %crate_install_bin
 Used to install crates that build as single binary.
-Can be used instead of `%cargo_install` when [this](https://github.com/terrapkg/packages/issues/1169) is applicable.
+Can be used instead of `%cargo_install{:rpmspec}` when [this](https://github.com/terrapkg/packages/issues/1169) is applicable.
 
 ### %rustup_nightly
-Used in `%prep` for nightly `rustc`/`cargo` from `rustup`.
+Used in the `%prep{:rpmspec}` section for nightly `rustc`/`cargo` from `rustup`.
 
 ### %cargo_prep_online_sccache
 Configures cargo sccache. Generally should not be needed.
@@ -710,12 +710,12 @@ Sets up environment variables for `sccache`.
 
 ## Subpackages
 These macros assist with packages that require certain subpackage types.
-For example, some packages will build application and library files. Using `%pkg_devel_files` will greatly help you in making the library files (`-devel`) subpackage.
+For example, some packages will build application and library files. Using `%pkg_devel_files{:rpmspec}` will greatly help you in making the library files (`-devel`) subpackage.
 More information on subpackages can be found on the [Fedora Packaging Guidelines](https://docs.fedoraproject.org/en-US/packaging-guidelines/#_mixed_use_packages).
 
 ### %files_libs
 This macro creates library subpackages and installs the library files.
-This is only for use in the [`%pkg_devel_files`](#pkg_devel_files) macro.
+This is only for use in the [`%pkg_devel_files{:rpmspec}` macro](#pkg_devel_files).
 
 ### %pkg_completion
 This macro creates shell completion subpackages and installs the shell completion files.
@@ -900,11 +900,11 @@ Used as a macro within [`%pkg_libs_files{:rpmspec}`](#pkg_libs_files).
 
 ### %_anda_srpm_macros_dir
 Expands to: `/usr/libexec/anda-srpm-macros`
-Anda directory for scripts such as `find-develinfo.sh` used by `%__anda_develfiles{:rpmspec}`, which is jused by [`%pkg_devel_files{:rpmspec}`](#pkg_devel_files).
+Anda directory for scripts such as `find-develinfo.sh` used by `%__anda_develfiles{:rpmspec}`, which is used in the [`%pkg_devel_files{:rpmspec}` macro](#pkg_devel_files).
 
 ### %__anda_staticfiles
 Expands to: `%_anda_srpm_macros_dir/find-staticinfo.sh %buildroot > anda-staticfiles.list{:rpmspec}`
-Creates anda-staticfiles.list file in `%{buildroot}{:rpmspec}` to be used by [`%pkg_static_files{:rpmspec}`](#pkg_static_files).
+Creates anda-staticfiles.list file in `%{buildroot}{:rpmspec}` to be used in the [`%pkg_static_files{:rpmspec}` macro](#pkg_static_files).
 
 ### %is_electron_bundled
 Expands to `%bcond bundled_electron %["%{name}" != "electron"]{:rpmspec}`
