@@ -134,6 +134,177 @@ Expands to: `%{rpmbuilddir}/.yarn{:rpmspec}`
 
 Used for [Yarn macros](#yarn-macros).
 
+## Electron
+These macros assist with the general packaging of applications that use [Electron](https://www.electronjs.org).
+
+### %electronmeta
+Set up all basic requirements including build macros for building an Electron app.
+
+<Callout>
+  This does NOT install the JavaScript package managers used for builds (e.g., `nodejs-npm`, `bun`, `pnpm`, `yarnpkg`, `yarnpkg-berry`).
+  Specify these `BuildRequires:{:rpmspec}` manually.
+</Callout>
+
+Available flags:
+- `-a{:rpmspec}` will pull in additional build dependencies often needed particularly when building with NPM.\
+  Currently, this includes `nodejs-devel`, `nodejs-packaging`, and `typescript`.
+
+Rundown of what all `%electronmeta{:rpmspec}` does:
+- Converts `%_target_cpu{:rpmspec}` (the RPM build architecture) into `%_electron_cpu{:rpmspec}`, the Electron format for compatible architectures. See the table below for conversions. See also: [%electron_arches](#electron_arches)
+  - These are defined because Electron names the build files and directories after the architecture.
+  - The [macros used to build Electron apps](#electron-build-macros) all require this to be set.
+  - In some cases, these architectures are used in the source tarballs for Electron projects.
+  - This can also be used to help work with the files if you need to do anything manually.
+- Defines `%__provides_excludes{:rpmspec}` to make sure Electron apps are not flagged as providers of their bundled dependencies, such as FFmpeg libraries.
+- Defines `%__requires_excludes{:rpmspec}` based on architecture to prevent Electron projects' cross-platform builds from causing false dependency positives from RPM.
+- Sets `%debug_package{:rpmspec}` to `%{nil}{:rpmspec}` to prevent stripping of bundled libraries and/or build failures due to not enough data to strip.
+- Sets the build and runtime dependencies.
+- Sets the `ExclusiveArch:{:rpmspec}` tag to only the architectures Electron supports.
+- Defines a `%bcond{:rpmspec}` for whether or not Electron is bundled for other macros.
+- Defines the bundled dependencies as bundled.
+  <Callout type="warning">
+    This only defines Electron's bundled dependencies, not any Node modules the app may also bundle.
+  </Callout>
+
+<div style={{ margin: "1em 0em 1em 0.5em" }}>
+  |                             `%_target_cpu`                                | `%_electron_cpu` |
+  |:-------------------------------------------------------------------------:|:----------------:|
+  |     `x86_64`, `x86_64_v2`, `x86_64_v3`, `x86_64_v4`, `amd64`, `em64t`     | `x64`            |
+  |                         `aarch64`                                         | `arm64`          |
+  | `i386`, `i486`, `i586`, `i686`, `pentium3`, `pentium4`, `athlon`, `geode` | `ia32`           |
+  |             `armv7l`, `armv7hl`, `armv7hnl`                               | `armv7l`         |
+  |         `mips64`, `mips64el`, `mips64r6`, `mips64r6el`                    | `mips64el`       |
+</div>
+
+This ensures packagers do not need to manually set these for every Electron app's spec, hopefully eliminating depsolver problems and helping reduce common build issues.
+
+Like other meta macros (e.g., `%forgemeta{:rpmspec}` from Fedora), you MUST be mindful of where in the spec this macro should be placed.
+- MUST always come after `Name:{:rpmspec}` is defined and before the `%prep{:rpmspec}` section.
+- SHOULD come before the `License:{:rpmspec}` field if using [`%{electron_license}`](#electron_license).
+- SHOULD come before the `License:{:rpmspec}` field if using [`%{electron_license}{:rpmspec}`](#electron_license).
+- MAY be used under preambles but before `%prep{:rpmspec}` if not using `%{electron_license}{:rpmspec}`.
+
+The safest location is under `Name:{:rpmspec}` and above other preambles. When in doubt, place the macro here.
+
+Example usage:
+```rpmspec
+Name:    electron
+%electronmeta
+Version: 39.2.7
+```
+
+### %electron_arches
+The architectures Electron supports. Automatically set as `ExclusiveArch` when using `%electronmeta{:rpmspec}`.
+
+As written, the macro expands to:
+- `%{x86_64} %{ix86} %{arm64} armv7l armv7hl armv7hnl %{mips64}{:rpmspec}`
+
+Which expands fully to:
+- `x86_64 x86_64_v2 x86_64_v3 x86_64_v4 amd64 em64t i386 i486 i586 i686 pentium3 pentium4 athlon geode aarch64 armv7l armv7hl armv7hnl mips64 mips64el mips64r6 mips64r6el`
+
+Which simply means Electron supports [x86_64](https://en.wikipedia.org/wiki/X86-64), [32-bit x86 (AKA: IA-32)](https://en.wikipedia.org/wiki/IA-32), [AArch64/ARM64](https://en.wikipedia.org/wiki/AArch64), [ARMv7 (AKA: `armhf`)](https://en.wikipedia.org/wiki/ARM_architecture_family#Architecture_versions), and [MIPS64](https://en.wikipedia.org/wiki/MIPS_architecture).
+
+However, at this time, Terra only supports x86_64, AArch64, and 32-bit x86.
+
+### %electron_license
+The license for bundled Electron.
+NOT set by default in `%electronmeta{:rpmspec}` because you cannot set the license field twice.
+MAY be used in combination with manually adding the other relevant licenses (if this is done, a proper license tag would be `License: XXX-x.x AND %{electron_license}{:rpmspec}`).
+
+[`%electronmeta`](#electronmeta) SHOULD be used BEFORE the `License:{:rpmspec}` preamble but AFTER `Name:{:rpmspec}` if using this macro.
+
+### Electron Build Macros
+These are macros used to build Electron apps using JavaScript package managers and builders such as [Electron Builder](https://www.electron.build), [Electron Forge](https://www.electronforge.io), and [Electron Vite](https://electron-vite.github.io).
+
+Capital letter flags generally denote options that SHOULD be used with caution or only if necessary for a build.
+
+For more information on each package manager, see [NPM Macros](#npm-macros), [Bun Macros](#bun-macros), [PNPM Macros](#pnpm-macros), and [Yarn Macros](#yarn-macros).
+
+NOTE: All of the following macros set the environment variable `$BUILDER` to either `electron-builder` or `electron-forge` depending on which the app is built with. SHOULD NOT need to be used manually, but MAY be if needed for any reason.
+
+#### %npm_build
+SHOULD be used for building Electron projects with NPM. Has a great deal of flags to work around NPM specific limitations.
+
+Available flags:
+- `-c{:rpmspec}`: Run `%{__npm} ci{:rpmspec}` instead of `%{__npm} install{:rpmspec}`. May be necessary for projects with stricter build dependencies.
+- `-e{:rpmspec}`: Execute commands and modules within the NPM build environment. Some commands may need `--` in between the command itself and the following arguments.
+- `-r{:rpmspec}`: Executes `%{__npm} run{:rpmspec}` for scripts in the `package.json`. Expects an argument.
+- `-E{:rpmspec}`: Execute Electron Builder/Electron Forge. Will NOT work for projects that require build steps which use Node.js or executing JavaScript scripts directly.
+- `-V{:rpmspec}`: Execute Electron Vite. Same limitation as with `-E{:rpmspec}`.
+- `-M{:rpmspec}`: Mode to use in Electron Vite builds. Accepts `production`, `development`, and `staging`. Note that this differs from `$NODE_ENV{:bash}` so you can run any combination of Vite environment modes and Node.js environment modes.
+
+#### %bun_build
+SHOULD be used to build Electron projects with [Bun](https://bun.sh/).
+
+Available flags:
+- `-c{:rpmspec}`: Run `%{__bun} ci{:rpmspec}` instead of `%{__bun} install{:rpmspec}`. Analogous to `%{__bun} install --frozen-lockfile{:rpmspec}`. May be necessary for projects with stricter build dependencies.
+- `-e{:rpmspec}`: Execute commands and modules within the Bun build environment.
+- `-v{:rpmspec}`: Run [Electron Vite](https://electron-vite.org/) build steps. Not needed for all Electron apps.
+- `-N{:rpmspec}`: Runs `--no-save{:rpmspec}` on the `%{__bun} install{:rpmspec}` step. This prevents updating or (re)creating a lockfile to prevent freezing.
+- `-r <argument>{:rpmspec}`: Executes `%{__bun} run{:rpmspec}` for scripts in the `package.json`. Expects an argument in place of `<argument>`.
+- `-F{:rpmspec}`: Runs `--force{:rpmspec}` on the `%{__bun} install{:rpmspec}` step. This will assure all dependencies are the latest versions from the registry, reinstalling them if necessary.
+- `-R{:rpmspec}`: Remove the bun.lock file. SHOULD only be used if the lockfile is causing build issues.
+
+#### %pnpm_build
+SHOULD be used for building Electron apps with PNPM.
+
+Available flags:
+- `-e{:rpmspec}`: Execute Node modules or installed programs in the PNPM build environment.
+- `-r{:rpmspec}`: Executes `%{__pnpm} run{:rpmspec}` for scripts in the `package.json{:rpmspec}`. Expects an argument. Not recommended for Electron Builder/Electron Forge or Electron Vite commands.
+- `-v{:rpmspec}`: Run Electron Vite build steps. Not needed for all Electron apps.
+- `-F{:rpmspec}`: Executes the `%{__pnpm} install{:rpmspec}` step with `--frozen-lockfile{:rpmspec}`. May be necessary for projects expecting very strict build dependencies, but can also override projects that do not enforce a lock.
+- `-N{:rpmspec}`: Executes the `%{__pnpm} install{:rpmspec}` step with `--no-frozen-lockfile{:rpmspec}`. Overrides projects that try to enforce a lockfile.
+- `-R{:rpmspec}`: Makes `%{__pnpm} exec{:rpmspec}` run on every project in the worspace recursively. SHOULD be used only if necessary and with caution.
+
+#### %yarn_build
+SHOULD be used to build Electron apps with Yarn or Yarn Berry.
+
+Available flags:
+- `-e{:rpmspec}`: Execute Node modules or installed programs in the Yarn build environment.
+- `-r{:rpmspec}`: Executes `%{__yarn} run{:rpmspec}` for scripts in the `package.json`. Expects an argument. Not recommended for Electron Builder, Electron Forge, or Electron Vite commands.
+- `-v{:rpmspec}`: Run Electron Vite build steps. Not needed for all Electron apps.
+- `-F{:rpmspec}`: Executes the `%{__yarn} install{:rpmspec}` step with `--frozen-lockfile{:rpmspec}`. May be necessary for projects expecting very strict build dependencies, but can also override projects that do not enforce a lock.
+- `-N{:rpmspec}`: Executes the `%{__yarn} install{:rpmspec}` step with `--no-lockfile{:rpmspec}`. Makes Yarn not update the lockfile on depedency installation.
+
+### %electron_install
+Install files of apps built using Electron Builder or Electron Forge. MUST be used after an appropriate [build macro](#electron-build-macros).
+
+Capital letter flags denote use with [desktop file](https://specifications.freedesktop.org/desktop-entry/latest) installation.
+
+By default, the install steps are:
+1. Make the install directory.
+  - This will be in the `%{_libdir}{:rpmspec}` (/usr/lib on 32-bit architectures and /usr/lib64 on 64-bit ones).
+  - This is done because programs with bundled dependencies (Electron, Node modules, and more) MUST have these dependencies kept together.
+2. Install the app's files.
+3. Symlink the app's binary to the bin directory.
+4. Install the app's icons.
+
+Available flags:
+- `-b{:rpmspec}` MUST be used when the app's executable differs from the name of the package.
+- `-d{:rpmspec}` MAY be used to install the app under a different directory than the name of the package.
+- `-i{:rpmspec}` MUST be used when the app's desktop file points to an icon name different from the name of the package.
+- `-l{:rpmspec}` MAY be used to fetch all licenses including the bundled ones and put them in a directory called `bundled_licenses`. You SHOULD then package them in the license directory using `%license bundled_licenses/*` in the `%files` section.
+  - If using this you MUST make sure there are no duplicate license names. For example, if the main application's license file is `LICENSE`, but one of its bundled license files is *also* `LICENSE`, you SHOULD rename the bundled license to an appropriate name indicating it is the license for a bundled dependency.
+  - An appropriate name would be something like `LICENSE.bundleddepname` or `bundleddepname.LICENSE`. Usually, the former is used, but you MAY use either format.
+  - This MUST be done because if there are two different files with the same name, the `cp` command used in the `%license` macro for the files section will either fail or overwrite the main software's license, which is not admissible for redistribution.
+- `-s{:rpmspec}` MAY be used to choose the name of the symlink.
+- `-S{:rpmspec}` MAY be used to create an additional symlink with a different name. Useful when an app has two interchangeable common names.
+- `-D{:rpmspec}` MAY be used to handle automatic installation of the .desktop file. This ONLY works if Electron Builder builds an AppImage, and should not be used if the source contains a desktop file.
+- `-E{:rpmspec}` MAY be used to set the "--enable-features" flag in the desktop file. Features to enable MUST be comma separated without spaces.
+- `-O{:rpmspec}` MAY be used to set the [Ozone platform](https://chromium.googlesource.com/chromium/src/+/lkgr/docs/ozone_overview.md) the Electron app will run on. If no arguments are supplied, it will fall back to `--ozone-platform-hint=auto`. Accepted arguments are `-Ox11` and `-Owayland`
+- `-U{:rpmspec}` MAY be used to set either `%u` or `%U` in the desktop file. If using this you MUST NOT use `u` as a macro name for any reason.
+  - `%u{:rpmspec}` means that a desktop file can only read one URL at a time, `%U{:rpmspec}` means that it can read multiple at a time. These are what are known as [exec keys](https://specifications.freedesktop.org/desktop-entry/latest/exec-variables.html).
+  - Defer to what the desktop file originally contained if you are unsure which to use.
+
+Example usage:
+- The command `%electron_install -b app -i app -s app -S alsoapp -D -Owayland -U %u -E WaylandWindowDecorations` would install the program with:
+  - Icons named `app.png`.
+  - A symlink named `app`.
+  - A second symlink called `alsoapp`.
+  - A desktop file with the `Exec` line reading `Exec=/usr/lib(64)/pkgname/app --enable-features=WaylandWindowDecorations --ozone-platform=wayland %u`.
+
+NOTE: Like the Electron build macros, this macro sets the environment variable `$BUILDER` to either `electron-builder` or `electron-forge` depending on which the app is built with. SHOULD NOT need to be used manually, but MAY be if needed for any reason.
+
 ## Go
 These macros assist with building Go projects.
 
