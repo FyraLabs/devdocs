@@ -491,7 +491,7 @@ Available flags:
   Currently, this includes `nodejs-devel`, `nodejs-packaging`, and `typescript`.
 
 Rundown of what all `%electronmeta{:rpmspec}` does:
-- Converts `%_target_cpu{:rpmspec}` (the RPM build architecture) into `%_electron_cpu{:rpmspec}`, the Electron format for compatible architectures. See the table below for conversions.
+- Converts `%_target_cpu{:rpmspec}` (the RPM build architecture) into `%_electron_cpu{:rpmspec}`, the Electron format for compatible architectures. See the table below for conversions. See also: [%electron_arches](#electron_arches)
   - These are defined because Electron names the build files and directories after the architecture.
   - The [macros used to build Electron apps](#electron-build-macros) all require this to be set.
   - In some cases, these architectures are used in the source tarballs for Electron projects.
