@@ -508,13 +508,13 @@ Rundown of what all `%electronmeta{:rpmspec}` does:
   </Callout>
 
 <div style={{ margin: "1em 0em 1em 0.5em" }}>
-  |                        `%_target_cpu`                                    | `%_electron_cpu` |
-  |:------------------------------------------------------------------------:|:----------------:|
-  |    `x86_64`, `x86_64_v2`, `x86_64_v3`, `x86_64_v4`, `amd64`, `em64t`     | `x64`            |
-  |                         `aarch64`                                        | `arm64`          |
-  | `i386`, `i486`, `i586`, `i686`, `pentium3`, `pentium4`, `athlon`, geode` | `ia32`           |
-  |             `armv7l`, `armv7hl`, `armv7hnl`                              | `armv7l`         |
-  |         `mips64`, `mips64el`, `mips64r6`, `mips64r6el`                   | `mips64el`       |
+  |                             `%_target_cpu`                                | `%_electron_cpu` |
+  |:-------------------------------------------------------------------------:|:----------------:|
+  |     `x86_64`, `x86_64_v2`, `x86_64_v3`, `x86_64_v4`, `amd64`, `em64t`     | `x64`            |
+  |                         `aarch64`                                         | `arm64`          |
+  | `i386`, `i486`, `i586`, `i686`, `pentium3`, `pentium4`, `athlon`, `geode` | `ia32`           |
+  |             `armv7l`, `armv7hl`, `armv7hnl`                               | `armv7l`         |
+  |         `mips64`, `mips64el`, `mips64r6`, `mips64r6el`                    | `mips64el`       |
 </div>
 
 This ensures packagers do not need to manually set these for every Electron app's spec, hopefully eliminating depsolver problems and helping reduce common build issues.
