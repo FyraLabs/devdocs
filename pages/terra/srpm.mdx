@@ -490,18 +490,8 @@ Available flags:
 - `-a{:rpmspec}` will pull in additional build dependencies often needed particularly when building with NPM.\
   Currently, this includes `nodejs-devel`, `nodejs-packaging`, and `typescript`.
 
-<div style={{ float: "right", margin: "1em 0em 1em 0.5em" }}>
-  |     `%_target_cpu` Macro       |               `%_target_cpu` Expanded                | `%_electron_cpu` |
-  |:------------------------------:|:----------------------------------------------------:|:----------------:|
-  | `%{x86_64}`                    | x86_64 x86_64_v2 x86_64_v3 x86_64_v4 amd64 em64t`    | `x64`            |
-  | `%{arm64}`                     |                         `aarch64`                    | `arm64`          |
-  | `%{ix86}`                      | `i386 i486 i586 i686 pentium3 pentium4 athlon geode` | `ia32`           |
-  |                                |             `armv7l`, `armv7hl`, `armv7hnl`          | `armv7l`         |
-  | `%{mips64}`                    |         `mips64 mips64el mips64r6 mips64r6el`        | `mips64el`       |
-</div>
-
 Rundown of what all `%electronmeta{:rpmspec}` does:
-- Converts `%_target_cpu{:rpmspec}` (the RPM build architecture) into `%_electron_cpu{:rpmspec}`, the Electron format for compatible architectures. See the table to the right for conversions.
+- Converts `%_target_cpu{:rpmspec}` (the RPM build architecture) into `%_electron_cpu{:rpmspec}`, the Electron format for compatible architectures. See the table below for conversions.
   - These are defined because Electron names the build files and directories after the architecture.
   - The [macros used to build Electron apps](#electron-build-macros) all require this to be set.
   - In some cases, these architectures are used in the source tarballs for Electron projects.
@@ -516,6 +506,16 @@ Rundown of what all `%electronmeta{:rpmspec}` does:
   <Callout type="warning">
     This only defines Electron's bundled dependencies, not any Node modules the app may also bundle.
   </Callout>
+
+<div style={{ margin: "1em 0em 1em 0.5em" }}>
+  |     `%_target_cpu` Macro       |     Corresponding Architecture/Microarchitecture     | `%_electron_cpu` |
+  |:------------------------------:|:----------------------------------------------------:|:----------------:|
+  | `%{x86_64}`                    | x86_64 x86_64_v2 x86_64_v3 x86_64_v4 amd64 em64t`    | `x64`            |
+  | `%{arm64}`                     |                         `aarch64`                    | `arm64`          |
+  | `%{ix86}`                      | `i386 i486 i586 i686 pentium3 pentium4 athlon geode` | `ia32`           |
+  |                                |             `armv7l`, `armv7hl`, `armv7hnl`          | `armv7l`         |
+  | `%{mips64}`                    |         `mips64 mips64el mips64r6 mips64r6el`        | `mips64el`       |
+</div>
 
 This ensures packagers do not need to manually set these for every Electron app's spec, hopefully eliminating depsolver problems and helping reduce common build issues.
 
