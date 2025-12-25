@@ -233,23 +233,21 @@ These packages SHOULD NOT contain anything **except**:
 
 #### Fixing Packages
 
-- If a package fix PR is fixing/changing anything user-facing, the `Release:{:rpmspec}` tag SHOULD be bumped. The only exception SHOULD be if you are fixing a package where the current version does not and has never built.
+- If a PR is changing anything user-facing, the `Release:{:rpmspec}` tag SHOULD be bumped. The only exception SHOULD be if you are fixing a package where the current version does not and has never built.
   - Some (not all!) examples of user-facing fixes requiring a `Release:{:rpmspec}` bump:
     - Installing a missing file.
-    - Adding a package to the `Requires:`.
+    - Adding any build or non-build, hard or soft, forward or backward dependencies.
     - Changing any user-facing tags (`URL:{:rpmspec}`, `License:{:rpmspec}`, `Summary:{:rpmspec}`, etc.).
 - If a package fix PR is fixing/changing anything build-facing, the `Release:{:rpmspec}` tag SHOULD NOT need to be bumped.
-  - Some (not all!) examples of 'user-facing' fixes requiring a `Release:{:rpmspec}` bump:
-    - Adding a package to the `BuildRequires:{:rpmspec}`.
+  - Some (not all!) examples changes NOT requiring a `Release:{:rpmspec}` bump:
     - Fixing a package that failed to build when the `Version:{:rpmspec}` tag is bumped.
-    - Adding/changing new macros, build steps, install steps, or general source code handing during build time (assuming this does not affect the installed files the user will see).
-- If you are unsure if a `Release:{:rpmspec}` bump is needed, please open the PR and ask, and we are happy to provide guidance!
+    - Any changes that do not affect the final package.
+- If you are unsure if a bump is needed, bump it.
 - You SHOULD add a `%changelog{:rpmspec}` entry for large changes, such as file renames, new build process, etc. Small changes like adding build dependencies or adding one-liners to make a build work MAY be omitted from adding a `%changelog{:rpmspec}` entry.
 
 #### Patches
 
-- A package's `%autosetup{:rpmspec}` macro SHOULD use the `-p1{:rpmspec}` flag only if patches are being applied.
-- Packages SHOULD apply patches during `%autosetup{:rpmspec}`. If this is not possible (typically when `%autosetup{:rpmspec}` is not used), you SHOULD use [%autopatch{:rpmspec}](../rpm/macros#autopatch).
+- Packages SHOULD apply patches (usually via the `-p*` flag) in `%autosetup{:rpmspec}`. If this is not possible (typically when `%autosetup{:rpmspec}` is not used), you SHOULD use [%autopatch{:rpmspec}](../rpm/macros#autopatch).
 
 #### Providing your own .desktop file
 
@@ -262,7 +260,7 @@ Copy the following template:
 ```
 [Desktop Entry]
 Name=PACKAGE NAME
-Exec=PROVIDED BINARY
+Exec=PROVIDED_BINARY
 Icon=ICON NAME
 Type=Application
 ```
@@ -271,14 +269,14 @@ The `Icon` tag SHOULD NOT a contain full path, just the name of the icon file.
 The `Exec` tag SHOULD be a full path if the binary placed in `/usr/bin` is a symlink.
 If this is not the case, it is up to you if you want to use the full path or not (it will look in the user's `$PATH`).
 
-You SHOULD name this file either `package-name.desktop` or `package app-ID.desktop`.
-You MAY add more tags, to see all possible tage, read through the freedesktop specification [here](https://specifications.freedesktop.org/desktop-entry/latest/).
+You SHOULD name this file either `package-name.desktop` or `package_app-ID.desktop`.
+You MAY add more tags, to see all possible tags, read through the [freedesktop specification](https://specifications.freedesktop.org/desktop-entry/latest/).
 
 ##### Installing the .desktop file
 
 To install the `.desktop` file, add it to your packages folder and add it as a `Source:` in your spec, install it, and list in your `%files`.
-We will be using the [NeoHtop package] as the example.
-Note that we are using the Anda SRPM [`%_appsdir` macro](./srpm#_appsdir) instead of %_datadir/applications/.
+It is RECOMMENDED to use the [`%_appsdir` macro](./srpm#_appsdir) from Anda SRPM instead of `%_datadir/applications/`.
+With [NeoHtop package] as the example:
 
 ```rpmspec
 Source1:  NeoHtop.desktop
@@ -312,7 +310,7 @@ desktop-file-validate %{buildroot}%{_appsdir}/NeoHtop.desktop
 
 ##### Finished Example
 
-`.desktop` file:
+`NeoHtop.desktop`:
 
 ```
 [Desktop Entry]
@@ -344,11 +342,10 @@ desktop-file-validate %{buildroot}%{_appsdir}/NeoHtop.desktop
 %files
 ...
 %{_appsdir}/NeoHtop.desktop
-
 ```
 
 #### Usage of Periods in Various Package Fields
-- You MUST NOT have a period at the end of any `Summary:{:rpmspec}` tags, and you SHOULD have a period at the end of all `%description{:rpmspec}` descriptions.
+You MUST NOT have a period at the end of any `Summary:{:rpmspec}` tags, and you SHOULD have a period at the end of all `%description{:rpmspec}`s.
 
 #### Usage of %elifarch
 
