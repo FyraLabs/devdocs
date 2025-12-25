@@ -32,6 +32,8 @@ Other packages MAY also provide appstream metadata files.
 
 ## Creating the `metainfo.xml` File
 
+Before creating your `metainfo.xml` file, check out our [appstream helper macro](./#terra_appstream), as it can save a lot of effort.
+
 Determine your package's app ID, then start with the template below.
 The metainfo file MUST be named `[1;3mapp_id[0m.metainfo.xml{:ansi}`.
 For example, `com.github.neohtop.metainfo.xml`.
@@ -86,17 +88,6 @@ Other tags exist that are not listed, you are free to use them but, but are typi
 
 All information based on the freedesktop specification, and each section links to it's freedesktop page for more info.
 Again, we highly recommend you read through the entire spec [here](https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html) and [here](https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html).
-
-#### Provides
-
-All binary names in the default PATH (typically `/usr/bin`) SHOULD be listed here.
-
-Basic `<provides/>{:xml}` tag[^1] example:
-```xml
-<provides>
-  <binary>BINARY NAME</binary>
-</provides>
-```
 
 #### Keywords
 
@@ -157,8 +148,9 @@ Freedesktop's example:
 
 #### %terra_appstream
 
-In short, `%terra_appstream{:rpmspec}` assists with installing your metainfo.xml file.
+`%terra_appstream{:rpmspec}` will add more sections to your `metainfo.xml`, or can generate your metainfo.xml file entirely.
 You SHOULD use it when installing your own metainfo.xml file.
+Review the [Terra Appstream Helper's README](https://github.com/terrapkg/appstream-helper/blob/main/README.md) for more details.
 You MAY need to add this line to your spec file: `BuildRequires: terra-appstream-helper{:rpmspec}`
 
 `%appid{:rpmspec}` SHOULD be defined at the top of your spec file (preamble), and used in references to the metainfo file name, for example:
@@ -166,6 +158,8 @@ You MAY need to add this line to your spec file: `BuildRequires: terra-appstream
 ```rpmspec
 %{_metainfodir}/%appid.metainfo.xml
 ```
+
+Other components may be defined, such as `name_pretty`, `developer`, `org`, etc.
 
 ### Installing your Metainfo File
 
