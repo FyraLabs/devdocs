@@ -231,11 +231,6 @@ These packages SHOULD NOT contain anything **except**:
 
 ### Miscellaneous
 
-#### Patches
-
-- A package's `%autosetup{:rpmspec}` macro SHOULD use the `-p1{:rpmspec}` flag only if patches are being applied.
-- Packages SHOULD apply patches during `%autosetup{:rpmspec}`. If this is not possible (typically when `%autosetup{:rpmspec}` is not used), you SHOULD use [`%autopatch{:rpmspec}`](../rpm/macros#autopatch).
-
 #### Fixing Packages
 
 - If a package fix PR is fixing/changing anything user-facing, the `Release:{:rpmspec}` tag SHOULD be bumped. The only exception SHOULD be if you are fixing a package where the current version does not and has never built.
@@ -250,8 +245,107 @@ These packages SHOULD NOT contain anything **except**:
     - Adding/changing new macros, build steps, install steps, or general source code handing during build time (assuming this does not affect the installed files the user will see).
 - If you are unsure if a `Release:{:rpmspec}` bump is needed, please open the PR and ask, and we are happy to provide guidance!
 
-#### Usage of Periods in Package Fields
-- You MUST NOT have a period at the end of the `Summary:{:rpmspec}` tag, and you SHOULD have a period at the end of all `%description{:rpmspec}` descriptions.
+#### Patches
+
+- A package's `%autosetup{:rpmspec}` macro SHOULD use the `-p1{:rpmspec}` flag only if patches are being applied.
+- Packages SHOULD apply patches during `%autosetup{:rpmspec}`. If this is not possible (typically when `%autosetup{:rpmspec}` is not used), you SHOULD use [`%autopatch{:rpmspec}`](../rpm/macros#autopatch).
+
+#### Providing your own .desktop file
+
+If you are packaging a graphical application that does not provide its own `.desktop` file, you SHOULD create one.
+
+##### Creating the .desktop file
+
+Copy the following template:
+
+```
+[Desktop Entry]
+Name=PACKAGE NAME
+Exec=PROVIDED BINARY
+Icon=ICON NAME
+Type=Application
+```
+
+The `Icon` and `Exec` tags SHOULD NOT contain full paths, just the name of the icon file/binary to execute.
+
+You SHOULD name this file either `package-name.desktop` or `package app-ID.desktop`.
+You MAY add more tags, to see all possible tage, read through the freedesktop specification [here](https://specifications.freedesktop.org/desktop-entry/latest/).
+
+##### Installing the .desktop file
+
+To install the `.desktop` file, add it to your packages folder and add it as a `Source:` in your spec, install it, and list in your `%files`.
+We will be using the [NeoHtop package] as the example.
+Note that we are using the Anda SRPM [`%_appsdir` macro](./srpm#_appsdir) instead of %_datadir/applications/.
+
+```rpmspec
+Source1:  NeoHtop.desktop
+
+...
+
+%install
+install -Dm644 %{SOURCE1} %{buildroot}%{_appsdir}/NeoHtop.desktop
+
+...
+
+%files
+...
+%{_appsdir}/NeoHtop.desktop
+```
+
+##### Validating the .desktop file
+
+You MUST validate your `.desktop` file. To do this, add the following to your spec file:
+
+```rpmspec
+BuildRequires:  desktop-file-utils
+
+...
+
+%check
+desktop-file-validate %{buildroot}%{_appsdir}/NeoHtop.desktop
+
+...
+```
+
+##### Finished Example
+
+`.desktop` file:
+
+```
+[Desktop Entry]
+Categories=Utility;
+Comment=A cross-platform system monitor
+Exec=NeoHtop
+Icon=NeoHtop
+Name=NeoHtop
+Terminal=false
+Type=Application
+```
+
+All custom `.desktop` file portions of a spec file:
+
+```rpmspec
+Source1:  NeoHtop.desktop
+
+...
+
+BuildRequires:  desktop-file-utils
+
+%install
+...
+install -Dm644 %{SOURCE1} %{buildroot}%{_appsdir}/NeoHtop.desktop
+
+%check
+desktop-file-validate %{buildroot}%{_appsdir}/NeoHtop.desktop
+
+%files
+...
+%{_appsdir}/NeoHtop.desktop
+
+```
+
+#### Usage of Periods in Various Package Fields
+- You MUST NOT have a period at the end of any `Summary:{:rpmspec}` tags, and you SHOULD have a period at the end of all `%description{:rpmspec}` descriptions.
 
 #### Usage of %elifarch
 
@@ -286,3 +380,4 @@ Correct:
 [^2]: https://github.com/terrapkg/packages/blob/e65a762352246f918d12e7c5a0e032ba0b1be73b/anda/langs/nim/netto/netto.spec
 
 [Fedora Packaging Guidelines]: https://docs.fedoraproject.org/en-US/packaging-guidelines/
+[NeoHtop package]: https://github.com/terrapkg/packages/tree/frawhide/anda/apps/neohtop
