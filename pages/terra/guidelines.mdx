@@ -244,6 +244,7 @@ These packages SHOULD NOT contain anything **except**:
     - Fixing a package that failed to build when the `Version:{:rpmspec}` tag is bumped.
     - Adding/changing new macros, build steps, install steps, or general source code handing during build time (assuming this does not affect the installed files the user will see).
 - If you are unsure if a `Release:{:rpmspec}` bump is needed, please open the PR and ask, and we are happy to provide guidance!
+- You SHOULD add a `%changelog` entry.
 
 #### Patches
 
