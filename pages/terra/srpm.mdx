@@ -148,6 +148,7 @@ Set up all basic requirements including build macros for building an Electron ap
 Available flags:
 - `-a{:rpmspec}` will pull in additional build dependencies often needed particularly when building with NPM.\
   Currently, this includes `nodejs-devel`, `nodejs-packaging`, and `typescript`.
+- `-D{:rpmspec}` will disable debuginfo package creation. This is necessary for many Electron apps as the bundled libraries often do not contain enough to strip, meaning this step in the build will fail. SHOULD only be used if debug packages cannot be created.
 
 Rundown of what all `%electronmeta{:rpmspec}` does:
 - Converts `%_target_cpu{:rpmspec}` (the RPM build architecture) into `%_electron_cpu{:rpmspec}`, the Electron format for compatible architectures. See the table below for conversions. See also: [%electron_arches](#electron_arches)
@@ -157,7 +158,7 @@ Rundown of what all `%electronmeta{:rpmspec}` does:
   - This can also be used to help work with the files if you need to do anything manually.
 - Defines `%__provides_excludes{:rpmspec}` to make sure Electron apps are not flagged as providers of their bundled dependencies, such as FFmpeg libraries.
 - Defines `%__requires_excludes{:rpmspec}` based on architecture to prevent Electron projects' cross-platform builds from causing false dependency positives from RPM.
-- Sets `%debug_package{:rpmspec}` to `%{nil}{:rpmspec}` to prevent stripping of bundled libraries and/or build failures due to not enough data to strip.
+- If using the `-D` boolean, sets `%debug_package{:rpmspec}` to `%{nil}{:rpmspec}` to prevent stripping of bundled libraries and/or build failures due to not enough data to strip.
 - Sets the build and runtime dependencies.
 - Sets the `ExclusiveArch:{:rpmspec}` tag to only the architectures Electron supports.
 - Defines a `%bcond{:rpmspec}` for whether or not Electron is bundled for other macros.
