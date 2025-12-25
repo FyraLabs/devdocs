@@ -244,12 +244,12 @@ These packages SHOULD NOT contain anything **except**:
     - Fixing a package that failed to build when the `Version:{:rpmspec}` tag is bumped.
     - Adding/changing new macros, build steps, install steps, or general source code handing during build time (assuming this does not affect the installed files the user will see).
 - If you are unsure if a `Release:{:rpmspec}` bump is needed, please open the PR and ask, and we are happy to provide guidance!
-- You SHOULD add a `%changelog` entry.
+- You SHOULD add a `%changelog{:rpmspec}` entry for large changes, such as file renames, new build process, etc. Small changes like adding build dependencies or adding one-liners to make a build work MAY be omitted from adding a `%changelog{:rpmspec}` entry.
 
 #### Patches
 
 - A package's `%autosetup{:rpmspec}` macro SHOULD use the `-p1{:rpmspec}` flag only if patches are being applied.
-- Packages SHOULD apply patches during `%autosetup{:rpmspec}`. If this is not possible (typically when `%autosetup{:rpmspec}` is not used), you SHOULD use [`%autopatch{:rpmspec}`](../rpm/macros#autopatch).
+- Packages SHOULD apply patches during `%autosetup{:rpmspec}`. If this is not possible (typically when `%autosetup{:rpmspec}` is not used), you SHOULD use [%autopatch{:rpmspec}](../rpm/macros#autopatch).
 
 #### Providing your own .desktop file
 
