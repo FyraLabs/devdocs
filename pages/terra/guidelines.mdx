@@ -247,7 +247,7 @@ These packages SHOULD NOT contain anything **except**:
 
 #### Patches
 
-- Packages SHOULD apply patches (usually via the `-p*` flag) in `%autosetup{:rpmspec}`. If this is not possible (typically when `%autosetup{:rpmspec}` is not used), you SHOULD use [%autopatch](../rpm/macros#autopatch).
+- Packages SHOULD apply patches (usually via the `-p*` flag) in `%autosetup{:rpmspec}`. If this is not possible (typically when `%autosetup{:rpmspec}` is not used), you SHOULD use [`%autopatch`](../rpm/macros#autopatch).
 
 #### Providing your own .desktop file
 
@@ -274,7 +274,13 @@ You MAY add more tags, to see all possible tags, read through the [freedesktop s
 
 ##### Installing the .desktop file
 
-To install the `.desktop` file, add it to your packages folder and add it as a `Source:` in your spec, install it, and list in your `%files`.
+To install the .desktop file:
+
+1. Add it to your package's folder
+2. Add it as a `Source:{:rpmspec}` in the .spec file
+3. Install it
+4. List it in the %files{:rpmspec} section
+
 It is RECOMMENDED to use the [`%_appsdir` macro](./srpm#_appsdir) from Anda SRPM instead of `%_datadir/applications/`.
 With [NeoHtop package] as the example:
 
