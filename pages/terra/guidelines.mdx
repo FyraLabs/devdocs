@@ -19,11 +19,11 @@ Packagers and maintainers MUST follow the policies and guidelines listed in this
 
 Everything covered here is one of 3 things:
 
-- A difference in the [Fedora Packaging Guidelines]
+- A difference from the [Fedora Packaging Guidelines]
 - In addition to the [Fedora Packaging Guidelines]
-- Adding a new guideline
+- A Terra-exclusive guideline
 
-If something seems missing, please refer to the [Fedora Packaging Guidelines].
+It is highly recommended to read through the [Fedora Packaging Guidelines] on langauges/sections not listed here, or for greater detail.
 
 ## Terra Packaging Guidelines
 
@@ -35,7 +35,7 @@ The package maintainer of a package SHOULD be added to the `Packager:{:rpmspec}`
 Packager: Raboneko <raboneko@fyralabs.com>
 ```
 
-### Usages of the `mold` Linker
+### Usage of the `mold` Linker
 
 We encourage the use of [`mold`](https://github.com/rui314/mold), which can speed up build times, especially in large projects.
 You MAY enable it in C/++ projects by adding `-fuse-ld=mold` in `CFLAGS`/`CXXFLAGS`.
@@ -46,7 +46,7 @@ You can disable `mold` for Rust and Nim by using `%bcond_with mold`.
 
 ### Interpreted Languages (Python, Ruby, etc.)
 
-All packages using interpreted languages follow the traditional Fedora guidelines.
+All packages using interpreted languages SHOULD follow the Fedora guidelines.
 All dependencies **_must_** be packaged individually as they are considered runtime dependencies.
 
 ### Dynamically Compiled Languages (C, C++, Vala)
@@ -55,9 +55,9 @@ Dependencies required for runtime MUST be packaged separately.
 
 ### Statically Compiled Languages
 
-As Terra does not strictly follow Fedora's reproducibility requirements, and we do not want large amounts of development libraries for them, packagers SHOULD vendor dependencies on build time.
+Terra does not strictly follow Fedora's reproducibility requirements, and we do not want large amounts of development libraries for them, packagers SHOULD vendor dependencies on build time.
 
-Terra's mock sandbox has networking enabled, so builders can download the dependencies directly on build time.
+Terra's Mock sandbox has networking enabled, so builders can download the dependencies directly on build time.
 
 #### Rust
 These are guidelines for packaging projects written in [Rust](https://rust-lang.org).
@@ -87,7 +87,7 @@ Example:
 %cargo_install
 ```
 
-In some rare cases, you may need to use `%cargo_build{:rpmspec}` and `%crate_install_bin{:rpmspec}` instead:
+In rare cases, you may need to use `%cargo_build{:rpmspec}` and `%crate_install_bin{:rpmspec}` instead:
 
 ```rpmspec
 %prep
@@ -251,7 +251,7 @@ These packages SHOULD NOT contain anything **except**:
 
 #### Providing Your Own .desktop File
 
-If you are packaging a graphical application that does not provide its own `.desktop` file, you SHOULD create one.
+If you are packaging a graphical app that doesn't provide its own `.desktop` file, you SHOULD create one.
 
 ##### Creating the .desktop File
 
