@@ -7,17 +7,46 @@ description: Install Andaman
 
 ## Ultramarine Linux
 
-Ultramarine comes with the Terra Repository, simply install Andaman!
+Ultramarine comes with the Terra Repository; simply install Andaman!
 
 `sudo dnf install anda`
 
-## Fedora Linux
+## Fedora and Derivatives
 
-First, install the [Terra Repository](https://terra.fyralabs.com)
+```bash
+sudo dnf install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' terra-release
+```
 
-`sudo dnf install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' terra-release`
+If you are using atomic editions of Fedora, run the following commands instead:
+
+```bash
+curl -fsSL https://github.com/terrapkg/subatomic-repos/raw/main/terra.repo | pkexec tee /etc/yum.repos.d/terra.repo
+sudo rpm-ostree install terra-release
+```
+
+Optionally, you can install `terra-release-extra` to use the Extras repository, `terra-release-mesa` to use the Mesa repository, and `terra-release-nvidia` to use the NVIDIA repository.
 
 Then, install Andaman
+
+`sudo dnf install anda`
+
+## Enterprise Linux (EL) and Derivatives
+
+Only EL10 is supported. Not all packages available in Terra are available in Terra EL.
+
+Terra EL requires EPEL, which may be installed with:
+
+```bash
+sudo dnf install 'https://dl.fedoraproject.org/pub/epel/epel-release-latest-$releasever.noarch.rpm'
+```
+
+And Terra EL itself can be installed with:
+
+```bash
+sudo dnf install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terrael$releasever' terra-release
+```
+
+Then, install Andaman:
 
 `sudo dnf install anda`
 
@@ -36,8 +65,6 @@ Alternatively you can also manually download the sources from GitHub:
 ```
 git clone https://github.com/FyraLabs/anda
 cd anda
-git checkout 0.2.3
+git checkout <version>     # replace with the current version
 cargo install --path .
 ```
-
-As of writing (2024-07-23), 0.2.3 is the latest version. You should replace this with the actual latest release.
