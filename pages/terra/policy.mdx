@@ -1,0 +1,193 @@
+---
+title: Policy
+description: "One of Terra's main focuses is package quality. Users should be able to install software from Terra in confidence. Our policies reflect that."
+---
+
+<Callout type="info">
+  The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+  NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and
+  "OPTIONAL" in this document are to be interpreted as described in
+  [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and
+  [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
+</Callout>
+
+## Submission Policy
+
+- Use common sense.
+- When it comes to submissions, anything is fair game, assuming that our policies are followed. However, there is a mild exception for GUI applications.
+  - Please refrain from submitting applications that work perfectly fine as a Flatpak, unless there is a technical or UX justification for it. Examples of these exceptions are:
+
+    | Application Type | Justification |
+    |------------------|---------------|
+    | Terminal Emulators | These often only work properly when run directly on the host system. |
+    | CLI/TUI applications | The UX of Flatpak isn't optimized for these types of applications. (ex. requiring the user to call Flatpak, and then the RDNN of the app) |
+    | Modded/Multi-instance game launchers (i.e Minecraft launchers) | May require access to system libraries, and can be better managed by the user when not sandboxed. For example Minecraft launchers can easily access multiple JRE installations when not sandboxed. |
+    | Other appliactions that require manual modification of data files | Requires user to modify its data files regularly, applies in the same above case. |
+    | Applications that suffer major performance or technical issues due to sandboxing (IDEs, text editors, file managers, DAWs and other applications that rely on native plugin support like VSTs or LV2, etc.) | These applications usually require systems libraries to be present to work properly. |
+    | System components | These packages simply cannot be sandboxed, as they are part of the operating system itself. |
+    | Libraries required to build or use the aforementioned packages | These libraries are required to build or use the aforementioned packages, and are usually not sandboxed. |
+
+    Other applications that are not specified here may be allowed on a case-by-case basis.
+- You MUST have the rights or permission to redistribute the packaged software. Please check the license of the software. Besides that, there is no prohibition on proprietary licenses.
+- Submissions must be maintained. We will reject submissions of unmaintained software.
+- Submissions MUST NOT be malicious.
+- Submissions SHOULD include an auto-update script (`update.rhai`).
+- Submissions SHOULD be placed in the corresponding directory in `anda/`, linked [here](https://github.com/terrapkg/packages/tree/frawhide/anda).
+  - Each folder MUST either contain folders and no source files (other files are exempted), or contain multiple files and no folders.
+  - The following directories have a higher priority. Categorize your new package in the following order:
+    1. `fonts/`
+    2. `system/` (bootloaders, kernels, drivers, ...)
+    3. `tools/buildsys/` (software used to build other software)
+    4. `devs/` (tools for software development)
+    5. `games/`
+    6. `themes/`
+    7. `docker/` (software related to containers)
+    8. `desktops/` (applications specific to a Desktop Environment)
+    9. `apps/` (GUI applications)
+    10. `langs/` (software written in/for a specific programming language)
+- When there are ambiguous or unspecified parts in our policies/guidelines, you SHOULD refer to [Fedora's packaging guidelines].
+- Low-quality contributions will be declined at the team's discretion.
+- Do not include work-in-progress code or untested patches. See https://dont-ship.it/.
+
+## Maintenance Policy
+
+- Anyone MAY make a PR (pull request) to an already existing package.
+- Unmaintained packages may be removed at any time. Before doing so, we will create a GitHub issue to gauge community interest.
+- Terra will only support the latest versions of Fedora, if a package doesn't build on the next version of Fedora, we might hold it back.
+
+## Technical Policies for Preamble
+
+This section describes the guidelines for the preamble items, notably naming and versioning.
+
+### Tags
+
+"_tag_" refers to different versions of the same software, as in their release schedule/model.
+For example, the `zed` package has 3 _tags_: `stable`, `preview` and `nightly`. (Some packages use `tip` instead of `nightly`.)
+_Tags_ may be named after Git branches from upstream.
+
+Having a different _tag_ of the same software warrants a separate package,
+i.e., they MUST have separate spec files with separate `Name:{:rpmspec}`s.
+The _tag_ SHOULD be specified in `Name:{:rpmspec}` using the format **`%{rawname}.%{tag}`**
+e.g. `ghostty.tip`, `zed.preview`, and `kf6-kio.switcheroo`.
+
+Packages without any _tags_ specified in `Name:{:rpmspec}` MUST be regarded as stable.
+
+For UX reasons, some packages MAY consider specifying `Provides: %{rawname}-%{tag}{:rpmspec}`.
+
+### Versioning
+
+{/* https://github.com/terrapkg/packages/issues/1907 */}
+<div style={{ float: "right", margin: "1em" }}>
+  | VCS              | ID    |
+  |------------------|-------|
+  | Git              | `git` |
+  | SVN              | `svn` |
+  | CVS              | `cvs` |
+  | Bazaar           | `bzr` |
+  | Mercurial        | `hg`  |
+  | Perforce (Helix) | `p4`  |
+  | Pijul            | `pjl` |
+  | Azure DevOps     | `tfs` |
+  | darcs            | `drc` |
+  | Fossil           | `fsl` |
+</div>
+
+Packages SHOULD follow one of the version formats below:
+
+```rpmspec
+## (Release tag tracking (stable))
+Version:  %{latest_stable_version}
+## (Commit tacking (nightly off version tag))
+Version:  %{latest_stable_version}^%{commit_date}git.%{shortcommit}
+## (Commit tacking (no stable version tag))
+Version:  %{unreleased_version}~%{commit_date}git.%{shortcommit}
+```
+
+`git` SHOULD be replaced with the correct _VCS identifier_ for **(b)** and **(c)** as listed on the right.
+
+If either commit tracking option is used, you MUST also include `labels { nightly = 1 }{:hcl}` in `anda.hcl` unless there is no `update.rhai`,
+as these two formats rely on the assumption that there is one `%shortcommit{:rpmspec}` for each `%commit_date{:rpmspec}` (and vice versa).
+
+`%unreleased_version{:rpmspec}` refers to the expected version number for the next stable (or a more stable _tag_ than `nightly{:rpmspec}`) release,
+while `%latest_stable_version{:rpmspec}` refers to the current latest released version number, preferably stable.
+
+`Commit tacking (nightly off version tag)` SHOULD be used when there is a stable and nightly version of a package.
+
+If upstream does not provide a version, use `Commit tacking (no stable version tag)` and replace `%unreleased_version{:rpmspec}` as `0{:rpmspec}`.
+
+### Packager Field
+
+The package maintainer of a package MUST be added to the `Packager:{:rpmspec}` preamble as follows:
+
+```rpmspec
+Packager: Raboneko <raboneko@fyralabs.com>
+```
+
+### Release Field
+
+The `Release:{:rpmspec}` preamble MUST NOT contain information regarding upstream versioning,
+including but not limited to commit dates, commit hashes, software versions, _tags_, etc.
+Without approval from the team, packages MUST use the format `Release: 1%?dist{:rpmspec}`.
+
+The release number SHOULD be incremented if changes are made to the package, unless the `Version:{:rpmspec}` changes.
+
+### Naming
+
+Prefix/Suffix the packages in the following order
+
+- Fonts MUST be suffixed with `-fonts`.
+- Shared libraries SHOULD be suffixed with `-libs`.
+  - Alternatively, the `lib` prefix is also allowed, but they SHOULD still provide `-libs`.
+- Development libraries SHOULD be suffixed with `-devel`.
+- If necessary, suffix `-bash-completion` (or other shells) and `-doc`.
+- Postfix a _tag_ if necessary (e.g. `.nightly`).
+
+### Packager Field
+
+The package maintainer of a package MUST be added to the `Packager:{:rpmspec}` preamble as follows:
+
+```rpmspec
+Packager: Raboneko <raboneko@fyralabs.com>
+```
+
+## Subrepos
+
+For `f*` branches, submissions that may introduce breaking changes MUST be included in our subrepos instead via the `subrepo = "extras"` label in `anda.hcl`.
+Valid subrepos include `extras`, `nvidia`, `mesa`, and `multimedia` (43 and later only).
+
+For example, `terra-mesa` should be in extra as the dependency solver will resolve this package for matching "provides" (such as `mesa-libEGL(x86-64)`).
+`libadwaita-nightly` should be in extra since it provides `pkgconfig(libadwaita-1)`, which is required by existing packages as a build dependency.
+`yt-dlp-nightly` **can be included normally** because it has no common provides with Fedora's `yt-dlp`.
+
+
+## AppStream Metadata & Desktop Files
+
+<Callout>Our AppStream guidelines are documented [here](/terra/appstream).</Callout>
+
+All graphical applications that can be started by the user MUST provide a [desktop entry](https://wiki.archlinux.org/title/Desktop_entries#Application_entry) file.
+Additionally, all packages except libraries MUST provide an [AppStream metadata](https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#qsr-app-example) file.
+
+
+## Miscellaneous Terra Policies
+
+### Security Policy
+
+Our security policy is documented in the [SECURITY.md file].
+
+### Code of Conduct
+
+Our code of conduct is documented in the [CODE_OF_CONDUCT.md file].
+
+### Lifecycle Policy
+
+Our support lifecycle is documented in the [lifecycle page].
+
+[Terra sources repo]: https://github.com/terrapkg/packages
+[Rhai]: https://rhai.rs/book/
+[Fedora's packaging guidelines]: https://docs.fedoraproject.org/en-US/packaging-guidelines
+[SECURITY.md file]: https://github.com/terrapkg/packages/blob/frawhide/SECURITY.md
+[CODE_OF_CONDUCT.md file]: https://github.com/terrapkg/packages/blob/frawhide/CODE_OF_CONDUCT.md
+[lifecycle page]: ../terra/lifecycle
+[andaman]: https://github.com/FyraLabs/anda/
+[rpm packaging guide]: https://rpm-packaging-guide.github.io/
+[spec file format]: https://rpm-software-management.github.io/rpm/manual/spec.html
