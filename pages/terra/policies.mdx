@@ -29,7 +29,7 @@ Only 1 number is allowed in `Release: 1%?dist{:rpmspec}` / `1%{?dist}`.
 
 If new package affects existing installs, MUST include in [subrepos](/terra/policy#subrepos).
 
-Add [Appstream metadata](/terra/appstream) and desktop file.
+Ship GUI apps with [appstream metadata](/terra/appstream) and desktop file.
 
 - Security policy: [SECURITY.md file]
 - Code of conduct: [CODE_OF_CONDUCT.md file]
@@ -190,8 +190,7 @@ For example, `terra-mesa` should be in extra as the dependency solver will resol
 
 <Callout>Our AppStream guidelines are documented [here](/terra/appstream).</Callout>
 
-All graphical applications that can be started by the user MUST provide a [desktop entry](/terra/guidelines#providing-your-own-desktop-file) file.
-Additionally, all packages except libraries MUST provide an [AppStream MetaInfo](https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#qsr-app-example) file.
+All graphical applications that can be started by the user MUST provide a [desktop entry](/terra/guidelines#providing-your-own-desktop-file) and [AppStream MetaInfo](https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#qsr-app-example) file. Other applications are also RECOMMENDED to do so.
 
 ## Miscellaneous Terra Policies
 
