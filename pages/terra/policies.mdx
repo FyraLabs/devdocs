@@ -1,5 +1,5 @@
 ---
-title: Policy
+title: Policies
 description: "One of Terra's main focuses is package quality. Users should be able to install software from Terra in confidence. Our policies reflect that."
 ---
 
@@ -12,6 +12,30 @@ import { Callout } from "nextra/components";
   [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and
   [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
 </Callout>
+
+## TL;DR
+
+Condensed version of policies.
+
+Only [submit](/terra/policy#submission-policy) packages legally distributable, proprietary or not, but try not to PR same things (a) already in Fedora or Flathub, & (b) WIP / untested code.
+Get sources into most suitable folder in repo, 1 `anda.hcl` & spec file per folder.
+Otherwise PR whatever the heck you want.
+
+Follow upstream [version](/terra/policy#versioning) if stable; prefer `%{unreleased_version}~%{commit_date}git.%{shortcommit}` over `%{latest_stable_version}^%{commit_date}git.%{shortcommit}` otherwise.
+Suffix `.nightly` / `-nightly` in name for `nightly` _[tag](/terra/policy#tags)_. Upstream Git branches can be _tag_ names.
+
+Only 1 number is allowed in `Release: 1%?dist{:rpmspec}` / `1%{?dist}`.
+`Packager: Your name <mail@example.com>{:rpmspec}` is REQUIRED.
+
+If new package affects existing installs, MUST include in [subrepos](/terra/policy#subrepos).
+
+Add [Appstream metadata](/terra/appstream) and desktop file.
+
+- Security policy: [SECURITY.md file]
+- Code of conduct: [CODE_OF_CONDUCT.md file]
+- Lifecycle policy: [lifecycle page]
+
+End.
 
 ## Submission Policy
 
