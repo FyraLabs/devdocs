@@ -29,24 +29,20 @@ It is highly recommended to read through the [Fedora Packaging Guidelines] on la
 
 Condensed version of guidelines.
 
-Try [`mold` linker](/terra/guidelines#usage-of-the-mold-linker).
-Use [`%pkg_completion`](/terra/srpm#pkg_completion) for shell completions.
-
-Use [`%pkg_devel_files`](/terra/srpm#pkg_devel_files), [`%pkg_libs_files`](/terra/srpm#pkg_libs_files), [`%pkg_static_files`]. See [Development and Shared Libraries](/terra/guidelines#development-and-shared-libraries) section.
-
 <Callout type="warning">
   REMEMBER TO [BUMP](#fixing-packages) `Release:{:rpmspec}` if propose new changes (unless the pkg with the current release num doesn't exist)
 </Callout>
 
+No period at end of `Summary:{:rpmspec}`, but add period at end of `%description{:rpmspec}`.
 [`%changelog`](/terra/guidelines#fixing-packages) only for large changes.
-
 Prefer patching e.g. `-p1` at `%autosetup` over using `%autopatch`.
+Prefer `%elifarch` over `%endif` + `%ifarch`.
+
+Use [`%pkg_completion`](/terra/srpm#pkg_completion) for shell completions.
+Use [`%pkg_devel_files`](/terra/srpm#pkg_devel_files), [`%pkg_libs_files`](/terra/srpm#pkg_libs_files), [`%pkg_static_files`](/terra/srpm#pkg_static_files).
+See [Development and Shared Libraries](/terra/guidelines#development-and-shared-libraries) section.
 
 Install `.desktop` file to `%_appsdir` for graphical apps. [Guide here](/terra/guidelines#providing-your-own-desktop-file). Prefer upstream provided ones over manually generating one.
-
-No period at end of `Summary:{:rpmspec}`, but add period at end of `%description{:rpmspec}`.
-
-Prefer `%elifarch` over `%endif` + `%ifarch`.
 
 Follow Fedora guidelines for interpreted (Python/Ruby) & dynamically (C/++) compiled langs.
 Statically compiled lang guidelines follow.
