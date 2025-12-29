@@ -3,7 +3,7 @@ title: Introduction
 description: Bootstrap a Linux system on Depthcharge with Submarine
 ---
 
-### Section Under Construction
+import { Callout } from "nextra/components";
 
 # Submarine
 ### Experimental bootloader for ChromeOS' Depthcharge
@@ -68,6 +68,10 @@ The build output is located in `build/`.
 You can now `dd` the `.bin` to a disk, or a `.kpart` to a partition, more information below.
 
 ## Usage
+
+<Callout type="info">
+  Please note, Submarine can NOT boot ChromeOS in its current state.
+</Callout>
 
 Before you can boot submarine, you need to enable booting from external storage. On your Chrome device, make sure developer mode is enabled, then go into ChromeOS, press Ctrl + Alt + F2 (This will either be the forward or refresh key on the top row) to switch to vt2. Log in as root (chronos, no password) and run the following command:
 
