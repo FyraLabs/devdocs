@@ -8,40 +8,71 @@ import { Callout } from "nextra/components";
 # Contributing
 
 Thanks for contributing to Terra!
-Terra is specifically designed to be as _package-maintainer-friendly_ as possible -- you
+
+Terra is specifically designed to be as _package-maintainer-friendly_ as possible — you
 don't need to know everything about the infrastructure to create a package for Terra!
 See the following guide for creating a new package yourself. Quick and easy.
 
-It's also ok to **suggest packages** to include into Terra, though it might take a while. (We're busy!)
+It's also ok to **suggest packages** to include into Terra by raising a [GitHub issue](https://github.com/terrapkg/packages/issues), though it might take a while. (We're busy!)
 
-Remember, it takes effort to create a package. If you ever need help, hop into
-[our Discord server](https://discord.gg/5fdPuxTg5Q) and we will try to help you.
+It takes effort to create a package, and as always, there is a learning curve.
+If you ever need help, hop into [our Discord server](https://fyralabs.com/discord) and we will try to help you.
+
+<Callout type="info">
+  The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+  NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and
+  "OPTIONAL" in this document are to be interpreted as described in
+  [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and
+  [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
+</Callout>
 
 ## Creating a package
 
 ### Before you begin...
 
-- Make sure the package name is not taken by other packages in Fedora repositories.
-- Review our [packaging policies](policy).
-- Review our custom [SRPM macros](#srpm-macros)
+- Make sure the package is not in the [Fedora repositories](https://packages.fedoraproject.org/), and the package name is not taken.
+- Review our [packaging policies](#policies) below.
+- Review our [packaging guidelines](../terra/guidelines).
+- Review our custom [SRPM macros](../terra/srpm), as these may be helpful to your package.
 
 ### Preparation
 
-- Install [Andaman] on your system and its mock configs
+#### Fedora/Ultramarine
+
+- Install [Andaman] and its Mock configs on your system:
   - `[1;32msudo dnf[97m install [0;97;mterra-mock-configs{:ansi}` via Terra
-  - anda is also available via rust crates.io
-  - If on an atomic system, this command works using podman: `podman run --rm --cap-add=SYS_ADMIN --privileged --volume ./:/anda --volume mock_cache:/var/lib/mock --workdir /anda ghcr.io/terrapkg/builder:frawhide anda`
-- Use `rust2rpm` for **Rust** packages
-- Use `pyp2rpm` for **Python** packages
-- Use `go2rpm` for **Go** packages
-- else, find the source of the packages you are adding, preferably a URL to a `.tar.gz` archive
-  - multiple archives are ok
-  - non `.tar.gz` archives are also ok, but might require additional build dependencies
-  - we also prefer archives from git repositories
+  - Anda is also available via [Cargo](https://crates.io/crates/anda).
+  - If on an atomic system, this command works using Podman: `podman run --rm --cap-add=SYS_ADMIN --privileged --volume ./:/anda --volume mock_cache:/var/lib/mock --workdir /anda ghcr.io/terrapkg/builder:frawhide anda`
+- Fork the [Terra sources repo](https://github.com/terrapkg/packages), and then `git clone` your fork.
+- You are now ready for the [Writing Sources]([contributing#writing-sources](https://developer.fyralabs.com/terra/contributing#writing-sources)) section below.
+  
+#### Dev Container
+
+You can create, build, and push a package all from within our Dev Container.
+This means you do NOT need to be running Fedora/Ultramarine to create a package.
+You can run this devcontainer from Linux, macOS, or Windows.
+
+- If you're Visual Studio Code, open it and navigate to the Extensions menu located at the bottom of the left sidebar.
+- Install [Docker](https://docs.docker.com/engine/install/). If you're on Linux, you'll need to enable the service and reboot.
+- Fork the [Terra sources repo](https://github.com/terrapkg/packages), and `git clone` your fork.
+- Open this folder in Visual Studio Code (File -> Open Folder).
+- It should prompt you to `reopen in Dev Container,` click this and wait for the Dev Container to open. If it doesn't prompt you, press `Ctrl` + `Shift` + `P`, type `Reopen in Container`, and press `Enter`.
+- You are now in the Terra Dev Container, and have all the packages and configuration necessary to start building packages!
+
+#### Language Support in Editors
+
+The most common languages you will see:
+- RPMSPEC (`.spec`), for the package build scripts
+- rhai, for the auto-update scripts
+- hcl, for informing `anda` of the package
+- xml, for AppStream MetaInfo on some packages
+
+VSCode should prompt you to install these extensions, and Zed should auto-install them.
+If not/using a different IDE, we suggest installing language support for each of these.
 
 ### Writing sources
 
-1. Fork/clone the [Terra sources repo](https://github.com/terrapkg/packages).
+1. Fork the [Terra sources repo](https://github.com/terrapkg/packages), and `git clone` your fork.
 1. Create a folder named after the package name, for example:
    - A font named `lovelyfonttype` would go in `anda/fonts/lovelyfonttype`.
    - A Pantheon DE package would go in `anda/desktops/elementary/`.
@@ -51,11 +82,11 @@ Remember, it takes effort to create a package. If you ever need help, hop into
    - The name of the folder name actually is just for identifications for Terra package maintainers.
      What matters is that the spec file name _must_ match with the package name defined in the spec file later.
      This is a Fedora `mock` limitation.
-   - For more information, check out our [packaging policies](policy).
+   - For more information, check out our [packaging policies].
 1. Edit `anda.hcl`, which tells [Andaman] how to build the package:
 
    ```hcl
-   project pkg {
+   project pkg { # NOTE - 'pkg' is NOT referring to the package name, rather, it needs to be verbatim `pkg`.
        rpm {
            spec = "<packagename>.spec"
        }
@@ -66,10 +97,16 @@ Remember, it takes effort to create a package. If you ever need help, hop into
    - It is a custom file format for RPM packages.
    - This [RPM Packaging Guide] might help newbies with no prior experiences with RPM specs.
    - This [Spec file format] docs goes into the details of the spec file format.
+   - You may use `rust2rpm` for **Rust** packages.
+   - You may use `go2rpm` for **Go** packages.
+   - Otherwise, find the source of the packages you are adding, preferably a URL to a `.tar.gz` archive
+   - Multiple archives are ok.
+   - Archives not in `.tar.gz` format are also okay, but might require extra work.
+   - Archives from git repositories are preferred.
 
 #### Editing the Spec file
 
-> TIP: Check out other spec files for other packages for some examples ;)
+> TIP: Check out other spec files of related packages for some examples ;)
 
 A generic spec file looks like this:
 
@@ -83,8 +120,8 @@ Source0:        https://github.com/some/repo/archive/%{version}.tar.gz
 # You should change the above link to the source tarball you got from the preparation section
 License:        MIT
 BuildRequires:  some dependencies >= 3.2.1 another-dep
-Requires:       deps here
-# We *highly* encourage you to add yourself as the packager here:
+Requires:       runtime deps here
+# We require you to add yourself as the packager here (if this is an issue for you, let us know):
 Packager:       Your Name <meowy@example.com>
 
 %description
@@ -102,7 +139,8 @@ echo "this will run when building pkg"
 echo "this will also run when building pkg but for installing it into %{buildroot} so that anda (mock) can package it"
 
 %files
-/usr/bin/pkgname-binary
+# This macro expands to `/usr/bin`. To see what macros expand to, you can run `rpm --eval %{MACRO}`
+%{_bindir}/pkgname-binary
 /path/to/more/files/*/package
 
 %changelog
@@ -110,29 +148,26 @@ echo "this will also run when building pkg but for installing it into %{buildroo
 - Description on what you've done
 ```
 
-- Add `Source0` or `Source1` or more.
-  These preambles should link to a compressed file (preferably `tar`) and will be extracted during `%prep`
-  You should've had the link prepared during [#Preparation](#preparation) :3
-- Add a new line `%prep`
+- Add `Source0:{:rpmspec}` or `Source1:{:rpmspec}` or more.
+  These preambles should link to a compressed file (preferably a tarball) and will be extracted during `%prep{:rpmspec}`.
+  You can find this by looking at the GitHub releases page (usually a .tar.gz link).
+- Add a new line `%prep{:rpmspec}`
   - The source file will be automatically downloaded and
-    extracted with `%autosetup -n <root dir name in tar file>` inside `%prep`.
-    Check out `blackbox-terminal.spec` as an example
+    extracted with `%autosetup -n <root dir name in tar file>` inside `%prep{:rpmspec}`.
   - If it is not a tar archive, extract the file manually with a command.
-    See `authy.spec` as an example (`unsquashfs`)
-- Inside `%build`, you might need to build the package.
-  Macros like `%meson` and `%cmake` are supported.
-  Check out `blackbox-terminal` or `prismlauncher`
-  - if not, manually state the command
-- List out all the files to be included inside `%files`
-  - Use `%doc` to state the README file (if it exists)
-  - Use `%license` to state the COPYING or LICENSE file (if it exists)
+- Inside `%build{:rpmspec}`, you might need to build the package.
+  Macros like `%meson{:rpmspec}` and `%cmake{:rpmspec}` are supported.
+  - If not, manually state the command.
+- List out all the files to be included inside `%files{:rpmspec}`.
+  - Use `%doc{:rpmspec}` to state the README file (if it exists).
+  - Use `%license{:rpmspec}` to state the COPYING or LICENSE file (if it exists).
   - TIP: If you are unsure about the files to install, run the build first.
-    `mock` will show you the files not packaged but installed via an error
-- Add `%changelog` (message preferably "Initial Package")
+    `mock` will show you the files not packaged but installed via an error.
+- Add `%changelog{:rpmspec}` (message preferably "Initial Package").
 
 ## Building
 
-- Having anda installed, run the following command:
+Having anda installed (or in the Dev Container) run the following command:
 
 ```ansi
 [1;32manda[97m build [0;3;37m-c terra-rawhide-x86_64[0m anda/fonts/lovelyfonttype-fonts/pkg
@@ -143,26 +178,28 @@ up a container), add `--rpm-builder=rpmbuild`. Remember to install the build
 dependencies using `[1;32msudo dnf[97m builddep [0;97;mpath/to/pkgname.spec{:ansi}`!
 
 - You don't need to create `pkg`. It's not supposed to exist, just needs to be at the end of the build command
-- Modify the architecture to match your machine (`x86_64`, `aarch64`)
+- Modify the architecture to match your machine (`x86_64`, `i386`, `aarch64`)
+- If needed (404 errors when building off `rawhide`, you can also modify the version it builds on (`43`, `42`, `el10`, etc.)
 - If the package fails to build, fix your spec file accordingly
   - Usually the actual useful error message can be found before the Python traceback (from mock).
-- The built RPM will be inside `anda-build/`
+- The built RPM(s) will be inside `anda-build/`
 
 ## Done?
 
+- Review our [policies](/terra/policy) and [guidelines](/terra/guidelines)
 - Git commit and push; remember you must sign your commits!
-- Create a pull request that merges to the `main` branch
+- Create a pull request that merges to the `frawhide` branch, this is equivalent to main or master
 
 ## Automatic updates
 
 The system regarding automatic updates [are described here](autoupdate). Here is an overview:
 
 [Andaman] supports updating via `.rhai` packages.
-See the "book" (more like guide) for [Rhai](https://rhai.rs/book/).
+See the "book" (more like guide) for [Rhai].
 
-- Create `update.rhai` inside the package folder.
+- Create an `update.rhai` file inside the folder of your package alongside your `.spec` file.
 - See references from other packages.
-- You also need to add `labels { nightly = "1" }{:hcl}` in anda.hcl for nightly packages.
+- You also need to add `labels { nightly = "1" }{:hcl}` in `anda.hcl` for nightly packages.
 
 <Callout type="info">Remember to add semicolons in Rhai scripts! (`;`)</Callout>
 <Callout type="info">
@@ -177,23 +214,3 @@ See the "book" (more like guide) for [Rhai](https://rhai.rs/book/).
   }
   ```
 </Callout>
-
-## SRPM Macros
-
-We provide SPRM macros to ease packaging and better integrate into our workflow. Please use these macros over their counterparts when possible.
-
-These are provided in the `anda-srpm-macros` package, if you use them, make sure to add `anda-srpm-macros` as a `BuildRequires` in the spec file.
-
-| Macro                           | Function                                                               |
-| ------------------------------- | ---------------------------------------------------------------------- |
-| `%cargo_prep_online`            | Enables internet access for `cargo`. Replaces `%cargo_prep` in `%prep` |
-| `%cargo_license_online`         | Replaces `%cargo_license` in `%build`                                  |
-| `%cargo_license_summary_online` | Replaces `%cargo_license_summary` in `%build`                          |
-| `%go_prep_online`               | Same as `go mod download`                                              |
-| `%go_build_online %goipath`     | Builds a go package in `%build`                                        |
-| `%nim_prep`                     | Setting up `nimble`                                                    |
-| `%nim_build` or `%nim_c`        | Builds a package. Requires an argument to `src/pkgname`                |
-
-[andaman]: https://github.com/FyraLabs/anda/
-[rpm packaging guide]: https://rpm-packaging-guide.github.io/
-[spec file format]: https://rpm-software-management.github.io/rpm/manual/spec.html
