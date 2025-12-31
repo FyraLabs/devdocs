@@ -1,0 +1,445 @@
+---
+title: Guidelines
+description: "Terra-specific guidelines."
+---
+
+import { Callout } from "nextra/components";
+import { Split } from "../../components/split";
+
+# Terra Guidelines
+
+<Callout type="info">
+  The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+  NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and
+  "OPTIONAL" in this document are to be interpreted as described in
+  [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and
+  [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
+</Callout>
+
+Packagers and maintainers MUST follow the policies and guidelines listed in this document.
+Everything covered here is one of 3 things:
+
+- Differences from the [Fedora Packaging Guidelines]
+- Changes in addition to the [Fedora Packaging Guidelines]
+- Terra-exclusive guidelines
+
+It is highly recommended to read through the [Fedora Packaging Guidelines] on langauges/sections not listed here, or for greater detail.
+
+## TL;DR
+
+Condensed version of guidelines.
+
+<Callout type="warning">
+  REMEMBER TO [BUMP](#fixing-packages) `Release:{:rpmspec}` if propose new changes (unless pkg with current release num doesn't exist in [repos](https://repos.fyralabs.com/))
+</Callout>
+
+No period at end of `Summary:{:rpmspec}`, but add period at end of `%description{:rpmspec}`.
+[`%changelog`](/terra/guidelines#fixing-packages) only for large changes.
+Prefer patching e.g. `-p1` at `%autosetup` over using `%autopatch`.
+Prefer `%elifarch` over `%endif` + `%ifarch`.
+
+Use [`%pkg_completion`](/terra/srpm#pkg_completion) for shell completions.
+Use [`%pkg_devel_files`](/terra/srpm#pkg_devel_files), [`%pkg_libs_files`](/terra/srpm#pkg_libs_files), [`%pkg_static_files`](/terra/srpm#pkg_static_files).
+See [Development and Shared Libraries](/terra/guidelines#development-and-shared-libraries) section.
+
+Install `.desktop` file to `%_appsdir` for graphical apps. [Guide here](/terra/guidelines#providing-your-own-desktop-file). Prefer upstream provided ones over manually generating one.
+
+Follow Fedora guidelines for interpreted (ex. Python/Ruby) & dynamically (ex. C/++) compiled langs.
+Statically compiled lang guidelines follow.
+
+For [Rust](#rust), use `rust2rpm`, suffix `_online` to `%cargo_prep`, `%cargo_license`, `%cargo_license_summary`;
+remove `%generate_buildrequires{:rpmspec}` section.
+If no flags to `%cargo_build`, remove it,
+else add flags to it and replace `%cargo_install` with `%crate_install_bin`.
+Also `%rustup_nightly` exists btw, [see our macros](../terra/srpm#rust).
+
+For [Go](#go), use `go2rpm`, rename package name to sensible one,
+remove `%generate_buildrequires{:rpmspec}` section, 
+EITHER add `%global gomodulesmode GO111MODULE=on{:rpmspec}` OR replace `%goprep` with [`%goprep_online`](/terra/srpm#goprep_online).
+
+For [Nim](#nim), use one of below. Also `%nim_c` = `%nim_build`, [see our macros](/terra/srpm#nim).
+
+<Split>
+  <Split.Left>
+    ```rpmspec
+    %prep
+    %autosetup
+    %nim_prep
+
+    %build
+    %nim_c src/dive
+    ```
+  </Split.Left>
+  <Split.Right>
+    ```rpmspec
+    %prep
+    %autosetup -Sgit
+
+    %build
+    atlas init
+    atlas rep atlas.lock
+    %nim_c src/netto
+    ```
+  </Split.Right>
+</Split>
+
+For [Zig](#zig), `BuildRequires: zig zig-rpm-macros zig-srpm-macros{:rpmspec}`.
+If doesn't build with build arguments provided by Fedora `%zig_build`
+(e.g. `ReleaseFast` required, microarchitectures), try [`%zig_build_target`](#zig_build_target).
+Remember to try e.g. `-Dstrip=false`. If still no debug info, `%global debug_package %{nil}{:rpmspec}`.
+If can't dynamically link all deps / no deps to link, `%zig_build_target` with `-s`, then `-fsys=pkgname` for things dyn-linkable.
+
+## Terra Packaging Guidelines
+
+### Usage of the `mold` Linker
+
+We encourage the use of [`mold`](https://github.com/rui314/mold), which can speed up build times, especially in large projects.
+You MAY enable it in C/++ projects by adding `-fuse-ld=mold` in `CFLAGS`/`CXXFLAGS`.
+
+The `%with_mold` flag is enabled by default in `anda-srpm-macros`. `mold` is also preinstalled in the builders.
+
+You can disable `mold` for Rust and Nim by using `%bcond_with mold`.
+
+### Interpreted Languages (Python, Ruby, etc.)
+
+All packages using interpreted languages SHOULD follow the Fedora guidelines.
+All dependencies **_must_** be packaged individually as they are considered runtime dependencies.
+
+### Dynamically Compiled Languages (C, C++, Vala)
+
+Dependencies required for runtime MUST be packaged separately.
+
+### Statically Compiled Languages
+
+Terra does not strictly follow Fedora's reproducibility requirements, and we do not want large amounts of development libraries for them, packagers SHOULD vendor dependencies on build time.
+
+Terra's Mock sandbox has networking enabled, so builders can download the dependencies directly on build time.
+
+#### Rust
+These are guidelines for packaging projects written in [Rust](https://rust-lang.org).
+
+For the official Rust language documentation, [see here](https://rust-lang.org/learn).
+
+- You SHOULD add (at least!) the following build dependencies to your spec file:
+  - `BuildRequires: anda-srpm-macros{:rpmspec}`
+  - `BuildRequires: cargo-rpm-macros{:rpmspec}`
+  - `BuildRequires: rust-srpm-macros{:rpmspec}`
+- You MAY generate the spec file using `rust2rpm`.
+- You SHOULD NOT use the tradtional Fedora `%cargo_prep{:rpmspec}` macro. Instead, use `%cargo_prep_online{:rpmspec}` from `anda-srpm-macros`. Also, you SHOULD remove the `%generate_buildrequires{:rpmspec}` macro, as it is useless.
+- It is RECOMMENDED to use `%cargo_license_online{:rpmspec}` and `%cargo_license_summary_online{:rpmspec}`, although they are not a strict requirement.
+- You SHOULD NOT use both `%cargo_build{:rpmspec}` and `%cargo_install{:rpmspec}` in the same spec file as anything that calls `cargo install` might cause a rebuild due to a cargo bug. You SHOULD only include `%cargo_build{:rpmspec}` or `%cargo_install{:rpmspec}`. In most cases, you can just omit `%cargo_build{:rpmspec}` entirely and it will build just fine.
+
+Example:
+
+```rpmspec
+%prep
+%autosetup -n %{crate}-%{version} -p1
+%cargo_prep_online
+
+%build
+%{cargo_license_online} > LICENSE.dependencies
+
+%install
+%cargo_install
+```
+
+In rare cases, you may need to use `%cargo_build{:rpmspec}` and `%crate_install_bin{:rpmspec}` instead:
+
+```rpmspec
+%prep
+%autosetup -n %{crate}-%{version}
+%cargo_prep_online
+
+%build
+%{cargo_license_online} > LICENSE.dependencies
+%{cargo_build} --locked
+
+%install
+# install the binary from target/rpm/%{crate} to %buildroot%_bindir
+%crate_install_bin
+```
+
+If Rust nightly is required, add the `%rustup_nightly{:rpmspec}` macro to `%prep{:rpmspec}`.
+
+Check the [Rust section on the SRPM page](../terra/srpm#rust) for more information on these macros.
+
+#### Go
+These are guidelines for packaging projects written in [Go](https://go.dev).
+
+For the official Go language documentation, [see here](https://go.dev/doc).
+
+- You SHOULD add (at least!) the following build dependencies to your spec file:
+  - `BuildRequires: go-rpm-macros{:rpmspec}`
+  - `BuildRequires: go-srpm-macros{:rpmspec}`
+- If you use `go2rpm`, you SHOULD NOT use the default naming, as an unnecessarily long package name is bad for UX. You MAY put the name generated by `go2rpm` in the `Provides:{:rpmspec}` field.
+- You SHOULD remove the `%generate_buildrequires{:rpmspec}` section, and either add `%global gomodulesmode GO111MODULE=on{:rpmspec}` OR use `%goprep_online{:rpmspec}` instead of `%goprep{:rpmspec}` in the `%prep{:rpmspec}` section. 
+  - You SHOULD add `BuildRequires: anda-srpm-macros{:rpmspec}` to your spec if using `%goprep_online{:rpmspec}`.
+
+#### Nim
+These are guidelines for packaging projects written in [Nim](https://nim-lang.org).
+
+For the official Nim language documentation, [see here](https://nim-lang.org/documentation.html).
+
+- You SHOULD add (at least!) the following build dependencies to your spec file:
+  - `BuildRequires: anda-srpm-macros{:rpmspec}`
+  - `BuildRequires: nim{:rpmspec}`
+- You SHOULD use our [Nim macros](../terra/srpm#nim).
+
+In most cases, use `nimble` to download dependencies in `%prep{:rpmspec}`,
+then `%build{:rpmspec}` with `nim`, e.g.[^1]:
+
+```rpmspec
+%prep
+%autosetup
+%nim_prep
+
+%build
+%nim_c src/dive
+
+%install
+install -Dm755 src/dive -t %buildroot%_bindir
+```
+
+The use of the [`atlas`](https://github.com/nim-lang/atlas) package cloner is also recognized, e.g.[^2]:
+
+```rpmspec
+%prep
+%autosetup -Sgit
+
+%build
+atlas init
+atlas rep atlas.lock
+%nim_c src/netto
+```
+
+#### Zig
+These are guidelines for packaging projects written in [Zig](https://ziglang.org).
+
+For the official Zig language documentation, [see here](https://ziglang.org/learn).
+
+- You SHOULD add (at least!) the following build dependencies to your spec file:
+  - `BuildRequires: zig{:rpmspec}`
+  - `BuildRequires: zig-rpm-macros{:rpmspec}`
+  - `BuildRequires: zig-srpm-macros{:rpmspec}`
+- When building Zig projects you SHOULD keep in mind that Zig is an optimization centric language and some projects may rely on build arguments different than what the [upstream Fedora macros](https://src.fedoraproject.org/rpms/zig/blob/rawhide/f/macros.zig) set. For example, many Zig projects rely on `ReleaseFast` (or more rarely, `ReleaseSmall`) builds for runtime optimization. Additionally, some Zig projects only work correctly when built for certain microarchitectures or higher (usually, this is `x86_64_v2` instead of `baseline` due to reliance on SIMD).
+- For these reasons, you SHOULD refer to upstream guidance when packaging Zig projects.
+- If any of the scenarios above apply, you MAY use `%zig_build_target` with appropriate flags instead of `%zig_build`. You however SHOULD use `%zig_build` instead if none of the above apply.
+  - If using `%zig_build_target`, you SHOULD add `BuildRequires: anda-srpm-macros{:rpmspec}` to your spec.
+  - For more information on `%zig_build_target`, please see its documentation on our [macros page](../terra/srpm#zig_build_target).
+
+Regardless of build macro in use, they should be used in either the `%build{:rpmspec}` or `%install{:rpmspec}` section depending on how the project is built (as some can be built directly into root by setting the `DESTDIR=%{buildroot}{:rpmspec}` variable).
+
+Example using `%zig_build`:
+```rpmspec
+%build
+%{zig_build} \
+  -Demit-docs
+```
+
+Example using `%zig_build_target`:
+```rpmspec
+%build
+%{zig_build_target -r fast -c x86_64_v2} \
+  -Demit-docs
+```
+
+- Note that `ReleaseFast` and especially `ReleaseSmall` will strip some debug info from the binaries.
+- Some Zig projects have enabled build flags to override this and those SHOULD be used if available (this will usually be `-Dstrip=false`).
+- If they are not, you may need to disable debug packages using the global variable `%global debug_package %{nil}{:rpmspec}` if not enough debug info is preserved to strip.
+
+For projects where dynamic linking of all dependencies is simply not possible (such as the version in the Fedora repos is too new or too old) or that have no dependencies to link, you MAY use `%zig_build_target` with the `-s` flag. You SHOULD still dynamically link compatible dependencies by using `-fsys=pkgname{:rpmspec}`.
+
+### Shell Completions
+
+- SHOULD be a subpackage.
+- SHOULD use the [`%pkg_completion{:rpmspec}` macro](../terra/srpm#pkg_completion).
+
+### Development and Shared Libraries
+
+You SHOULD try to use the [`%pkg_devel_files{:rpmspec}`, `%pkg_libs_files{:rpmspec}` and `%pkg_static_files{:rpmspec}` macros](../terra/srpm#subpackages).
+
+Shared library packages SHOULD be suffixed with `-libs{:rpmspec}`.
+These packages SHOULD NOT contain anything **except**:
+
+```rpmspec
+%_libdir/*.so.*
+%doc …
+%license …
+```
+
+<Callout type="warning">
+  Do not confuse the `-libs` file (`*.so.*`) with a `-devel` file (`*.so`).
+</Callout>
+
+Development library packages SHOULD be suffixed with `-devel`.
+These packages SHOULD NOT contain anything **except**:
+
+```rpmspec
+%doc …
+%license …
+%_includedir/*
+# ^ source files, depending on the language, could be in other locations
+%_libdir/*.so
+%_libdir/*.a
+%_libdir/pkgconfig/%{name}.pc
+# and other development files (.vapi, .typelib, .gir, etc.).
+```
+
+### Miscellaneous
+
+#### Fixing Packages
+
+- If a PR is changing anything user-facing, the `Release:{:rpmspec}` tag SHOULD be bumped. The only exception SHOULD be if you are fixing a package where the current version does not and has never built.
+  - Some (not all!) examples of user-facing fixes requiring a `Release:{:rpmspec}` bump:
+    - Installing a missing file.
+    - Adding any build or non-build, hard or soft, forward or backward dependencies.
+    - Changing any user-facing tags (`URL:{:rpmspec}`, `License:{:rpmspec}`, `Summary:{:rpmspec}`, etc.).
+- If a package fix PR is fixing/changing anything build-facing, the `Release:{:rpmspec}` tag SHOULD NOT need to be bumped.
+  - Some (not all!) examples changes NOT requiring a `Release:{:rpmspec}` bump:
+    - Fixing a package that failed to build when the `Version:{:rpmspec}` tag is bumped.
+    - Any changes that do not affect the final package.
+- If you are unsure if a bump is needed, bump it.
+- You SHOULD add a `%changelog{:rpmspec}` entry for large changes, such as file renames, new build process, etc. Small changes like adding build dependencies or adding one-liners to make a build work MAY be omitted from adding a `%changelog{:rpmspec}` entry.
+
+#### Patches
+
+- Packages SHOULD apply patches (usually via the `-p*` flag) in `%autosetup{:rpmspec}`. If this is not possible (typically when `%autosetup{:rpmspec}` is not used), you SHOULD use [%autopatch](../rpm/macros#autopatch).
+
+#### Providing Your Own .desktop File
+
+If you are packaging a graphical app that doesn't provide its own `.desktop` file, you SHOULD create one.
+
+##### Creating the .desktop File
+
+Copy the following template:
+
+```
+[Desktop Entry]
+Name=PACKAGE NAME
+Exec=PROVIDED_BINARY
+Icon=ICON NAME
+Type=Application
+```
+
+The `Icon` tag SHOULD NOT a contain full path, just the name of the icon file.
+The `Exec` tag SHOULD be a full path if the binary placed in `/usr/bin` is a symlink.
+If this is not the case, it is up to you if you want to use the full path or not (it will look in the user's `$PATH`).
+
+You SHOULD name this file either `package-name.desktop` or `package_app-ID.desktop`.
+You MAY add more tags, to see all possible tags, read through the [freedesktop specification](https://specifications.freedesktop.org/desktop-entry/latest/).
+
+##### Installing the .desktop File
+
+To install the `.desktop` file:
+
+1. Add it to your package's folder
+2. Add it as a `Source:{:rpmspec}` in the .spec file
+3. Install it
+4. List it in the `%files{:rpmspec}` section
+
+It is RECOMMENDED to use the [`%_appsdir` macro](./srpm#_appsdir) from Anda SRPM instead of `%_datadir/applications/`.
+With [NeoHtop package] as the example:
+
+```rpmspec
+Source1:  NeoHtop.desktop
+
+...
+
+%install
+install -Dm644 %{SOURCE1} %{buildroot}%{_appsdir}/NeoHtop.desktop
+
+...
+
+%files
+...
+%{_appsdir}/NeoHtop.desktop
+```
+
+##### Validating the .desktop File
+
+You MUST validate your `.desktop` file. To do this, add the following to your spec file:
+
+```rpmspec
+BuildRequires:  desktop-file-utils
+
+...
+
+%check
+desktop-file-validate %{buildroot}%{_appsdir}/NeoHtop.desktop
+
+...
+```
+
+##### Finished Example
+
+`NeoHtop.desktop`:
+
+```
+[Desktop Entry]
+Categories=Utility;
+Comment=A cross-platform system monitor
+Exec=NeoHtop
+Icon=NeoHtop
+Name=NeoHtop
+Terminal=false
+Type=Application
+```
+
+All custom `.desktop` file portions of a spec file:
+
+```rpmspec
+Source1:  NeoHtop.desktop
+
+...
+
+BuildRequires:  desktop-file-utils
+
+%install
+...
+install -Dm644 %{SOURCE1} %{buildroot}%{_appsdir}/NeoHtop.desktop
+
+%check
+desktop-file-validate %{buildroot}%{_appsdir}/NeoHtop.desktop
+
+%files
+...
+%{_appsdir}/NeoHtop.desktop
+```
+
+#### Usage of Periods in Various Package Fields
+You MUST NOT have a period at the end of any `Summary:{:rpmspec}` tags, and you SHOULD have a period at the end of all `%description{:rpmspec}`s.
+
+#### Usage of %elifarch
+
+To make specs easier to read, you SHOULD use `%ifarch{:rpmspec}` followed by `%elifarch{:rpmspec}` before `%endif{:rpmspec}` in specs where build steps are arch dependent.
+
+Incorrect:
+
+```rpmspec 
+%ifarch x86_64
+%define arch %{nil}
+%endif
+%ifarch aarch64
+%define arch arm64-
+%endif
+```
+
+Correct:
+
+```rpmspec
+%ifarch x86_64
+%define arch %{nil}
+%elifarch aarch64
+%define arch arm64-
+%endif
+```
+
+---
+
+# Footnotes
+
+[^1]: https://github.com/terrapkg/packages/blob/e65a762352246f918d12e7c5a0e032ba0b1be73b/anda/langs/nim/dive/umdive.spec
+[^2]: https://github.com/terrapkg/packages/blob/e65a762352246f918d12e7c5a0e032ba0b1be73b/anda/langs/nim/netto/netto.spec
+
+[Fedora Packaging Guidelines]: https://docs.fedoraproject.org/en-US/packaging-guidelines/
+[NeoHtop package]: https://github.com/terrapkg/packages/tree/frawhide/anda/apps/neohtop

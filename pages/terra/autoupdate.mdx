@@ -24,7 +24,7 @@ let ver = gh("FyraLabs/subatomic"); // gets latest version from GitHub
 rpm.version(ver); // updates the version in the spec file using `ver`
 ```
 
-<Callout type="warning">you need SEMICOLONS! (`;`)</Callout>
+<Callout type="warning">you MUST have semicolons (`;`)</Callout>
 
 Updates are triggered every 10 minutes using `[1;32manda[97m update{:ansi}`.
 
@@ -80,6 +80,26 @@ You can obtain the branch name during runtime in Rhai using `labels.branch` (str
 
   Consequently, under normal circumstances and without approval, you are NOT allowed to use GitHub/GitLab related functions.
 </Callout>
+
+#### Weekly packages
+
+Weekly packages are updated every 7 days using
+`[1;32manda[97m update [0;3;37m-vv --filters[0;97;m weekly=[1;35m$([1;32mdate [1;36m"+%w"[1;35m){:ansi}`.
+Their `anda.hcl` files should look something like this:
+
+```hcl
+project pkg {
+	rpm {
+		spec = "pkg.spec"
+	}
+	labels {
+		weekly = 0 # a random number between 0~6 inclusive
+	}
+}
+```
+
+To decide the random number, just search for "_random number between 0 and 6_" with your favourite search engine.
+The random number decides which day in the week will the auto-update script run.
 
 #### Functions and Modules
 

@@ -3,7 +3,7 @@ title: Introduction
 description: Bootstrap a Linux system on Depthcharge with Submarine
 ---
 
-### Section Under Construction
+import { Callout } from "nextra/components";
 
 # Submarine
 ### Experimental bootloader for ChromeOS' Depthcharge
@@ -40,10 +40,18 @@ bc
 openssl-devel
 ```
 
-Additionally, you'll need to install u-root. To install the latest version:
+Additionally, you'll need to install `u-root` and `depthcharge-tools` (if you have the [Terra repository](https://terra.fyralabs.com/), you can `dnf install` them).
+To install the latest versions:
 
 ```bash
 go install github.com/u-root/u-root@latest
+pip3 install depthcharge-tools
+```
+
+Lastly, you may need to install a cross-compile gcc. For example:
+
+```bash
+gcc-aarch64-linux-gnu
 ```
 
 ## Building
@@ -57,14 +65,13 @@ make -j$(nproc) <x86_64|arm64>
 Please note that you **must** pass an architecture target.
 
 The build output is located in `build/`.
-For testing, an image is built at `build/submarine.bin` which you can directly flash onto an external drive.
-So, for example, replace `/dev/sdX` with the device file of the external drive:
-
-```bash
-sudo dd if=build/submarine.bin of=/dev/sdX
-```
+You can now `dd` the `.bin` to a disk, or a `.kpart` to a partition, more information below.
 
 ## Usage
+
+<Callout type="info">
+  Please note, Submarine can NOT boot ChromeOS in its current state.
+</Callout>
 
 Before you can boot submarine, you need to enable booting from external storage. On your Chrome device, make sure developer mode is enabled, then go into ChromeOS, press Ctrl + Alt + F2 (This will either be the forward or refresh key on the top row) to switch to vt2. Log in as root (chronos, no password) and run the following command:
 
@@ -73,15 +80,31 @@ sudo enable_dev_usb_boot
 ```
 
 For quick testing, you can flash `submarine-<arch>.bin` to an external drive. This image includes a partition table already set up for booting ChromeOS kernels.
+So, for example, replace `/dev/sdX` with the device file of the external drive:
 
-Alternatively, you can create your own partition to install submarine to. Start by creating an EXT4 partition (16MB for x86_64, 64MB for aarch64). Next you will edit the partition flags to tell depthcharge that you can boot from that partition by running the following command:
+```bash
+sudo dd if=build/submarine.bin of=/dev/sdX
+```
+
+Alternatively, you can create your own partition to install submarine to. Start by creating an EXT4 partition (16MB for x86_64, 64MB for aarch64). Next you will edit the partition flags to tell depthcharge that you can boot from that partition by running the following command (you may need to install the `vboot-utils` package):
 
 ```bash
 cgpt add -i <partition number> -t kernel -P 15 -T 1 -S 1 /dev/sdX
 ```
 
 As always, substitute in the correct values for your drive. You can then flash `submarine-<arch>.kpart` to the partition you just created.
+So, for example, replace `/dev/sdX` with the device file of the external drive:
+
+```bash
+sudo dd if=build/submarine-<arch>.kpart of=/dev/sdX
+```
 
 After installing submarine to an external drive, plug in your drive with submarine to your ChromeOS device. On the developer mode screen, press Ctrl + U to boot from external storage. If all goes well, you should soon see the submarine boot menu.
 
+If you want to install submarine to your internal disk to avoid having to boot using an external storage device, install your operating system like normal, and then create a partition on the internal disk for submarine as described above.
+You will then need to flash the `.kpart` and set the flags using the `cgpt` command above (note, if you do not want to make another partition, you can safely wipe the EFI partition and use that space for submarine instead).
+
 If you run into any issues, please report them. Include the model of your device, which can be found on the developer mode screen.
+
+If you want a guide on how to install Ultramarine using this 'manual' method, follow the instructions [here](https://wiki.ultramarine-linux.org/en/anywhere/chromebook/#manual-installation---note-that-ultramarine-chromebook-edition-will-be-a-much-easier-experience-once-released).
+Note that we also have (unofficial) guides for some other distributions in this devdocs section.

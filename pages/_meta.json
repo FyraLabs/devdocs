@@ -37,5 +37,10 @@
     "title": "RPM",
     "type": "page",
     "display": "hidden"
+  },
+  "suzyqboard": {
+    "title": "SuzyQ Board",
+    "type": "page",
+    "display": "hidden"
   }
 }
