@@ -5,7 +5,7 @@ import { Callout } from "nextra/components";
 [Taidan] is the [out-of-box experience] for Ultramarine 42 and newer.
 It's built with Rust and [libhelium].
 
-Taidan is standalone from Readymade, meaning you can combine it with any installer, or even lack thereof (in the case of preinstalled images.)
+Taidan is standalone from Readymade, meaning you can combine it with any installer, or even lack thereof (in the case of preinstalled images).
 
 ## History
 
@@ -15,7 +15,6 @@ menu […] meant to be used for Ultramarine Linux 39's Anaconda post-install men
 We messed this up, and ended up repurposing Stellar to install Nvidia and Broadcom drivers if you connected to the internet during installation.
 
 We decided pretty early in Readymade's design that the system should be configured on first-boot rather than in the installer, leading to us building Taidan.
-Development spanned less than 3 months from October '24 to January '25.
 
 ## Configuration
 
@@ -37,7 +36,7 @@ The basics should just work on most distributions! If you need more, Taidan can 
 - Setting the theme and accent colour
 - Enabling scheduled screen tinting (night light)
 - System tweaks (distro-defined, e.g. swapping default Flatpaks for RPMs)
-- Provide a selection of apps for the user to pick from
+- Provide a catalogue of apps for the user to pick from
 
 <Callout type="info">
   Taidan generates part of the configurations from the `/etc/os-release` file.
@@ -53,7 +52,7 @@ in `/usr/share/taidan/po/`. These translations are preferred over the compile-ti
 
 ### Tweaks
 
-Taidan allows distributions to present "tweaks", options to be presented to the user, in Ultramarine we use
+Taidan allows distributions to present "tweaks" as options to be presented to the user, in Ultramarine we use
 tweaks to offer RPMs over Flatpaks for those who prefer it.
 
 Tweaks are read at runtime.
@@ -92,7 +91,7 @@ The `up` executable will be given a single argument of either 1 or 0, denoting w
 
 In addition, the `Settings` struct is serialized as JSON and fed to the executable via stdin.
 
-### Catalogue Customisations
+### Catalogue Customizations
 
 Taidan reads the `/etc/com.fyralabs.Taidan/catalogue/` folder for the software catalogue.
 This may be changed by the runtime envvar `TAIDAN_CATALOGUE_DIR`.

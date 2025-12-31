@@ -2,21 +2,15 @@ import { Callout } from "nextra/components";
 
 # Readymade
 
-[Readymade] is the new installer for Ultramarine.. It's built with Rust and
-[libhelium] and comes with a custom backend based on systemd-repart.
+[Readymade] is the new installer for Ultramarine.
+It's built with Rust and [libhelium] and comes with a custom backend based on systemd-repart.
+It is currently available as a [preview download], and will become the default installer soon.
 
-Readymade was created due to frustrations with Anaconda.
-The most common complaint we receive about Ultramarine is "why is Anaconda (slow/ugly/hard to use/like this)".
-
-We knew we had to replace Anaconda at some point,
-but had been putting it off, until we tried to make Anaconda install to a Chromebook.
+Readymade was created due to the limitations of the Anaconda installer, especially when it came to installing to Chromebooks.
 
 Chromebooks are weird, so to boot Linux on them we have to act weird. We flash a binary to a partition,
 and don't have an ESP or BIOSBOOT partition.
-Anaconda does not like this, this is when we discovered that Anaconda is hardcoded for
-EFI and BIOS systems to have very particular disk layouts, with no option for distributions to change it.
-
-So we decided to fix it, and that's how Readymade was born.
+Anaconda does not like this, as it's hardcoded for EFI and BIOS systems to have very particular disk layouts, with no option for distributions to change it.
 
 <Callout type="info">
   It's very important to note that Readymade does not play any role in building
@@ -41,7 +35,7 @@ pkgconfig(libhelium-1)
 pkgconfig(libgnome-desktop4)
 ```
 
-Dependencies: (according to `dnf rq --providers-of=requires readymade`)
+Runtime dependencies: (according to `dnf rq --providers-of=requires readymade`)
 
 ```
 cairo
@@ -71,7 +65,7 @@ Configurations are read from `/etc/readymade.toml` or, a path specified by the `
 
 Some example configuration files for Ultramarine are in `templates/`.
 
-The Universal Blue configurations are available here:
+The Universal Blue Bluefin configurations are available here:
 https://github.com/ublue-os/bluefin/blob/3c75eac59184afbe89250f2a4eaaf4c748b23ec8/iso_files/configure_iso.sh#L21-L53
 
 ## Running
@@ -102,6 +96,11 @@ Note how loop devices become valid install targets within debug builds, select t
 You can also use another disk in your system, or a USB drive.
 
 The above commands are available as scripts in the `scripts/` directory.
+
+### Packages
+
+We have a stable and nightly version of [Readymade packaged in Terra].
+Feel free to pull in from Terra, or repackage as needed.
 
 ## Debugging
 
@@ -167,3 +166,5 @@ Readymade will execute the modules in the order specified in the configuration.
 
 [Readymade]: https://github.com/FyraLabs/readymade
 [libhelium]: https://github.com/tau-OS/libhelium
+[preview download]: https://ultramarine-linux.org/download
+[Readymade packaged in Terra]: https://github.com/terrapkg/packages/tree/frawhide/anda/system/readymade
