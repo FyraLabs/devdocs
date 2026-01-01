@@ -58,7 +58,7 @@ Used in [`%pkg_completions`](#pkg_completion), or manually when `%pkg_completion
 ### %_gnomeextensionsdir
 Expands to: `%{_datadir}/gnome-shell/extensions%{?uuid:/%{uuid}}{:rpmspec}`
 
-**NOTE:** %{uuid}{:rpmspec}` is usually defined in gnome-shell-extension packages. if the macro is defined in your spec file (`%global uuid PKG-UUID`), it will be appended to the path upon expansion as: `%{_datadir}/gnome-shell/extensions/%{uuid}{:rpmspec}`.
+**NOTE:** `%{uuid}{:rpmspec}` is usually defined in gnome-shell-extension packages. if the macro is defined in your spec file (`%global uuid PKG-UUID`), it will be appended to the path upon expansion as: `%{_datadir}/gnome-shell/extensions/%{uuid}{:rpmspec}`.
 Otherwise, it will expand without `%{uuid}`, as: `%{_datadir}/gnome-shell/extensions{:rpmspec}`.
 Note that you SHOULD then need to add the extension's UUID after this macro.
 
