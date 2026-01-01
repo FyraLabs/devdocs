@@ -55,6 +55,12 @@ Expands to: `%_datadir/elvish/lib/completions{:rpmspec}`
 
 Used in [`%pkg_completions`](#pkg_completion), or manually when `%pkg_completions` cannot be used.
 
+### %_gnomeextensionsdir
+Expands to: `%{_datadir}/gnome-shell/extensions/%{uuid}{:rpmspec}` or `%{_datadir}/gnome-shell/extensions{:rpmspec}`
+
+**NOTE:** If the `%{uuid}{:rpmspec}` macro is defined, it will be appended to the path upon expansion: `%{_datadir}/gnome-shell/extensions/%{uuid}{:rpmspec}`.
+Otherwise, it will expand without a `uuid`, which MUST be added manually: `%{_datadir}/gnome-shell/extensions{:rpmspec}`.
+
 ### %_hicolordir
 Expands to: `%_iconsdir/hicolor{:rpmspec}` or `/usr/share/icons/hicolor{:rpmspec}`
 
