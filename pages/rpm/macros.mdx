@@ -840,6 +840,7 @@ Parameterized as `%patch(b:p:P:REz:)`.
 
 This list is NOT exhaustive. Some macros are not built-in. If your
 machine does not come with them, try `dnf install 'rpm_macro(macro_name)'{:sh}`.
+Macros with the '(Terra only)' warning are part of the `anda-srpm-macros` package in Terra, documentation for these can be found on the [Terra SRPM devdocs page](https://developer.fyralabs.com/terra/srpm#directories).
 
 ```
 /
@@ -871,6 +872,7 @@ machine does not come with them, try `dnf install 'rpm_macro(macro_name)'{:sh}`.
 ┃ ┃ ┣╸lua
 ┃ ┃ ┃ ┗╸%{lua_version} ⇒ %{lua_libdir}
 ┃ ┃ ┣╸ocaml           ⇒ %{ocamldir}
+┃ ┃ ┣╸pkgconfig       ⇒ %{_pkgconfigdir} (Terra only)
 ┃ ┃ ┗╸security        ⇒ %{_pam_moduledir}
 ┃ ┣╸lib               ⇒ %{_libdir} ONLY ON `noarch` OR 32-BIT PLATFORMS
 ┃ ┃ ┣╸binfmt.d        ⇒ %{_binfmtdir}
@@ -912,6 +914,7 @@ machine does not come with them, try `dnf install 'rpm_macro(macro_name)'{:sh}`.
 ┃ ┣╸libexec           ⇒ %{_libexecdir}
 ┃ ┃ ┗╸perl5-tests     ⇒ %{perl_testdir}
 ┃ ┗╸share             ⇒ %{_datadir} %{_datarootdir}
+┃   ┣╸applications    ⇒ %{_appsdir} (Terra only)
 ┃   ┣╸bash-completion
 ┃   ┃ ┗╸completions   ⇒ %{bash_completions_dir}
 ┃   ┣╸cargo
@@ -925,13 +928,19 @@ machine does not come with them, try `dnf install 'rpm_macro(macro_name)'{:sh}`.
 ┃   ┃ ┗╸%{name}      ⇒ %{_pkgdocdir}
 ┃   ┣╸elvish
 ┃   ┃ ┗╸lib
-┃   ┃   ┗╸completions ⇒ %{elvish_completions_dir}
+┃   ┃   ┗╸completions ⇒ %{elvish_completions_dir} (Terra only)
 ┃   ┣╸fish
 ┃   ┃ ┗╸vendor_completions.d ⇒ %{fish_completions_dir}
 ┃   ┣╸fonts           ⇒ %{_fontbasedir}
 ┃   ┣╸fontconfig
 ┃   ┃ ┗╸conf.avail    ⇒ %{_fontconfig_templatedir}
+┃   ┣╸gnome-shell
+┃   ┃ ┗╸extensions    ⇒ %{_gnomeextensionsdir} (Terra only)
+┃   ┃   ┗╸%{uuid}     ⇒ %{_gnomeextensionsdir} (When %{uuid} is defined in a spec) (Terra only)
 ┃   ┣╸icons           ⇒ %{_iconsdir}
+┃   ┃ ┗╸hicolor       ⇒ %{_hicolordir} (Terra only)
+┃   ┃   ┗╸scalable
+┃   ┃     ┗╸apps      ⇒ %{_scalableiconsdir} (Terra only)
 ┃   ┣╸info            ⇒ %{_infodir}
 ┃   ┣╸ivy-xmls        ⇒ %{_ivyxmldir}
 ┃   ┣╸java            ⇒ %{_javadir}
@@ -944,6 +953,9 @@ machine does not come with them, try `dnf install 'rpm_macro(macro_name)'{:sh}`.
 ┃   ┣╸man             ⇒ %{_mandir}
 ┃   ┣╸maven-poms      ⇒ %{_mavenpomdir}
 ┃   ┣╸metainfo        ⇒ %{_metainfodir}
+┃   ┣╸nushell
+┃   ┃ ┗╸vendor
+┃   ┃   ┗╸autoload    ⇒ %{nushell_completions_dir} (Terra only)
 ┃   ┣╸pam.d           ⇒ %{_pam_vendordir}
 ┃   ┣╸pkgconfig
 ┃   ┃ ┗╸personality.d ⇒ %{pkgconfig_personalitydir}
