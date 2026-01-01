@@ -56,7 +56,7 @@ Expands to: `%_datadir/elvish/lib/completions{:rpmspec}`
 Used in [`%pkg_completions`](#pkg_completion), or manually when `%pkg_completions` cannot be used.
 
 ### %_gnomeextensionsdir
-Expands to: `%{_datadir}/gnome-shell/extensions/%{uuid}{:rpmspec}` or `%{_datadir}/gnome-shell/extensions{:rpmspec}`
+Expands to: `%{_datadir}/gnome-shell/extensions%{?uuid:/%{uuid}}{:rpmspec}`
 
 **NOTE:** %{uuid}{:rpmspec}` is usually defined in gnome-shell-extension packages. if the macro is defined in your spec file (`%global uuid PKG-UUID`), it will be appended to the path upon expansion as: `%{_datadir}/gnome-shell/extensions/%{uuid}{:rpmspec}`.
 Otherwise, it will expand without `%{uuid}`, as: `%{_datadir}/gnome-shell/extensions{:rpmspec}`.
