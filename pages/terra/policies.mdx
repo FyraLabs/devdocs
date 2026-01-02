@@ -141,14 +141,6 @@ while `%latest_stable_version{:rpmspec}` refers to the current latest released v
 
 If upstream does not provide a version, use `Commit tacking (no stable version tag)` and replace `%unreleased_version{:rpmspec}` as `0{:rpmspec}`.
 
-### Packager Field
-
-The package maintainer of a package MUST be added to the `Packager:{:rpmspec}` preamble as follows:
-
-```rpmspec
-Packager: Raboneko <raboneko@fyralabs.com>
-```
-
 ### Release Field
 
 The `Release:{:rpmspec}` preamble MUST NOT contain information regarding upstream versioning,
