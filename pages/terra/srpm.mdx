@@ -247,7 +247,7 @@ SHOULD be used to build Electron projects with [Bun](https://bun.sh/).
 Available flags:
 - `-c{:rpmspec}`: Run `%{__bun} ci{:rpmspec}` instead of `%{__bun} install{:rpmspec}`. Analogous to `%{__bun} install --frozen-lockfile{:rpmspec}`. May be necessary for projects with stricter build dependencies.
 - `-e{:rpmspec}`: Execute commands and modules within the Bun build environment.
-- `-v{:rpmspec}`: Run [Electron Vite](https://electron-vite.org/) build steps. Not needed for all Electron apps.
+- `-v{:rpmspec}`: Run Electron Vite build steps. Not needed for all Electron apps.
 - `-N{:rpmspec}`: Runs `--no-save{:rpmspec}` on the `%{__bun} install{:rpmspec}` step. This prevents updating or (re)creating a lockfile to prevent freezing.
 - `-r <argument>{:rpmspec}`: Executes `%{__bun} run{:rpmspec}` for scripts in the `package.json`. Expects an argument in place of `<argument>`.
 - `-F{:rpmspec}`: Runs `--force{:rpmspec}` on the `%{__bun} install{:rpmspec}` step. This will assure all dependencies are the latest versions from the registry, reinstalling them if necessary.
