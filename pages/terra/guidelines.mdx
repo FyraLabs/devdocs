@@ -287,6 +287,26 @@ These packages SHOULD NOT contain anything **except**:
 
 ### Miscellaneous
 
+#### Changelog Entries
+
+You MUST add a Changelog entry when you submit a new package, and you MUST NOT use `%autochangelog`.
+We typically use `Initial package`/`Initial commit`, but anything that describes adding the package is fine.
+
+##### Changing an Existing Package
+
+You SHOULD add a `%changelog{:rpmspec}` entry for large changes, such as file renames, new build process, etc.
+Small changes like adding build dependencies or adding one-liners to make a build work MAY be omitted from adding a `%changelog{:rpmspec}` entry, it is up to you.
+
+##### Copying a Spec from a Different Repository
+
+When copying/porting/using a spec file from a different repository (SUSE, Mandriva, RPMfusion, Copr, etc.), you MUST preserve any changelogs in the spec, and then add your own changelog entry as `Port to Terra`.
+You MAY specify which repo it has been ported from.
+
+##### Modifying Changelog Entries
+
+This *should* not need to be done, the only reasons are if there was a formatting error, date error, or updated name/emails.
+It is also acceptable to add more to previous changelogs (for example, adding missing emails/version), but there MUST be a reason to do this.
+
 #### Fixing Packages
 
 - If a PR is changing anything user-facing, the `Release:{:rpmspec}` tag SHOULD be bumped. The only exception SHOULD be if you are fixing a package where the current version does not and has never built.
@@ -299,7 +319,7 @@ These packages SHOULD NOT contain anything **except**:
     - Fixing a package that failed to build when the `Version:{:rpmspec}` tag is bumped.
     - Any changes that do not affect the final package.
 - If you are unsure if a bump is needed, bump it.
-- You SHOULD add a `%changelog{:rpmspec}` entry for large changes, such as file renames, new build process, etc. Small changes like adding build dependencies or adding one-liners to make a build work MAY be omitted from adding a `%changelog{:rpmspec}` entry.
+- Follow appropriate Changelog procedures outlined in the above section.
 
 #### Patches
 
