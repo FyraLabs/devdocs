@@ -5,6 +5,8 @@ description: Unbrick your ChromeOS Device using the SuzyQ Board
 
 When Unbricking, the SuzyQ Board is no different then using a SuzyQable. Follow [MrChromebox's Unbricking page](https://docs.mrchromebox.tech/docs/support/unbricking/unbrick-suzyq.html).
 
+Please note that mrchromebox UEFI only supports x86_64 Chromebooks, but the SuzyQ Board will support any ARM Chromebook that supports [Closed Case Debugging (CCD)](https://chromium.googlesource.com/chromiumos/third_party/hdctools/+/main/docs/ccd.md) (this should include all aarch64 Chromebooks).
+
 Note that this WILL work on Ultramarine and Fedora. Grab the `flashrom` package from Fedora repositories, and `cbfstool` from [Terra](https://terra.fyralabs.com/).
 
 For other distros/package manaagers, check out [flashrom packaging on Repology](https://repology.org/project/flashrom/versions), and [cbfstool packaging on Repology](https://repology.org/project/coreboot/versions) (note that the package must include `cbfstool`).
