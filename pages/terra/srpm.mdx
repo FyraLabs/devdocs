@@ -610,6 +610,9 @@ Available flags:
 
 Expands to: `%{__bun} pm trust{:rpmspec}`
 
+#### %bun_test
+TODO
+
 ### Deno Macros
 Macros for using [Deno](https://deno.com).
 
@@ -629,6 +632,15 @@ Call modules directly with DX/Deno X.
 Expands to: `/usr/bin/env %{deno_common_envvars} /usr/bin/dx{:rpmspec}`
 
 SHOULD be used in place of calling `dx` or `deno x` itself.
+
+#### %deno_audit
+TODO
+
+#### %deno_approve_scripts
+TODO
+
+#### %deno_test
+TODO
 
 ### PNPM Macros
 Macros for using [PNPM](https://pnpm.io).
@@ -684,6 +696,9 @@ Available flags:
 
 Expands to: `%{__pnpm} approve-builds{:rpmspec}`
 
+#### %pnpm_test
+TODO
+
 ### Yarn Macros
 Macros for using [Yarn (Yarn Classic/Yarn v1)](https://classic.yarnpkg.com) and [Yarn Berry (Yarn Modern/Yarn v2+)](https://yarnpkg.com).
 
@@ -719,6 +734,9 @@ SHOULD be used in place of calling `yarn dlx` itself.
 Audit Yarn if the package uses bundled Node dependencies. For use in the `%check{:rpmspec}` section.
 
 You SHOULD NOT need to fix vulnerabilities for Node modules that are __not bundled in the final package__. This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
+
+#### %yarn_test
+TODO
 
 ### Tauri Macros
 Macros for using [Tauri](https://v2.tauri.app).
