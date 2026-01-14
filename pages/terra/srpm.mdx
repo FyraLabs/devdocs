@@ -1181,7 +1181,7 @@ For example, `Requires: %{name} = %evr{:rpmspec}`.
 Expands to: `%{?epoch:%{epoch}:}%{version}-%{release}`.
 Real package examples:
 
-`Requires:` example:
+`Requires:{:rpmspec}` example:
 
 ```rpmspec
 BuildRequires:  pkgconfig(pkgconf)
