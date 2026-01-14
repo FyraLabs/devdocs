@@ -183,6 +183,9 @@ Expands to: `/usr/bin/desktop-file-edit{:rpmspec}`
 ### %__desktop_file_install
 Expands to: `/usr/bin/desktop-file-install{:rpmspec}`
 
+### %__desktop_file_validate
+Expands to: `/usr/bin/desktop-file-validate{:rpmspec}`
+
 ### %__update_desktop_database
 Expands to: `/usr/bin/update-desktop-database{:rpmspec}`
 
@@ -217,6 +220,17 @@ Available flags:
 Example usage:
 ```rpmspec
 %desktop_file_install -k Exec,Icon -v pkg,pkgicon -u %u -f path/to/file.desktop
+```
+
+### %desktop_file_validate
+SHOULD be used if you for any reason need to edit a .desktop file a build has already installed.
+
+Available flags:
+- `-f <argument>{:rpmspec}`: MAY be used to specify the file, but is actually OPTIONAL if you list the file path after the macro.
+
+Example usage:
+```rpmspec
+%desktop_file_validate -f path/to/file.desktop
 ```
 
 ### %update_desktop_database
