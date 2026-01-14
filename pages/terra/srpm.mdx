@@ -26,6 +26,11 @@ For upstream macros available in Fedora/Terra, check out our unofficial [macros 
   [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
 </Callout>
 
+<Callout>
+  All macro flags followed by `<argument>` REQUIRE an argument passed to them.
+  All macro flags followed by `<?argument>` MAY have an argument passed to them.
+</Callout>
+
 ## Directories
 These macros define certain system directories, and SHOULD be used in place of the raw directory path.
 
@@ -49,6 +54,27 @@ However the proposed environment variable is `$BUN_HOME`, so we have this for th
 Expands to: `%{rpmbuilddir}/.bun{:rpmspec}`
 
 Used for [Bun macros](#bun-macros).
+
+### %_cargo_home
+Set by our [Cargo prep macros](#rust-macros).
+
+We set this specifically because in online builds if the directory is manually changed as a build step (such as multi Crate repo projects), the Crates could be redownloaded during build and slow down build times. Tools like Tauri also read `.cargo` differently because they change the current working directory.
+
+Expands to: `%{rpmbuilddir}%{?buildsubdir:/%{buildsubdir}}/.cargo{:rpmspec}`
+
+### %_deno_dir
+The directory that Deno's files and cache are stored in.
+
+Expands to: `%{rpmbuilddir}/.deno{:rpmspec}`
+
+Used for [Deno macros](#deno-macros).
+
+### %_deno_install_root
+Directory where Deno installs dependency packages.
+
+Expands to: `%{_deno_dir}/bin{:rpmspec}`
+
+Used for [Deno macros](#deno-macros).
 
 ### %elvish_completions_dir
 Expands to: `%_datadir/elvish/lib/completions{:rpmspec}`
@@ -122,6 +148,13 @@ This macro is subject to deprecation once all EL distributions with an RPM versi
 
 Expands to: `%{?builddir}%{?!builddir:%{_builddir}}{:rpmspec}`
 
+### %_rustup_home
+This macro is set by `%rustup_nightly`.
+
+It sets a specific location for Rustup install files so the toolchain information is never potentially lost during different build steps and to keep files out of `$HOME`.
+
+Expands to: `%{rpmbuilddir}/.rustup{:rpmspec}`
+
 ### %_scalableiconsdir
 Expands to: `%_hicolordir/scalable/apps{:rpmspec}` or `/usr/share/icons/hicolor/scalable/apps{:rpmspec}`
 The directory that SHOULD be used when installing application `.svg` files to.
@@ -141,6 +174,47 @@ Expands to: `%{rpmbuilddir}/.yarn{:rpmspec}`
 
 Used for [Yarn macros](#yarn-macros).
 
+## Desktop File Macros
+These are macros used for working with [.desktop files](https://specifications.freedesktop.org/desktop-entry/latest).
+
+### %__desktop_file_edit
+Expands to: `/usr/bin/desktop-file-edit{:rpmspec}`
+
+### %__desktop_file_install
+Expands to: `/usr/bin/desktop-file-install{:rpmspec}`
+
+### %__update_desktop_database
+Expands to: `/usr/bin/update-desktop-database{:rpmspec}`
+
+### %desktop_file_edit
+SHOULD be used if you for any reason need to edit a .desktop file a build has already installed.
+
+Available flags:
+- `-f <argument>{:rpmspec}`: MAY be used to specify the file, but is actually OPTIONAL if you list the file path after the macro and all other flags.
+- `-k <argument>{:rpmspec}`: List the "keys" to change (Exec, Icon, etc.). Comma separated for multiple keys.
+- `-v <argument>{:rpmspec}`: List the "values" to set for keys you are changing. Comma separated for multiple keys. MUST be listed in the same corresponding order the keys are listed in.
+  - Example: `%desktop_file_edit -k Exec -v /usr/bin/pkg /path/to/filetoedit.desktop`
+- `-u <argument>`  MAY be used to set either `%u` or `%U` in the desktop file. If using this you MUST NOT use `u` as a macro name for any reason.
+  - `%u{:rpmspec}` means that a desktop file can only read one URL at a time, `%U{:rpmspec}` means that it can read multiple at a time. These are what are known as [exec keys](https://specifications.freedesktop.org/desktop-entry/latest/exec-variables.html).
+  - Defer to what the desktop file originally contained if you are unsure which to use.
+
+### %desktop_file_install
+SHOULD be used to install a .desktop file.
+
+Available flags:
+- `-f <argument>{:rpmspec}`: MAY be used to specify the file, but is actually OPTIONAL if you list the file path after the macro and all other flags.
+- `-k <argument>{:rpmspec}`: List the "keys" to change (Exec, Icon, etc.). Comma separated for multiple keys.
+- `-v <argument>`: List the "values" to set for keys you are changing. Comma separated for multiple keys. MUST be listed in the same corresponding order the keys are listed in.
+  - Example: `%desktop_file_install -k Exec -v /usr/bin/pkg /path/to/filetoedit.desktop`
+- `-u <argument>{:rpmspec}`  MAY be used to set either `%u` or `%U` in the desktop file. If using this you MUST NOT use `u` as a macro name for any reason.
+  - `%u{:rpmspec}` means that a desktop file can only read one URL at a time, `%U{:rpmspec}` means that it can read multiple at a time. These are what are known as [exec keys](https://specifications.freedesktop.org/desktop-entry/latest/exec-variables.html).
+  - Defer to what the desktop file originally contained if you are unsure which to use.
+
+### %update_desktop_database
+A post/postun script to update the .desktop database on install/uninstall of the package. Is most likely not necessary for most things.
+
+Expands to: `%{__update_desktop_database} --quiet || :{:rpmspec}`
+
 ## Electron
 These macros assist with the general packaging of applications that use [Electron](https://www.electronjs.org).
 
@@ -153,14 +227,14 @@ Set up all basic requirements including build macros for building an Electron ap
 </Callout>
 
 Available flags:
-- `-a{:rpmspec}` will pull in additional build dependencies often needed particularly when building with NPM.\
-  Currently, this includes `nodejs-devel`, `nodejs-packaging`, and `typescript`.
+- `-a{:rpmspec}` will pull in additional build dependencies often needed particularly when building with NPM.
+  - Currently, this includes `nodejs-devel`, `nodejs-packaging`, and `typescript`.
 - `-D{:rpmspec}` will disable debuginfo package creation. This is necessary for many Electron apps as the bundled libraries often do not contain enough to strip, meaning this step in the build will fail. SHOULD only be used if debug packages cannot be created.
 
 Rundown of what all `%electronmeta{:rpmspec}` does:
 - Converts `%_target_cpu{:rpmspec}` (the RPM build architecture) into `%_electron_cpu{:rpmspec}`, the Electron format for compatible architectures. See the table below for conversions. See also: [%electron_arches](#electron_arches)
   - These are defined because Electron names the build files and directories after the architecture.
-  - The [macros used to build Electron apps](#electron-build-macros) all require this to be set.
+  - The [macros used to build Electron apps](#webapp-build-macros) all require this to be set.
   - In some cases, these architectures are used in the source tarballs for Electron projects.
   - This can also be used to help work with the files if you need to do anything manually.
 - Defines `%__provides_excludes{:rpmspec}` to make sure Electron apps are not flagged as providers of their bundled dependencies, such as FFmpeg libraries.
@@ -177,11 +251,11 @@ Rundown of what all `%electronmeta{:rpmspec}` does:
 <div style={{ margin: "1em 0em 1em 0.5em" }}>
   | `%_target_cpu`                  | `%_electron_cpu` |
   |:-------------------------------:|:----------------:|
-  | `%x86_64`[^1]                   | `x64`            |
-  | `%arm64` (`aarch64`)            | `arm64`          |
-  | `%ix86`[^2]                     | `ia32`           |
+  | `%{x86_64}`[^1]                 | `x64`            |
+  | `%{arm64}` (`aarch64`)          | `arm64`          |
+  | `%{ix86}`[^2]                   | `ia32`           |
   | `armv7l`, `armv7hl`, `armv7hnl` | `armv7l`         |
-  | `%mips64`                       | `mips64el`       |
+  | `%{mips64}`                     | `mips64el`       |
 </div>
 
 This ensures packagers don't need to manually set these for every Electron app's spec, hopefully eliminating depsolver problems and helping reduce common build issues.
@@ -221,59 +295,6 @@ MAY be used in combination with manually adding the other relevant licenses (if 
 
 [`%electronmeta`](#electronmeta) SHOULD be used BEFORE the `License:{:rpmspec}` preamble but AFTER `Name:{:rpmspec}` if using this macro.
 
-### Electron Build Macros
-These are macros used to build Electron apps using JavaScript package managers and builders such as [Electron Builder](https://www.electron.build), [Electron Forge](https://www.electronforge.io), and [Electron Vite](https://electron-vite.github.io).
-
-Capital letter flags generally denote options that SHOULD be used with caution or only if necessary for a build.
-
-For more information on each package manager, see [NPM Macros](#npm-macros), [Bun Macros](#bun-macros), [PNPM Macros](#pnpm-macros), and [Yarn Macros](#yarn-macros).
-
-NOTE: All of the following macros set the environment variable `$BUILDER` to either `electron-builder` or `electron-forge` depending on which the app is built with. SHOULD NOT need to be used manually, but MAY be if needed for any reason.
-
-#### %npm_build
-SHOULD be used for building Electron projects with NPM. Has a great deal of flags to work around NPM specific limitations.
-
-Available flags:
-- `-c{:rpmspec}`: Run `%{__npm} ci{:rpmspec}` instead of `%{__npm} install{:rpmspec}`. May be necessary for projects with stricter build dependencies.
-- `-e{:rpmspec}`: Execute commands and modules within the NPM build environment. Some commands may need `--` in between the command itself and the following arguments.
-- `-r{:rpmspec}`: Executes `%{__npm} run{:rpmspec}` for scripts in the `package.json`. Expects an argument.
-- `-E{:rpmspec}`: Execute Electron Builder/Electron Forge. Will NOT work for projects that require build steps which use Node.js or executing JavaScript scripts directly.
-- `-V{:rpmspec}`: Execute Electron Vite. Same limitation as with `-E{:rpmspec}`.
-- `-M{:rpmspec}`: Mode to use in Electron Vite builds. Accepts `production`, `development`, and `staging`. Note that this differs from `$NODE_ENV{:bash}` so you can run any combination of Vite environment modes and Node.js environment modes.
-
-#### %bun_build
-SHOULD be used to build Electron projects with [Bun](https://bun.sh/).
-
-Available flags:
-- `-c{:rpmspec}`: Run `%{__bun} ci{:rpmspec}` instead of `%{__bun} install{:rpmspec}`. Analogous to `%{__bun} install --frozen-lockfile{:rpmspec}`. May be necessary for projects with stricter build dependencies.
-- `-e{:rpmspec}`: Execute commands and modules within the Bun build environment.
-- `-v{:rpmspec}`: Run Electron Vite build steps. Not needed for all Electron apps.
-- `-N{:rpmspec}`: Runs `--no-save{:rpmspec}` on the `%{__bun} install{:rpmspec}` step. This prevents updating or (re)creating a lockfile to prevent freezing.
-- `-r <argument>{:rpmspec}`: Executes `%{__bun} run{:rpmspec}` for scripts in the `package.json`. Expects an argument in place of `<argument>`.
-- `-F{:rpmspec}`: Runs `--force{:rpmspec}` on the `%{__bun} install{:rpmspec}` step. This will assure all dependencies are the latest versions from the registry, reinstalling them if necessary.
-- `-R{:rpmspec}`: Remove the bun.lock file. SHOULD only be used if the lockfile is causing build issues.
-
-#### %pnpm_build
-SHOULD be used for building Electron apps with PNPM.
-
-Available flags:
-- `-e{:rpmspec}`: Execute Node modules or installed programs in the PNPM build environment.
-- `-r{:rpmspec}`: Executes `%{__pnpm} run{:rpmspec}` for scripts in the `package.json{:rpmspec}`. Expects an argument. Not recommended for Electron Builder/Electron Forge or Electron Vite commands.
-- `-v{:rpmspec}`: Run Electron Vite build steps. Not needed for all Electron apps.
-- `-F{:rpmspec}`: Executes the `%{__pnpm} install{:rpmspec}` step with `--frozen-lockfile{:rpmspec}`. May be necessary for projects expecting very strict build dependencies, but can also override projects that do not enforce a lock.
-- `-N{:rpmspec}`: Executes the `%{__pnpm} install{:rpmspec}` step with `--no-frozen-lockfile{:rpmspec}`. Overrides projects that try to enforce a lockfile.
-- `-R{:rpmspec}`: Makes `%{__pnpm} exec{:rpmspec}` run on every project in the worspace recursively. SHOULD be used only if necessary and with caution.
-
-#### %yarn_build
-SHOULD be used to build Electron apps with Yarn or Yarn Berry.
-
-Available flags:
-- `-e{:rpmspec}`: Execute Node modules or installed programs in the Yarn build environment.
-- `-r{:rpmspec}`: Executes `%{__yarn} run{:rpmspec}` for scripts in the `package.json`. Expects an argument. Not recommended for Electron Builder, Electron Forge, or Electron Vite commands.
-- `-v{:rpmspec}`: Run Electron Vite build steps. Not needed for all Electron apps.
-- `-F{:rpmspec}`: Executes the `%{__yarn} install{:rpmspec}` step with `--frozen-lockfile{:rpmspec}`. May be necessary for projects expecting very strict build dependencies, but can also override projects that do not enforce a lock.
-- `-N{:rpmspec}`: Executes the `%{__yarn} install{:rpmspec}` step with `--no-lockfile{:rpmspec}`. Makes Yarn not update the lockfile on depedency installation.
-
 ### %electron_install
 Install files of apps built using Electron Builder or Electron Forge. MUST be used after an appropriate [build macro](#electron-build-macros).
 
@@ -288,19 +309,20 @@ By default, the install steps are:
 4. Install the app's icons.
 
 Available flags:
-- `-b{:rpmspec}` MUST be used when the app's executable differs from the name of the package.
-- `-d{:rpmspec}` MAY be used to install the app under a different directory than the name of the package.
-- `-i{:rpmspec}` MUST be used when the app's desktop file points to an icon name different from the name of the package.
+- `-b <argument>{:rpmspec}` MUST be used when the app's executable differs from the name of the package.
+- `-d <argument>{:rpmspec}` MAY be used to install the app under a different directory than the name of the package.
+- `-i <argument>{:rpmspec}` MUST be used when the app's desktop file points to an icon name different from the name of the package.
+- `-I <?argument>{:rpmspec}` MAY be used to handle automatic icon installation. It can be used to point to either the folder icons are in and the icon files themselves. You MUST include the file extension if pointing it to the icon files, otherwise it will assume you are pointing it to a directory.
 - `-l{:rpmspec}` MAY be used to fetch all licenses including the bundled ones and put them in a directory called `bundled_licenses`. You SHOULD then package them in the license directory using `%license bundled_licenses/*` in the `%files` section.
   - If using this you MUST make sure there are no duplicate license names. For example, if the main application's license file is `LICENSE`, but one of its bundled license files is *also* `LICENSE`, you SHOULD rename the bundled license to an appropriate name indicating it is the license for a bundled dependency.
   - An appropriate name would be something like `LICENSE.bundleddepname` or `bundleddepname.LICENSE`. Usually, the former is used, but you MAY use either format.
   - This MUST be done because if there are two different files with the same name, the `cp` command used in the `%license` macro for the files section will either fail or overwrite the main software's license, which is not admissible for redistribution.
-- `-s{:rpmspec}` MAY be used to choose the name of the symlink.
-- `-S{:rpmspec}` MAY be used to create an additional symlink with a different name. Useful when an app has two interchangeable common names.
+- `-s <argument>{:rpmspec}` MAY be used to choose the name of the symlink.
+- `-S <argument>{:rpmspec}` MAY be used to create an additional symlink with a different name. Useful when an app has two interchangeable common names.
 - `-D{:rpmspec}` MAY be used to handle automatic installation of the .desktop file. This ONLY works if Electron Builder builds an AppImage, and should not be used if the source contains a desktop file.
-- `-E{:rpmspec}` MAY be used to set the "--enable-features" flag in the desktop file. Features to enable MUST be comma separated without spaces.
-- `-O{:rpmspec}` MAY be used to set the [Ozone platform](https://chromium.googlesource.com/chromium/src/+/lkgr/docs/ozone_overview.md) the Electron app will run on. If no arguments are supplied, it will fall back to `--ozone-platform-hint=auto`. Accepted arguments are `-Ox11` and `-Owayland`
-- `-U{:rpmspec}` MAY be used to set either `%u` or `%U` in the desktop file. If using this you MUST NOT use `u` as a macro name for any reason.
+- `-E <argument>{:rpmspec}` MAY be used to set the "--enable-features" flag in the desktop file. Features to enable MUST be comma separated without spaces.
+- `-O <?argument>{:rpmspec}` MAY be used to set the [Ozone platform](https://chromium.googlesource.com/chromium/src/+/lkgr/docs/ozone_overview.md) the Electron app will run on. If no arguments are supplied, it will fall back to `--ozone-platform-hint=auto`. Accepted arguments are `-Ox11` and `-Owayland`
+- `-U <argument>{:rpmspec}` MAY be used to set either `%u` or `%U` in the desktop file. If using this you MUST NOT use `u` as a macro name for any reason.
   - `%u{:rpmspec}` means that a desktop file can only read one URL at a time, `%U{:rpmspec}` means that it can read multiple at a time. These are what are known as [exec keys](https://specifications.freedesktop.org/desktop-entry/latest/exec-variables.html).
   - Defer to what the desktop file originally contained if you are unsure which to use.
 
@@ -311,7 +333,7 @@ Example usage:
   - A second symlink called `alsoapp`.
   - A desktop file with the `Exec` line reading `Exec=/usr/lib(64)/pkgname/app --enable-features=WaylandWindowDecorations --ozone-platform=wayland %u`.
 
-NOTE: Like the Electron build macros, this macro sets the environment variable `$BUILDER` to either `electron-builder` or `electron-forge` depending on which the app is built with. SHOULD NOT need to be used manually, but MAY be if needed for any reason.
+NOTE: Like the webapp build macros, this macro sets the environment variable `$WEBAPP_BUILD_TOOL` to either `electron-builder` or `electron-forge` depending on which the app is built with. SHOULD NOT need to be used manually, but MAY be if needed for any reason.
 
 ## Go
 These macros assist with building Go projects.
@@ -338,7 +360,7 @@ This macro SHOULD only be used if Node.js packages available from the repos are 
 You MUST add `nvm` as a build dependency: `BuildRequires: nvm{:rpmspec}`.
 
 Available flags:
-- `-v{:rpmspec}` is REQUIRED for this macro to pass the version to NVM. This flag accepts a full version, the major for the latest of a major version of Node.js (e.g., `24`), or `node` to use the latest version of Node.js available.
+- `-v <argument>{:rpmspec}` is REQUIRED for this macro to pass the version to NVM. This flag accepts a full version, the major for the latest of a major version of Node.js (e.g., `24`), or `node` to use the latest version of Node.js available.
 
 Usecase examples:
 - Fedora has not yet packaged the correct version of Node.js or the required version is older than what is supplied.
@@ -362,13 +384,13 @@ Vendored versions of NPM and NPX are subject to limitations in commands as they 
 Prepare a Node module for build steps.
 
 Available flags:
-- `-n{:rpmspec}` MUST be used to define `%{npm_name}{:rpmspec}` if it was not defined as a global macro.
+- `-n <argument>{:rpmspec}` MUST be used to define `%{npm_name}{:rpmspec}` if it was not defined as a global macro.
 
 #### %fetch_node_tests
 Fetch self-tests from a Git repo. MUST include all necessary test files and folders. If used, it SHOULD be placed in the `%prep{:rpmspec}` section.
 
 Available flags:
-- `-u{:rpmspec}` MUST be used to define the URL if the one listed in the `URL:{:rpmspec}` tag for the package is not detectable as clonable.
+- `-u <argument>{:rpmspec}` MUST be used to define the URL if the one listed in the `URL:{:rpmspec}` tag for the package is not detectable as clonable.
 
 All necessary test files and folders MUST be listed after the macro. Test folders MUST start with `/{:rpmspec}`.
 
@@ -434,7 +456,7 @@ Expands to: `/usr/bin/license-checker --limitAttributes licenses`
 This is similar to [`%__npm_license_checker`](#__npm_license_checker), but limits the output to only the license.
 
 Available flags:
-- `-o{:rpmspec}` MAY be used as a shorthand for `--out{:rpmspec}`.
+- `-o <argument>{:rpmspec}` MAY be used as a shorthand for `--out{:rpmspec}`.
 
 Example output:
 
@@ -487,7 +509,7 @@ What these do:
 - Disables update notifications since we are using a packaged version of NPM unless using `%vendor_nodejs{:rpmspec}`.
 - Sets color to `always` for more easily readable logs.
 
-#### %npm_buildflags
+#### %npm_config_opts
 Explicit NPM configuration flags of the environment variables set by the Macros.
 
 Expands to: `--userconfig=%{rpmbuilddir}/.npmrc --globalconfig=%{rpmbuilddir}/npmrc --cache=%{rpmbuilddir}/.npm --loglevel=error --fund=false --update-notifier=false --color=always --init-module=%{rpmbuilddir}/.npm-init.js{:rpmspec}`
@@ -496,6 +518,8 @@ Expands to: `--userconfig=%{rpmbuilddir}/.npmrc --globalconfig=%{rpmbuilddir}/np
 Macro to call NPM with predetermined enviroment variables.
 
 Expands to: `/usr/bin/env %{npm_common_envvars} %{?with_vendored_nodejs:%{__nvm} exec npm --}%{!?with_vendored_nodejs:/usr/bin/npm}{:rpmspec}`
+
+SHOULD be used in place of calling `npm` itself.
 
 #### %__npx
 Remotely run Node modules with NPX.
@@ -515,8 +539,8 @@ Installed packages with fixed dependencies SHOULD be tested first to make sure t
 Available flags:
 - `-d{:rpmspec}` will run with `--dry-run{:rpmspec}` so you can check what the fix would do.
 - `-f{:rpmspec}` will run with `--force{:rpmspec}`, ignoring package locks or other requirements set by the module to fix the dependencies. This MUST be tested locally and verified to not cause breakage.
-- `-o{:rpmspec}` will omit a dependency or group (such as `dev{:rpmspec}`) from being fixed.
-- `-O{:rpmspec}` will only fix a specified depency or group.
+- `-o <argument>{:rpmspec}` will omit a dependency or group (such as `dev{:rpmspec}`) from being fixed.
+- `-O <argument>{:rpmspec}` will only fix a specified depency or group.
 - `-p{:rpmspec}` will limit the run to the package lock.
 
 LIMITATION: Cannot be used on modules installed using the `-g{:rpmspec}` flag (which is done in `%npm_prep{:rpmspec}`) which use a package lock.
@@ -529,13 +553,22 @@ Sets the `$BUN_HOME{:bash}` for future use and sets the cache dir.
 
 Expands to: `%{npm_common_envvars} BUN_HOME=%{_bun_home} BUN_INSTALL_CACHE_DIR=%{_bun_cache_dir} BUN_RUNTIME_TRANSPILER_CACHE_PATH=%{_bun_cache_dir} FORCE_COLOR=1{:rpmspec}`
 
+#### %bun_config_opts
+Explicit Bun configuration flags of the environment variables set by the Macros.
+
+Expands to: `--cache-dir=%{_bun_cache_dir}{:rpmspec}`
+
 #### %__bun
-Expands to: `/usr/bin/env %{bun_common_envvars} /usr/bin/bun`
+Expands to: `/usr/bin/env %{bun_common_envvars} /usr/bin/bun{:rpmspec}`
+
+SHOULD be used in place of calling `bun` itself.
 
 #### %__bunx
 Run Node modules (downloading them if necessary) with Bun.
 
-Expands to: `/usr/bin/env %{bun_common_envvars} /usr/bin/bunx`
+Expands to: `/usr/bin/env %{bun_common_envvars} /usr/bin/bunx{:rpmspec}`
+
+SHOULD be used in place of calling `bunx` or `bun x` itself.
 
 #### %bun_audit
 Audit with Bun if package uses bundled Node dependencies. For use in the `%check{:rpmspec}` section.
@@ -554,6 +587,26 @@ Available flags:
 
 Expands to: `%{__bun} pm trust{:rpmspec}`
 
+### Deno Macros
+Macros for using [Deno](https://deno.com).
+
+#### %deno_common_envvars
+Sets the `$DENO_DIR{:bash}`, `$DENO_INSTALL_ROOT{:bash}`, limits `$DENO_JOBS{:bash}` to `${RPM_BUILD_NCPUS}{:bash}`, disables update notifications, and forces color.
+
+Expands to: `%{npm_common_envvars} DENO_DIR=%{_deno_dir} DENO_INSTALL_ROOT=%{_deno_install_root} DENO_NO_UPDATE_CHECK=1 DENO_JOBS=${RPM_BUILD_NCPUS} FORCE_COLOR=1{:rpmspec}`
+
+#### %__deno
+Expands to: `/usr/bin/env %{deno_common_envvars} /usr/bin/deno{:rpmspec}`
+
+SHOULD be used in place of calling `deno` itself.
+
+#### %__dx
+Call modules directly with DX/Deno X.
+
+Expands to: `/usr/bin/env %{deno_common_envvars} /usr/bin/dx{:rpmspec}`
+
+SHOULD be used in place of calling `dx` or `deno x` itself.
+
 ### PNPM Macros
 Macros for using [PNPM](https://pnpm.io).
 
@@ -563,8 +616,8 @@ Sets the NPM environment variables and the PNPM home directory.
 Expands to: `%{npm_common_envvars} PNPM_HOME=%{_pnpm_home}{:rpmspec}`
 
 #### %__pnpm
-
 Expands to: `/usr/bin/env %{pnpm_common_envvars} %{?with_vendored_pnpm:%{_pnpm_home}/pnpm}%{!?with_vendored_pnpm:/usr/bin/pnpm}{:rpmspec}`
+
 SHOULD be used in place of calling `pnpm` itself.
 
 #### %__pnpx
@@ -572,11 +625,13 @@ Remotely execute Node modules using PNPX.
 
 Expands to: `/usr/bin/env %{pnpm_common_envvars} /usr/bin/pnpx{:rpmspec}`
 
+SHOULD be used in place of calling `pnpx` or `pnpm dlx` itself.
+
 #### %vendor_pnpm
 This SHOULD only be used if PNPM is not usable/available from the available repositories.
 
 Available flags:
-- `-v{:rpmspec}` MAY be used to define a desired version of PNPM.
+- `-v <argument>{:rpmspec}` MAY be used to define a desired version of PNPM.
 
 Usecase examples:
 - Fedora's currently packaged PNPM is too old for the build.
@@ -616,13 +671,22 @@ Sets the NPM evironment variables and Yarn's cache folder.
 
 Expands to: `%{npm_common_envvars} YARN_CACHE_FOLDER=%{_yarn_cache_dir}{:rpmspec}`
 
+#### %yarn_config_opts
+Explicit Yarn configuration flags of the environment variables set by the Macros.
+
+Expands to: `--cache-folder=%{_yarn_cache_dir}{:rpmspec}`
+
 #### %__yarn
 Expands to: `/usr/bin/env %{yarn_common_envvars} /usr/bin/yarn{:rpmspec}`
+
+SHOULD be used in place of calling `yarn` itself.
 
 #### %__yarn_dlx
 Remotely execute a Node module with Yarn DLX.
 
 Expands to: `/usr/bin/env %{yarn_common_envvars} /usr/bin/yarn dlx{:rpmspec}`
+
+SHOULD be used in place of calling `yarn dlx` itself.
 
 <Callout>
   `yarnpkg-berry` is REQUIRED as a build dependency instead of `yarnpkg`.
@@ -632,6 +696,161 @@ Expands to: `/usr/bin/env %{yarn_common_envvars} /usr/bin/yarn dlx{:rpmspec}`
 Audit Yarn if the package uses bundled Node dependencies. For use in the `%check{:rpmspec}` section.
 
 You SHOULD NOT need to fix vulnerabilities for Node modules that are __not bundled in the final package__. This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
+
+### Tauri Macros
+Macros for using [Tauri](https://v2.tauri.app).
+
+Tauri apps always require JavaScript package managers AND Cargo, so for this reason the [Rust macros](#rust) are also relevant.
+
+### %tauri_buildrequires
+MAY be used in a spec by setting `BuildRequires: %{tauri_buildrequires}{:rpmspec}`
+
+Available flags:
+- `-a{:rpmspec}`: Additional BuildRequires that may be needed for some projects.
+  - Currently, this includes `nodejs-devel`, `nodejs-packaging`, and `typescript`.
+  - This would be used as `BuildRequires: %{tauri_buildrequires -a}{:rpmspec}`.
+- `-t{:rpmspec}`: Pull Tauri itself from the repos.
+  - This would be used as `BuildRequires: %{tauri_buildrequires -t}{:rpmspec}`
+
+### %tauri_prep
+Preps a Tauri package. Wrapper for `%cargo_prep_online` that checks that the Tauri subdirectory is correct.
+
+Available flags:
+- `-n <argument>{:rpmspec}`: The name of the subdirectory to `cd` into before running `%cargo_prep_online`. This value is also used when setting a macro used in other Tauri macros. If this flag is not passed, the macro will default to the most common name used for this subdirectory which is `src-tauri`.
+
+### %tauri_install
+MAY be used to install a built Tauri package. A port of `%cargo_install`.
+
+Available flags:
+- `-f <argument>{:rpmspec}`: Should be the same as the features that were passed to the Tauri build. Used for installing the Cargo development files.
+
+### %tauri_cargo_license
+A port of `%cargo_license_online` that points to the Tauri app's Cargo.toml.
+
+Available flags:
+- `-f <argument>{:rpmspec}`: Should be the same as the features that were passed to the Tauri build.
+
+### %tauri_cargo_license_summary
+A port of `%cargo_license_summary_online` that points to the Tauri app's Cargo.toml.
+
+Available flags:
+- `-f <argument>{:rpmspec}`: Should be the same as the features that were passed to the Tauri build.
+
+### %tauri_cargo_vendor_manifest
+A port of `%cargo_vendor_manifest_online` that points to the Tauri app's Cargo.toml.
+
+### %tauri_generate_buildrequires
+Generates BuildRequires for a Tauri build.
+
+Supports the same flags as [%tauri_buildrequires](#tauri_buildrequires).
+
+<Callout>
+  BuildRequires generation only works in Mock.
+</Callout>
+
+### Configurable Tauri Macros
+
+#### %__tauri_bundles
+By default, all macros which call Tauri do not build bundles. Set `%global __tauri_bundles` to the bundle(s) you want to change this.
+
+This may be useful for, for example, building an AppImage to extract a .desktop file from.
+
+#### %__tauri_ignore_version_mismatches
+This macro disables Tauri version mismatch checking. It can be set to anything.
+
+<Callout>
+  Use of this macro is **heavily discouraged.** It only exists in Tauri, and is only enableable with this macro, because Tauri may detect a version mismatch incorrectly in some situations. You SHOULD NOT use this to force a system Tauri build.
+</Callout>
+
+### System Tauri Macros
+These are macros for use with Tauri if installed from the repo. Please note that using Tauri from the repo MAY NOT WORK with all projects unless you override version checking, which is not advisable in most circumstances.
+
+#### %__tauri
+Calls Tauri while setting the Fedora Cargo environment variables.
+
+Expands to: `/usr/bin/env CARGO_HOME='%{_cargo_home}'%{!?with_rust_nightly: RUSTC_BOOTSTRAP=1}%{?with_rust_nightly: RUSTUP_HOME='%{_rustup_home}'} RUSTFLAGS='%{build_rustflags}' /usr/bin/tauri`
+
+#### %tauri_build
+Build with system Tauri.
+
+Available flags:
+- `-f <argument>{:rpmspec}`: Features to enable in Tauri and Cargo. Comma separated.
+
+#### %tauri_build_crate
+A port of [%cargo_build_crate](https://codeberg.org/rust2rpm/cargo-rpm-macros/src/commit/754ec0c9a09d8a89990f454c17dc0da07861741f/macros.d/macros.cargo#L280) for Tauri.
+
+Available flags:
+- `-f <argument>{:rpmspec}`: Features to enable in Tauri and Cargo. Comma separated.
+
+### Webapp Build Macros
+These are macros used to build webappsapps using JavaScript package managers and builders such as [Electron Builder](https://www.electron.build), [Electron Forge](https://www.electronforge.io), [Electron Vite](https://electron-vite.github.io), or [Tauri](#tauri_macros).
+
+Capital letter flags generally denote options that SHOULD be used with caution or only if necessary for a build.
+
+For more information on each package manager, see [NPM Macros](#npm-macros), [Bun Macros](#bun-macros), [PNPM Macros](#pnpm-macros), and [Yarn Macros](#yarn-macros).
+
+NOTE: All of the following macros set the environment variable `$WEBAPP_BUILD_TOOL` to either `electron-builder`, `electron-forge`, or `tauri` depending on which the app is built with. SHOULD NOT need to be used manually, but MAY be if needed for any reason.
+
+#### %npm_build
+SHOULD be used for building Electron or Tauri apps with NPM. Has a great deal of flags to work around NPM specific limitations.
+
+Available flags:
+- `-c{:rpmspec}`: Run `%{__npm} ci{:rpmspec}` instead of `%{__npm} install{:rpmspec}`. May be necessary for projects with stricter build dependencies.
+- `-e <argument>{:rpmspec}`: Execute commands and modules within the NPM build environment. Some commands may need `--` in between the command itself and the following arguments. Can accept multiple arguments if they are separated using standard shell separators (`;` and `&&`).
+- `-f <argument>{:rpmspec}`: This option is only for Tauri projects. Features to pass to Tauri/Cargo. Features should be comma separated.
+- `-r <argument>{:rpmspec}`: Executes `%{__npm} run{:rpmspec}` for scripts in the `package.json`. Can run multiple scripts if they are comma separated.
+- `-B{:rpmspec}`: Execute the webapp builder (Electron Builder, Electron Forge, or Tauri) directly. Will NOT work for projects that require build steps which use Node.js or executing JavaScript scripts directly.
+- `-C <argument>{:rpmspec}`: Point NPM to the build config file if it cannot automatically detect it.
+- `-M <argument>{:rpmspec}`: Mode to use in Electron Vite builds. Accepts `production`, `development`, and `staging`. Note that this differs from `$NODE_ENV{:bash}` so you can run any combination of Vite environment modes and Node.js environment modes.
+- `-V{:rpmspec}`: Execute Electron Vite. Same limitation as with `-B{:rpmspec}`.
+
+#### %bun_build
+SHOULD be used to build Electron or Tauri apps with Bun.
+
+Available flags:
+- `-c{:rpmspec}`: Run `%{__bun} ci{:rpmspec}` instead of `%{__bun} install{:rpmspec}`. Analogous to `%{__bun} install --frozen-lockfile{:rpmspec}`. May be necessary for projects with stricter build dependencies.
+- `-e <argument>{:rpmspec}`: Execute commands and modules within the Bun build environment. Can accept multiple arguments if they are separated using standard shell separators (`;` and `&&`).
+- `-f <argument>{:rpmspec}`: This option is only for Tauri projects. Features to pass to Tauri/Cargo. Features should be comma separated.
+- `-v{:rpmspec}`: Run Electron Vite build steps. Not needed for all Electron apps.
+- `-r <argument>{:rpmspec}`: Executes `%{__bun} run{:rpmspec}` for scripts in the `package.json`. Can accept multiple arguments if they are comma separated.
+- `-F{:rpmspec}`: Runs `--force{:rpmspec}` on the `%{__bun} install{:rpmspec}` step. This will assure all dependencies are the latest versions from the registry, reinstalling them if necessary.
+- `-N{:rpmspec}`: Runs `--no-save{:rpmspec}` on the `%{__bun} install{:rpmspec}` step. This prevents updating or (re)creating a lockfile to prevent freezing.
+- `-R{:rpmspec}`: Remove the bun.lock file. SHOULD only be used if the lockfile is causing build issues. Built apps using this MUST be carefully tested for problems.
+
+#### %deno_build
+SHOULD be used to build Electron or Tauri apps with Deno.
+
+Available flags:
+- `-f <argument>{:rpmspec}`: This option is only for Tauri projects. Features to pass to Tauri/Cargo. Features should be comma separated.
+- `-t <argument>{:rpmspec}`: Executes `%{__deno} task{:rpmspec}` for scripts in the `package.json`. Can accept multiple arguments if they are comma separated.
+- `-v{:rpmspec}`: Run Electron Vite build steps. Not needed for all Electron apps.
+- `-r <argument>{:rpmspec}`: Executes files with `%{__deno} run{:rpmspec}`. Can accept multiple arguments if they are comma separated.
+- `-x <argument>{:rpmspec}`: Execute commands and modules within the Deno build environment. Can accept multiple arguments if they are separated using standard shell separators (`;` and `&&`).
+- `-F{:rpmspec}`: Runs `--force{:rpmspec}` on the `%{__deno} install{:rpmspec}` step. This will overwite the existing dependency installation (if any exists).
+- `-N{:rpmspec}`: Runs `--no-lock{:rpmspec}` on the `%{__deno} install{:rpmspec}` step. This prevents updating or (re)creating a lockfile to prevent freezing.
+
+#### %pnpm_build
+SHOULD be used for building Electron or Tauri apps with PNPM.
+
+Available flags:
+- `-e <argument>{:rpmspec}`: Execute Node modules or installed programs in the PNPM build environment. Can accept multiple arguments if they are separated using standard shell separators (`;` and `&&`).
+- `-f <argument>{:rpmspec}`: This option is only for Tauri projects. Features to pass to Tauri/Cargo. Features should be comma separated.
+- `-r <argument>{:rpmspec}`: Executes `%{__pnpm} run{:rpmspec}` for scripts in the `package.json{:rpmspec}`. Not recommended for Electron Builder/Electron Forge or Electron Vite commands. Can accept multiple arguments if they are comma separated.
+- `-v{:rpmspec}`: Run Electron Vite build steps. Not needed for all Electron apps.
+- `-F{:rpmspec}`: Executes the `%{__pnpm} install{:rpmspec}` step with `--frozen-lockfile{:rpmspec}`. May be necessary for projects expecting very strict build dependencies, but can also override projects that do not enforce a lock.
+- `-N{:rpmspec}`: Executes the `%{__pnpm} install{:rpmspec}` step with `--no-frozen-lockfile{:rpmspec}`. Overrides projects that try to enforce a lockfile.
+- `-R{:rpmspec}`: Makes `%{__pnpm} exec{:rpmspec}` run on every project in the worspace recursively. SHOULD be used only if necessary and with caution.
+
+#### %yarn_build
+SHOULD be used to build Electron or Tauri apps with Yarn or Yarn Berry.
+
+Available flags:
+- `-e <argument>{:rpmspec}`: Execute Node modules or installed programs in the Yarn build environment.
+- `-f <argument>{:rpmspec}`: This option is only for Tauri projects. Features to pass to Tauri/Cargo. Features should be comma separated.
+- `-r <argument>{:rpmspec}`: Executes `%{__yarn} run{:rpmspec}` for scripts in the `package.json`. Not recommended for Electron Builder, Electron Forge, or Electron Vite commands. Can accept multiple arguments if they are comma separated.
+- `-v{:rpmspec}`: Run Electron Vite build steps. Not needed for all Electron apps.
+- `-F{:rpmspec}`: Executes the `%{__yarn} install{:rpmspec}` step with `--frozen-lockfile{:rpmspec}`. May be necessary for projects expecting very strict build dependencies, but can also override projects that do not enforce a lock.
+- `-N{:rpmspec}`: Executes the `%{__yarn} install{:rpmspec}` step with `--no-lockfile{:rpmspec}`. Makes Yarn not update the lockfile on dependency installation.
 
 ### Other
 JavaScript related macros that apply to all or do not fit into any of the above categories.
@@ -643,26 +862,31 @@ Based on Fedora's [`%set_build_flags{:rpmspec}` macro](https://src.fedoraproject
 
 Expands to:
 ```rpmspec
-NPM_CONFIG_USERCONFIG="%{rpmbuilddir}/.npmrc" ; export NPM_CONFIG_USERCONFIG ; \
-NPM_CONFIG_GLOBALCONFIG="%{rpmbuilddir}/npmrc" ; export NPM_CONFIG_GLOBALCONFIG ; \
-NPM_CONFIG_CACHE="%{_npm_cache_dir}" ; export NPM_CONFIG_CACHE ; \
-NPM_CONFIG_LOGLEVEL="error" ; export NPM_CONFIG_LOGLEVEL ; \
-NPM_CONFIG_FUND="false" ; export NPM_CONFIG_FUND ; \
-NPM_CONFIG_UPDATE_NOTIFIER="false" ; export NPM_CONFIG_UPDATE_NOTIFIER ; \
-NO_UPDATE_NOTIFIER="1" ; export NO_UPDATE_NOTIFIER ; \
-NPM_CONFIG_COLOR="always" ; export NPM_CONFIG_COLOR ; \
-NPM_CONFIG_INIT_MODULE="%{rpmbuilddir}/.npm-init.js" ; export NPM_CONFIG_INIT_MODULE ; \
-BUN_HOME="%{_bun_home}" ; export BUN_HOME ; \
-BUN_INSTALL_CACHE_DIR="%{_bun_cache_dir}" ; export BUN_INSTALL_CACHE_DIR \
-BUN_RUNTIME_TRANSPILER_CACHE_PATH="%{_bun_cache_dir}" ; export BUN_RUNTIME_TRANSPILER_CACHE_PATH ; \
-PNPM_HOME="%{_pnpm_home}" ; export PNPM_HOME ; \
-YARN_CACHE_FOLDER="%{_yarn_cache_dir}" ; export YARN_CACHE_FOLDER ; \
-NPMFLAGS="${NPMFLAGS:-%{npm_buildflags} }" ; export NPMFLAGS
+NPM_CONFIG_USERCONFIG="${NPM_CONFIG_USERCONFIG:-%{rpmbuilddir}/.npmrc}" ; export NPM_CONFIG_USERCONFIG ; \
+NPM_CONFIG_GLOBALCONFIG="${NPM_CONFIG_GLOBALCONFIG:-%{rpmbuilddir}/npmrc}" ; export NPM_CONFIG_GLOBALCONFIG ; \
+NPM_CONFIG_CACHE="${NPM_CONFIG_CACHE:-%{_npm_cache_dir}}" ; export NPM_CONFIG_CACHE ; \
+NPM_CONFIG_LOGLEVEL="${NPM_CONFIG_LOGLEVEL:-error}" ; export NPM_CONFIG_LOGLEVEL ; \
+NPM_CONFIG_FUND="${NPM_CONFIG_FUND:-false}" ; export NPM_CONFIG_FUND ; \
+NPM_CONFIG_UPDATE_NOTIFIER="${NPM_CONFIG_UPDATE_NOTIFIER:-false}" ; export NPM_CONFIG_UPDATE_NOTIFIER ; \
+NPM_CONFIG_COLOR="${NPM_CONFIG_COLOR:-always}" ; export NPM_CONFIG_COLOR ; \
+NPM_CONFIG_INIT_MODULE="${NPM_CONFIG_INIT_MODULE:-%{rpmbuilddir}/.npm-init.js}" ; export NPM_CONFIG_INIT_MODULE ; \
+BUN_HOME="${BUN_HOME:-%{_bun_home}}" ; export BUN_HOME ; \
+BUN_INSTALL_CACHE_DIR="${BUN_INSTALL_CACHE_DIR:-%{_bun_cache_dir}}" ; export BUN_INSTALL_CACHE_DIR \
+BUN_RUNTIME_TRANSPILER_CACHE_PATH="${BUN_RUNTIME_TRANSPILER_CACHE_PATH:-%{_bun_cache_dir}}" ; export BUN_RUNTIME_TRANSPILER_CACHE_PATH ; \
+DENO_DIR="${DENO_DIR:-%{_deno_dir}}" ; export DENO_DIR ; \
+DENO_INSTALL_ROOT="${DENO_INSTALL_ROOT:-%{_deno_install_root}}" ; export DENO_INSTALL_ROOT ; \
+DENO_NO_UPDATE_CHECK="${DENO_NO_UPDATE_CHECK:-1}" ; export DENO_NO_UPDATE_CHECK ; \
+DENO_JOBS="${DENO_JOBS:-${RPM_BUILD_NCPUS}}" ; export DENO_JOBS ; \
+PNPM_HOME="${PNPM_HOME:-%{_pnpm_home}}" ; export PNPM_HOME ; \
+YARN_CACHE_FOLDER="${YARN_CACHE_FOLDER:-%{_yarn_cache_dir}}" ; export YARN_CACHE_FOLDER ; \
+NPM_OPTS="${NPM_OPTS:-%{npm_config_opts} }" ; export NPM_OPTS ; \
+BUN_OPTS="${BUN_OPTS:-%{bun_config_opts} }" ; export BUN_OPTS ; \
+YARN_OPTS="${YARN_OPTS:-%{yarn_config_opts} }" ; export YARN_OPTS
 ```
 
-This ensures the environment variables are explicitly exported and therefor are more likely to be picked up by all shell processes. It also creates an environment variable called `$NPMFLAGS{:bash}` which can be passed to NPM in lieu of the macro `%{npm_buildflags}{:rpmspec}` to force our config, if necessary.
+This ensures the environment variables are explicitly exported and therefor are more likely to be picked up by all shell processes. It also creates environment variables called `$NPM_OPTS{:bash}`, `$BUN_OPTS{:bash}`, and `$YARN_OPTS{:bash}`, which can be passed to NPM in lieu of the macros `%{npm_config_opts}{:rpmspec}`, `%{bun_config_opts}{:rpmspec}`, and `%{yarn_config_opts}{:rpmspec}`, respectively, to force our config if necessary.
 
-This should only be needed in the event you are using [%__npx](#__npx), [%__pnpx](#__pnpx), [%__bunx](#__bunx), or [%__yarn_dlx](#__yarn_dlx).
+This should only be needed in the event you are using [%__npx](#__npx), [%__pnpx](#__pnpx), [%__bunx](#__bunx), [%__dx](#__dx), or [%__yarn_dlx](#__yarn_dlx).
 
 ## Nim
 These macros assist with building Nim projects.
@@ -809,12 +1033,12 @@ These macros assist with building Zig projects.
 Build Zig projects with a specified architecture and build mode.
 
 Available flags:
-- `-c` is used to set a specific CPU (micro)architecture to build for. If no argument is supplied, it will fall back to the `%{_target_cpu}` set by the build. You MUST specify a CPU architecture manually in cases where Zig's architecture format and RPM's do not match (e.g., `aarch64`).
+- `-c <?argument>{:rpmspec}`: Used to set a specific CPU (micro)architecture to build for. If no argument is supplied, it will fall back to the `%{_target_cpu}` set by the build. You MUST specify a CPU architecture manually in cases where Zig's architecture format and RPM's do not match (e.g., `aarch64`).
   - SHOULD ONLY be used in projects that would not perform correctly when built for baseline.
   - For more information on x86_64 microarchitectures, see [here](https://en.wikipedia.org/wiki/X86-64#Microarchitecture_levels).
-- `-r` is used to set the [release/build mode](https://zig.guide/build-system/build-modes). Accepted arguments are `fast`, `small`, `safe`, and `slow`.
+- `-r <argument>{:rpmspec}`: Used to set the [release/build mode](https://zig.guide/build-system/build-modes). Accepted arguments are `fast`, `small`, `safe`, and `slow`.
   - SHOULD be used if a project would have performance issues if built for `safe` (what Fedora sets by default).
-- `-s` is used to allow the project to link statically.
+- `-s{:rpmspec}`: used to allow the project to link statically.
   - SHOULD ONLY be used if a project either has no dependencies to link, OR dependencies from the repos either aren't present or are incompatible versions.
   - You SHOULD still dynamically link compatible dependencies using `-fsys=pkgname`.
 
@@ -892,7 +1116,7 @@ URL:           https://github.com/ad-oliviero/uwufetch
 `%git_clone` SHOULD only be used when the source tarballs provided by upstream does not include all required sources in the repository (e.g., if the build process expects a Git environment or the tarball doesn't contain submodules).
 
 ### %go_task
-Expands to: `go-task --parallel --verbose --yes`
+Expands to: `go-task --parallel --concurrency %{?_smp_build_ncpus} --verbose --yes`
 SHOULD be used in place of `go-task` if using Go Task.
 
 ## Unused in Spec Files
@@ -915,10 +1139,15 @@ Anda directory for scripts such as `find-develinfo.sh` used by `%__anda_develfil
 Expands to: `%_anda_srpm_macros_dir/find-staticinfo.sh %buildroot > anda-staticfiles.list{:rpmspec}`
 Creates anda-staticfiles.list file in `%{buildroot}{:rpmspec}` to be used by [`%pkg_static_files`](#pkg_static_files).
 
+### %desktop_file_args
+This macro is created when using the `-F` option in `%electron_install`. It's used to pass the appropriate Exec arguments to `desktop-file-install` and has no other use.
 
 ### %is_electron_bundled
 Expands to `%bcond bundled_electron %["%{name}" != "electron"]{:rpmspec}`
 A functional macro that tells other macros if Electron is bundled or if the package being worked with is Electron itself. Used by [`%electronmeta`](#electronmeta) and [`%electron_license`](#electron_license).
+
+### %__tauri_common_opts
+Common opts passed to Tauri. Used by macros which call Tauri.
 
 ---
 
