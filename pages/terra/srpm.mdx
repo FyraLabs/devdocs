@@ -133,7 +133,7 @@ Expands to: `%{rpmbuilddir}/.pnpm{:rpmspec}`
 Used for [PNPM macros](#pnpm-macros).
 
 ### %_pnpm_store
-The directory where Node modules installed by PNPM usually go. This will usually not be produced when using PNPM as a build tool, but exists for rare builds it may be created in.
+The directory where JavaScript modules installed by PNPM usually go. This will usually not be produced when using PNPM as a build tool, but exists for rare builds it may be created in.
 
 Expands to: `%{_pnpm_home}/store{:rpmspec}`
 
@@ -241,11 +241,15 @@ Expands to: `%{__update_desktop_database} --quiet || :{:rpmspec}`
 ## Electron
 These macros assist with the general packaging of applications that use [Electron](https://www.electronjs.org).
 
+<Callout>
+  Many Electron projects will default to building distro binary packages (such as RPMs and Debs) and this rarely works well in RPM builds. You should be prepared to patch or otherwise modify the Electron Builder config to rectify this.
+</Callout>
+
 ### %electronmeta
 Set up all basic requirements including build macros for building an Electron app.
 
 <Callout>
-  This does NOT install the JavaScript package managers used for builds (e.g., `nodejs-npm`, `bun`, `pnpm`, `yarnpkg`, `yarnpkg-berry`).
+  This does NOT install the JavaScript package managers used for builds except for NPM (e.g., `bun`, `deno`, `pnpm`, `yarnpkg`, `yarnpkg-berry`).
   Specify these `BuildRequires:{:rpmspec}` manually.
 </Callout>
 
@@ -268,7 +272,7 @@ Rundown of what all `%electronmeta{:rpmspec}` does:
 - Defines a `%bcond{:rpmspec}` for whether or not Electron is bundled for other macros.
 - Defines the bundled dependencies as bundled.
   <Callout type="warning">
-    This only defines Electron's bundled dependencies, not any Node modules the app may also bundle.
+    This only defines Electron's bundled dependencies, not any JavaScript modules the app may also bundle.
   </Callout>
 
 <div style={{ margin: "1em 0em 1em 0.5em" }}>
@@ -319,14 +323,14 @@ MAY be used in combination with manually adding the other relevant licenses (if 
 [`%electronmeta`](#electronmeta) SHOULD be used BEFORE the `License:{:rpmspec}` preamble but AFTER `Name:{:rpmspec}` if using this macro.
 
 ### %electron_install
-Install files of apps built using Electron Builder or Electron Forge. MUST be used after an appropriate [build macro](#electron-build-macros).
+Install files of apps built using Electron Builder or Electron Forge. MUST be used after an appropriate [build macro](#webapp-build-macros).
 
 Capital letter flags denote use with [desktop file](https://specifications.freedesktop.org/desktop-entry/latest) installation.
 
 By default, the install steps are:
 1. Make the install directory.
   - This will be in the `%{_libdir}{:rpmspec}` (/usr/lib on 32-bit architectures and /usr/lib64 on 64-bit ones).
-  - This is done because programs with bundled dependencies (Electron, Node modules, and more) MUST have these dependencies kept together.
+  - This is done because programs with bundled dependencies (Electron, JavaScript modules, and more) MUST have these dependencies kept together.
 2. Install the app's files.
 3. Symlink the app's binary to the bin directory.
 4. Install the app's icons.
@@ -401,7 +405,7 @@ What `%vendor_nodejs{:rpmspec}` does:
 Vendored versions of NPM and NPX are subject to limitations in commands as they must be run through `exec`.
 
 ### Node Module Macros
-"Node modules" refer to JavaScript packages run using a JavaScript runtime (usually Node.js), almost always hosted on the [NPM Registry](https://www.npmjs.com/).
+"Node modules" refer to JavaScript packages run using a JavaScript runtime (usually Node.js), which are hosted on the [NPM Registry](https://www.npmjs.com).
 
 #### %npm_prep
 Prepare a Node module for build steps.
@@ -440,11 +444,6 @@ Real package example:
 # Environment variable is one set during execution of %%npm_install
 ./bin/%{npm_name}$_js --limitAttributes licenses --out LICENSE.modules
 ```
-
-#### %npm_test
-Runs generic NPM tests. This will not be applicable to all Node modules. For use in the `%check{:rpmspec}` section.
-
-Expands to: `%{__npm} test{:rpmspec}`
 
 #### %node_self_test
 Runs self-defined tests on the Node module. This is not applicable for all Node modules. Also, not all tests (that are supported as Node modules) can use a wide variety of testing tools. For use in `%check{:rpmspec}`.
@@ -515,6 +514,12 @@ Expands to: `%{__npm_license_checker} --summary`
   - This is very important for consistent macro behavior as well as if the cache must be modified or deleted during build for any reason.
 2. All macros calling the package managers also call NPM environment variables because most of them are using build dependencies from the NPM Registry, some even wrap NPM commands with their own. This ensures consistent NPM behavior.
 
+<Callout type="info">
+  "Node modules" refer to JavaScript packages run using a JavaScript runtime (usually Node.js), which are hosted on the [NPM Registry](https://www.npmjs.com).
+  "JavaScript modules", however, refers to to JavaScript packages run using a JavaScript runtime which are hosted on *either* the NPM Registry or the [JavaScript Registry](https://jsr.io), the latter of which are also called "modern JavaScript packages." This means Node modules are JavaScript modules, but not the other way around.
+  NPM only officially uses Node modules. You can use JSR with NPX by using `npx jsr`, but not through NPM directly. Other package managers of new enough versions support both.
+<Callout>
+
 ### NPM Macros
 Macros for using [NPM](https://www.npmjs.com).
 
@@ -550,7 +555,7 @@ Remotely run Node modules with NPX.
 Expands to: `/usr/bin/env %{npm_common_envvars} %{?with_vendored_nodejs:%{__nvm} exec npx --}%{!?with_vendored_nodejs:/usr/bin/npx}{:rpmspec}`
 
 #### %npm_audit
-Audit with NPM if package uses bundled Node dependencies. For use in the `%check{:rpmspec}` section.
+Audit with NPM if package uses bundled Node module dependencies. For use in the `%check{:rpmspec}` section.
 
 Vulnerabilities for Node modules __not bundled in the final package__ SHOULD NOT be fixed. If a vulnerability is found *only* in build dependencies, you are fine to leave it as is.
 
@@ -567,6 +572,11 @@ Available flags:
 - `-p{:rpmspec}` will limit the run to the package lock.
 
 LIMITATION: Cannot be used on modules installed using the `-g{:rpmspec}` flag (which is done in `%npm_prep{:rpmspec}`) which use a package lock.
+
+#### %npm_test
+Runs NPM tests. This will not be applicable to all projects or Node modules. For use in the `%check{:rpmspec}` section. For some projects it may be necessary to export `NODE_ENV=test{:bash}` first.
+
+Expands to: `%{__npm} test{:rpmspec}`
 
 ### Bun Macros
 Macros for using [Bun](https://bun.com).
@@ -587,23 +597,23 @@ Expands to: `/usr/bin/env %{bun_common_envvars} /usr/bin/bun{:rpmspec}`
 SHOULD be used in place of calling `bun` itself.
 
 #### %__bunx
-Run Node modules (downloading them if necessary) with Bun.
+Run JavaScript modules (downloading them if necessary) with Bun.
 
 Expands to: `/usr/bin/env %{bun_common_envvars} /usr/bin/bunx{:rpmspec}`
 
 SHOULD be used in place of calling `bunx` or `bun x` itself.
 
 #### %bun_audit
-Audit with Bun if package uses bundled Node dependencies. For use in the `%check{:rpmspec}` section.
+Audit with Bun if package uses bundled JavaScript module dependencies. For use in the `%check{:rpmspec}` section.
 
 <Callout>
-  `bun audit` is currently just a wrapper for NPM audit but lacks the `fix` option; use `%npm_audit_fix{:rpmspec}` to fix vulnerabilities.
+  `bun audit` is currently just a wrapper for NPM audit but lacks the `fix` option; use `%npm_audit_fix{:rpmspec}` to fix vulnerabilities if they are found in Node modules.
 </Callout>
 
-You SHOULD NOT need to fix vulnerabilities for Node modules that are __not bundled in the final package__. This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
+You SHOULD NOT need to fix vulnerabilities for JavaScript modules that are __not bundled in the final package__. This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
 
 #### %bun_pm_trust
-Add Node modules to trusted dependencies so their postinstall scripts can be run. SHOULD only be used if necessary.
+Add JavaScript modules to trusted dependencies so their postinstall scripts can be run. Requires arguments for dependencies to approve. SHOULD only be used if necessary.
 
 Available flags:
 - `-a{:rpmspec}` can be used to trust all dependencies, otherwise simply list the dependencies you want to trust after the command.
@@ -611,7 +621,9 @@ Available flags:
 Expands to: `%{__bun} pm trust{:rpmspec}`
 
 #### %bun_test
-TODO
+Runs Bun tests. This will not be applicable to all projects. For use in the `%check{:rpmspec}` section. For some projects it may be necessary to export `NODE_ENV=test{:bash}` first.
+
+Expands to: `%{__bun} test{:rpmspec}`
 
 ### Deno Macros
 Macros for using [Deno](https://deno.com).
@@ -634,13 +646,26 @@ Expands to: `/usr/bin/env %{deno_common_envvars} /usr/bin/dx{:rpmspec}`
 SHOULD be used in place of calling `dx` or `deno x` itself.
 
 #### %deno_audit
-TODO
+Audit with Deno if package uses bundled JavaScript module dependencies. For use in the `%check{:rpmspec}` section.
+
+Expands to: `NPM_CONFIG_AUDIT_LEVEL=low %{__deno} audit --level=low --ignore-unfixable --socket{:rpmspec}`
+
+<Callout>
+  `deno audit` currently lacks a way to fix vulnerabilities; use you MAY try using `%npm_audit_fix{:rpmspec}` to fix vulnerabilities.
+</Callout>
 
 #### %deno_approve_scripts
-TODO
+Approve dependency scripts with Deno if needed. Requires arguments for dependencies to approve. SHOULD only be used if necessary.
+
+Available flags:
+- `-l{:rpmspec}` will limit approval to only dependencies found in the package lock.
+
+Expands to: `%{__deno} approve-scripts{:rpmspec}`
 
 #### %deno_test
-TODO
+Runs Deno tests. This will not be applicable to all projects. For use in the `%check{:rpmspec}` section. For some projects it may be necessary to export `NODE_ENV=test{:bash}` first.
+
+Expands to: `%{__deno} test --parallel{:rpmspec}`
 
 ### PNPM Macros
 Macros for using [PNPM](https://pnpm.io).
@@ -656,7 +681,7 @@ Expands to: `/usr/bin/env %{pnpm_common_envvars} %{?with_vendored_pnpm:%{_pnpm_h
 SHOULD be used in place of calling `pnpm` itself.
 
 #### %__pnpx
-Remotely execute Node modules using PNPX.
+Remotely execute JavaScript modules using PNPX.
 
 Expands to: `/usr/bin/env %{pnpm_common_envvars} /usr/bin/pnpx{:rpmspec}`
 
@@ -679,9 +704,9 @@ Usecase examples:
     ```
 
 #### %pnpm_audit
-Audit with PNPM if the package uses bundled Node dependencies. For use in the `%check{:rpmspec}` section.
+Audit with PNPM if the package uses bundled JavaScript module dependencies. For use in the `%check{:rpmspec}` section.
 
-You SHOULD NOT need to fix vulnerabilities for Node modules that are __not bundled in the final package__. This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
+You SHOULD NOT need to fix vulnerabilities for JavaScript modules that are __not bundled in the final package__. This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
 
 #### %pnpm_audit_fix
 Fix security issues in dependencies using PNPM.
@@ -689,7 +714,7 @@ Fix security issues in dependencies using PNPM.
 Expands to: `NPM_CONFIG_AUDIT_LEVEL=low %{__pnpm} audit{:rpmspec}`
 
 #### %pnpm_approve_builds
-Approve dependency scripts with PNPM if needed.
+Approve dependency scripts with PNPM if needed. Requires arguments for dependencies to approve. SHOULD only be used if necessary.
 
 Available flags:
 - `-g{:rpmspec}` can be used to trust depdendencies of globally installed packages.
@@ -697,7 +722,9 @@ Available flags:
 Expands to: `%{__pnpm} approve-builds{:rpmspec}`
 
 #### %pnpm_test
-TODO
+Runs PNPM tests. This will not be applicable to all JavaScript modules. For use in the `%check{:rpmspec}` section. For some projects it may be necessary to export `NODE_ENV=test{:bash}` first.
+
+Expands to: `%{__pnpm} test{:rpmspec}`
 
 ### Yarn Macros
 Macros for using [Yarn (Yarn Classic/Yarn v1)](https://classic.yarnpkg.com) and [Yarn Berry (Yarn Modern/Yarn v2+)](https://yarnpkg.com).
@@ -720,7 +747,7 @@ Expands to: `/usr/bin/env %{yarn_common_envvars} /usr/bin/yarn{:rpmspec}`
 SHOULD be used in place of calling `yarn` itself.
 
 #### %__yarn_dlx
-Remotely execute a Node module with Yarn DLX.
+Remotely execute a JavaScript module with Yarn DLX.
 
 Expands to: `/usr/bin/env %{yarn_common_envvars} /usr/bin/yarn dlx{:rpmspec}`
 
@@ -731,12 +758,14 @@ SHOULD be used in place of calling `yarn dlx` itself.
 </Callout>
 
 #### %yarn_audit
-Audit Yarn if the package uses bundled Node dependencies. For use in the `%check{:rpmspec}` section.
+Audit Yarn if the package uses bundled JavaScript module dependencies. For use in the `%check{:rpmspec}` section.
 
-You SHOULD NOT need to fix vulnerabilities for Node modules that are __not bundled in the final package__. This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
+You SHOULD NOT need to fix vulnerabilities for JavaScript modules that are __not bundled in the final package__. This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
 
 #### %yarn_test
-TODO
+Runs Yarn tests. This will not be applicable to all projects. For use in the `%check{:rpmspec}` section. For some projects it may be necessary to export `NODE_ENV=test{:bash}` first.
+
+Expands to: `%{__yarn} test{:rpmspec}`
 
 ### Tauri Macros
 Macros for using [Tauri](https://v2.tauri.app).
@@ -752,6 +781,11 @@ Available flags:
   - This would be used as `BuildRequires: %{tauri_buildrequires -a}{:rpmspec}`.
 - `-t{:rpmspec}`: Pull Tauri itself from the repos.
   - This would be used as `BuildRequires: %{tauri_buildrequires -t}{:rpmspec}`
+
+<Callout>
+  This does NOT install the JavaScript package managers used for builds except for NPM (e.g., `bun`, `deno`, `pnpm`, `yarnpkg`, `yarnpkg-berry`).
+  Specify these `BuildRequires:{:rpmspec}` manually.
+</Callout>
 
 ### %tauri_prep
 Preps a Tauri package. Wrapper for `%cargo_prep_online` that checks that the Tauri subdirectory is correct.
@@ -787,6 +821,11 @@ Supports the same flags as [%tauri_buildrequires](#tauri_buildrequires).
 
 <Callout>
   BuildRequires generation only works in Mock.
+</Callout>
+
+<Callout>
+  This does NOT install the JavaScript package managers used for builds except for NPM (e.g., `bun`, `deno`, `pnpm`, `yarnpkg`, `yarnpkg-berry`).
+  Specify these `BuildRequires:{:rpmspec}` manually.
 </Callout>
 
 ### Configurable Tauri Macros
@@ -828,7 +867,7 @@ These are macros used to build webapps using JavaScript package managers and bui
 
 Capital letter flags generally denote options that SHOULD be used with caution or only if necessary for a build.
 
-For more information on each package manager, see [NPM Macros](#npm-macros), [Bun Macros](#bun-macros), [PNPM Macros](#pnpm-macros), and [Yarn Macros](#yarn-macros).
+For more information on each package manager, see [NPM Macros](#npm-macros), [Bun Macros](#bun-macros), [Deno Macros](#deno-macros), [PNPM Macros](#pnpm-macros), and [Yarn Macros](#yarn-macros).
 
 NOTE: All of the following macros set the environment variable `$WEBAPP_BUILD_TOOL` to either `electron-builder`, `electron-forge`, or `tauri` depending on which the app is built with. SHOULD NOT need to be used manually, but MAY be if needed for any reason.
 
@@ -845,6 +884,14 @@ Available flags:
 - `-M <argument>{:rpmspec}`: Mode to use in Electron Vite builds. Accepts `production`, `development`, and `staging`. Note that this differs from `$NODE_ENV{:bash}` so you can run any combination of Vite environment modes and Node.js environment modes.
 - `-V{:rpmspec}`: Execute Electron Vite. Same limitation as with `-B{:rpmspec}`.
 
+Example usage:
+```rpmspec
+%build
+%npm_build -r script,script2 -e %{__nodejs} tasks/task1.js && %{__nodejs} tasks/tasks2.js -B
+```
+
+The above would run the necessary install steps, run script and script2, execute Node.js to run task1.js and task2.js, then call the build tool.
+
 #### %bun_build
 SHOULD be used to build Electron or Tauri apps with Bun.
 
@@ -856,7 +903,15 @@ Available flags:
 - `-r <argument>{:rpmspec}`: Executes `%{__bun} run{:rpmspec}` for scripts in the `package.json`. Can accept multiple arguments if they are comma separated.
 - `-F{:rpmspec}`: Runs `--force{:rpmspec}` on the `%{__bun} install{:rpmspec}` step. This will assure all dependencies are the latest versions from the registry, reinstalling them if necessary.
 - `-N{:rpmspec}`: Runs `--no-save{:rpmspec}` on the `%{__bun} install{:rpmspec}` step. This prevents updating or (re)creating a lockfile to prevent freezing.
-- `-R{:rpmspec}`: Remove the bun.lock file. SHOULD only be used if the lockfile is causing build issues. Built apps using this MUST be carefully tested for problems.
+- `-R{:rpmspec}`: Remove the bun.lock file. SHOULD only be used if the lockfile is causing build issues or upstream builds without a lock file. Built apps using this MUST be carefully tested for problems.
+
+Example usage:
+```rpmspec
+%build
+%bun_build -c -r script,script2 -e ng build && echo "Done."
+```
+
+The above would run `%{__bun} ci`, run script and script2, the JavaScript module executable `ng` to build with, call echo, then call the build tool.
 
 #### %deno_build
 SHOULD be used to build Electron or Tauri apps with Deno.
@@ -870,11 +925,19 @@ Available flags:
 - `-F{:rpmspec}`: Runs `--force{:rpmspec}` on the `%{__deno} install{:rpmspec}` step. This will overwite the existing dependency installation (if any exists).
 - `-N{:rpmspec}`: Runs `--no-lock{:rpmspec}` on the `%{__deno} install{:rpmspec}` step. This prevents updating or (re)creating a lockfile to prevent freezing.
 
+Example usage:
+```rpmspec
+%build
+%deno_build -t script,script2 -r file1.js,file2.js
+```
+
+The above would run run script and script2, then run file1.js and file2.js with Deno before running the build tool.
+
 #### %pnpm_build
 SHOULD be used for building Electron or Tauri apps with PNPM.
 
 Available flags:
-- `-e <argument>{:rpmspec}`: Execute Node modules or installed programs in the PNPM build environment. Can accept multiple arguments if they are separated using standard shell separators (`;` and `&&`).
+- `-e <argument>{:rpmspec}`: Execute JavaScript modules or installed programs in the PNPM build environment. Can accept multiple arguments if they are separated using standard shell separators (`;` and `&&`).
 - `-f <argument>{:rpmspec}`: This option is only for Tauri projects. Features to pass to Tauri/Cargo. Features should be comma separated.
 - `-r <argument>{:rpmspec}`: Executes `%{__pnpm} run{:rpmspec}` for scripts in the `package.json{:rpmspec}`. Not recommended for Electron Builder/Electron Forge or Electron Vite commands. Can accept multiple arguments if they are comma separated.
 - `-v{:rpmspec}`: Run Electron Vite build steps. Not needed for all Electron apps.
@@ -882,21 +945,37 @@ Available flags:
 - `-N{:rpmspec}`: Executes the `%{__pnpm} install{:rpmspec}` step with `--no-frozen-lockfile{:rpmspec}`. Overrides projects that try to enforce a lockfile.
 - `-R{:rpmspec}`: Makes `%{__pnpm} exec{:rpmspec}` run on every project in the worspace recursively. SHOULD be used only if necessary and with caution.
 
+Example usage:
+```rpmspec
+%build
+%pnpm_build -N -v -r script,script2
+```
+
+The above would run `%{__pnpm} install --no-frozen-lockfile`, run script and script2, then call Electron Vite before the build tool.
+
 #### %yarn_build
 SHOULD be used to build Electron or Tauri apps with Yarn or Yarn Berry.
 
 Available flags:
-- `-e <argument>{:rpmspec}`: Execute Node modules or installed programs in the Yarn build environment.
+- `-e <argument>{:rpmspec}`: Execute JavaScript modules or installed programs in the Yarn build environment.
 - `-f <argument>{:rpmspec}`: This option is only for Tauri projects. Features to pass to Tauri/Cargo. Features should be comma separated.
 - `-r <argument>{:rpmspec}`: Executes `%{__yarn} run{:rpmspec}` for scripts in the `package.json`. Not recommended for Electron Builder, Electron Forge, or Electron Vite commands. Can accept multiple arguments if they are comma separated.
 - `-v{:rpmspec}`: Run Electron Vite build steps. Not needed for all Electron apps.
 - `-F{:rpmspec}`: Executes the `%{__yarn} install{:rpmspec}` step with `--frozen-lockfile{:rpmspec}`. May be necessary for projects expecting very strict build dependencies, but can also override projects that do not enforce a lock.
 - `-N{:rpmspec}`: Executes the `%{__yarn} install{:rpmspec}` step with `--no-lockfile{:rpmspec}`. Makes Yarn not update the lockfile on dependency installation.
 
+Example usage:
+```rpmspec
+%build
+%yarn_build -f wayland,x11
+```
+
+The above would run Yarn build steps and execute a Tauri build with the features `wayland` and `x11`.
+
 ### Other
 JavaScript related macros that apply to all or do not fit into any of the above categories.
 
-#### %set_node_build_flags
+#### %set_javascript_build_flags
 Set the flags and environment variables used for JavaScript package manager builds.
 
 Based on Fedora's [`%set_build_flags{:rpmspec}` macro](https://src.fedoraproject.org/rpms/redhat-rpm-config/blob/rawhide/f/buildflags.md#using-rpm-build-flags).
