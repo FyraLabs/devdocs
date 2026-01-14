@@ -193,10 +193,14 @@ Available flags:
 - `-f <argument>{:rpmspec}`: MAY be used to specify the file, but is actually OPTIONAL if you list the file path after the macro and all other flags.
 - `-k <argument>{:rpmspec}`: List the "keys" to change (Exec, Icon, etc.). Comma separated for multiple keys.
 - `-v <argument>{:rpmspec}`: List the "values" to set for keys you are changing. Comma separated for multiple keys. MUST be listed in the same corresponding order the keys are listed in.
-  - Example: `%desktop_file_edit -k Exec -v /usr/bin/pkg /path/to/filetoedit.desktop`
 - `-u <argument>`  MAY be used to set either `%u` or `%U` in the desktop file. If using this you MUST NOT use `u` as a macro name for any reason.
   - `%u{:rpmspec}` means that a desktop file can only read one URL at a time, `%U{:rpmspec}` means that it can read multiple at a time. These are what are known as [exec keys](https://specifications.freedesktop.org/desktop-entry/latest/exec-variables.html).
   - Defer to what the desktop file originally contained if you are unsure which to use.
+
+Example usage:
+```rpmspec
+%desktop_file_edit -k Exec,Icon -v /usr/bin/pkg,pkgicon -u %u -f /path/to/file.desktop
+```
 
 ### %desktop_file_install
 SHOULD be used to install a .desktop file.
@@ -209,6 +213,11 @@ Available flags:
 - `-u <argument>{:rpmspec}`  MAY be used to set either `%u` or `%U` in the desktop file. If using this you MUST NOT use `u` as a macro name for any reason.
   - `%u{:rpmspec}` means that a desktop file can only read one URL at a time, `%U{:rpmspec}` means that it can read multiple at a time. These are what are known as [exec keys](https://specifications.freedesktop.org/desktop-entry/latest/exec-variables.html).
   - Defer to what the desktop file originally contained if you are unsure which to use.
+
+Example usage:
+```rpmspec
+%desktop_file_install -k Exec,Icon -v /usr/bin/pkg,pkgicon -u %u -f path/to/file.desktop
+```
 
 ### %update_desktop_database
 A post/postun script to update the .desktop database on install/uninstall of the package. Is most likely not necessary for most things.
