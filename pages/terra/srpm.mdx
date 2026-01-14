@@ -304,7 +304,7 @@ Version: 39.2.7
 ```
 
 ### %electron_arches
-The architectures Electron supports. Automatically set as `ExclusiveArch` when using `%electronmeta{:rpmspec}`.
+The architectures Electron supports. Automatically set as `ExclusiveArch:{:rpmspec}` when using `%electronmeta{:rpmspec}`.
 
 As written, the macro expands to:
 - `%{x86_64} %{ix86} %{arm64} armv7l armv7hl armv7hnl %{mips64}{:rpmspec}`
