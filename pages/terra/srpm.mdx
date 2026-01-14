@@ -400,6 +400,14 @@ What `%vendor_nodejs{:rpmspec}` does:
 
 Vendored versions of NPM and NPX are subject to limitations in commands as they must be run through `exec`.
 
+<Callout type="info">
+  "Node modules" refer to JavaScript packages run using a JavaScript runtime (usually Node.js), which are hosted on the [NPM Registry](https://www.npmjs.com).
+
+  "JavaScript modules", however, refers to to JavaScript packages run using a JavaScript runtime which are hosted on *either* the NPM Registry or the [JavaScript Registry](https://jsr.io), the latter of which are also called "modern JavaScript packages." This means Node modules are JavaScript modules, but not the other way around.
+
+  NPM only officially uses Node modules. You can use JSR with NPX by using `npx jsr`, but not through NPM directly. Other package managers of new enough versions support both.
+</Callout>
+
 ### Node Module Macros
 Macros for packaging Node modules.
 
@@ -509,12 +517,6 @@ Expands to: `%{__npm_license_checker} --summary`
 1. The JavaScript package manager cache directories are placed in [`%{rpmbuilddir}`](#rpmbuilddir) because `$HOME{:bash}` can be different depending on if a build is in Mock or RPM Build.
   - This is very important for consistent macro behavior as well as if the cache must be modified or deleted during build for any reason.
 2. All macros calling the package managers also call NPM environment variables because most of them are using build dependencies from the NPM Registry, some even wrap NPM commands with their own. This ensures consistent NPM behavior.
-
-<Callout type="info">
-  "Node modules" refer to JavaScript packages run using a JavaScript runtime (usually Node.js), which are hosted on the [NPM Registry](https://www.npmjs.com).\
-  "JavaScript modules", however, refers to to JavaScript packages run using a JavaScript runtime which are hosted on *either* the NPM Registry or the [JavaScript Registry](https://jsr.io), the latter of which are also called "modern JavaScript packages." This means Node modules are JavaScript modules, but not the other way around.\
-  NPM only officially uses Node modules. You can use JSR with NPX by using `npx jsr`, but not through NPM directly. Other package managers of new enough versions support both.
-</Callout>
 
 ### NPM Macros
 Macros for using [NPM](https://www.npmjs.com).
