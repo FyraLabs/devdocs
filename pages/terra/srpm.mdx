@@ -292,7 +292,6 @@ This ensures packagers don't need to manually set these for every Electron app's
 Like other meta macros (e.g., `%forgemeta{:rpmspec}` from Fedora), you MUST be mindful of where in the spec this macro should be placed.
 - MUST always come after `Name:{:rpmspec}` is defined and before the `%prep{:rpmspec}` section.
 - SHOULD come before the `License:{:rpmspec}` field if using [`%{electron_license}`](#electron_license).
-- SHOULD come before the `License:{:rpmspec}` field if using [`%{electron_license}`](#electron_license).
 - MAY be used under preambles but before `%prep{:rpmspec}` if not using `%{electron_license}{:rpmspec}`.
 
 The safest location is under `Name:{:rpmspec}` and above other preambles. When in doubt, place the macro here.
