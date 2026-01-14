@@ -241,10 +241,6 @@ Expands to: `%{__update_desktop_database} --quiet || :{:rpmspec}`
 ## Electron
 These macros assist with the general packaging of applications that use [Electron](https://www.electronjs.org).
 
-<Callout>
-  Many Electron projects will default to building distro binary packages (such as RPMs and Debs) and this rarely works well in RPM builds. You should be prepared to patch or otherwise modify the Electron Builder config to rectify this.
-</Callout>
-
 ### %electronmeta
 Set up all basic requirements including build macros for building an Electron app.
 
@@ -518,7 +514,7 @@ Expands to: `%{__npm_license_checker} --summary`
   "Node modules" refer to JavaScript packages run using a JavaScript runtime (usually Node.js), which are hosted on the [NPM Registry](https://www.npmjs.com).
   "JavaScript modules", however, refers to to JavaScript packages run using a JavaScript runtime which are hosted on *either* the NPM Registry or the [JavaScript Registry](https://jsr.io), the latter of which are also called "modern JavaScript packages." This means Node modules are JavaScript modules, but not the other way around.
   NPM only officially uses Node modules. You can use JSR with NPX by using `npx jsr`, but not through NPM directly. Other package managers of new enough versions support both.
-<Callout>
+</Callout>
 
 ### NPM Macros
 Macros for using [NPM](https://www.npmjs.com).
