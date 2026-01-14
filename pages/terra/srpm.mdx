@@ -388,8 +388,6 @@ Expands to: `/usr/bin/env NVM_DIR=%{_nvm_dir} /usr/bin/nvm{:rpmspec}`
 #### %vendor_nodejs
 This macro SHOULD only be used if Node.js packages available from the repos are not usable for some reason.
 
-You MUST add `nvm` as a build dependency: `BuildRequires: nvm{:rpmspec}`.
-
 Available flags:
 - `-v <argument>{:rpmspec}` is REQUIRED for this macro to pass the version to NVM. This flag accepts a full version, the major for the latest of a major version of Node.js (e.g., `24`), or `node` to use the latest version of Node.js available.
 
@@ -407,6 +405,10 @@ What `%vendor_nodejs{:rpmspec}` does:
 1. Sets a `%bcond{:rpmspec}` to `vendored_nodejs{:rpmspec}` so other macros will use the vendored version.
 
 Vendored versions of NPM and NPX are subject to limitations in commands as they must be run through `exec`.
+
+<Callout>
+  You MUST add `nvm` as a build as a `BuildRequires:{:rpmspec}` if using this macro.
+</Callout>
 
 ### Node Module Macros
 Macros for packaging Node modules.
@@ -837,7 +839,7 @@ This may be useful for, for example, building an AppImage to extract a .desktop 
 This macro disables Tauri version mismatch checking. It can be set to anything.
 
 <Callout type="warning">
-  Use of this macro is **heavily discouraged.** It only exists in Tauri, and is only enableable with this macro, because Tauri may detect a version mismatch incorrectly in some situations. You SHOULD NOT use this to force a system Tauri build.
+  Use of this macro is **heavily discouraged.** The option to ignore version mismatches only exists in Tauri, and is only enableable with this macro, because Tauri may detect a version mismatch incorrectly in some situations. You SHOULD NOT use this to force a system Tauri build with an incorrect Tauri version.
 </Callout>
 
 ### System Tauri Macros
