@@ -367,6 +367,14 @@ MAY be used to prep a Go package for online builds. Replaces `%goprep{:rpmspec}`
 ## JavaScript Runtimes
 These are macros to assist with the general packaging of applications that use JavaScript runtimes, such as Node.js or Bun.
 
+<Callout type="info">
+  "Node modules" refer to JavaScript packages run using a JavaScript runtime (usually Node.js), which are hosted on the [NPM Registry](https://www.npmjs.com).
+
+  "JavaScript modules", however, refers to to JavaScript packages run using a JavaScript runtime which are hosted on *either* the NPM Registry or the [JavaScript Registry](https://jsr.io), the latter of which are also called "modern JavaScript packages." This means Node modules are JavaScript modules, but not the other way around.
+
+  NPM only officially uses Node modules. You can use JSR with NPX by using `npx jsr`, but not through NPM directly. Other package managers of new enough versions support both.
+</Callout>
+
 ### Node.js Macros
 Macros for using [Node.js](https://nodejs.org). These require the use of [Fedora Node.js macros](https://docs.fedoraproject.org/en-US/packaging-guidelines/Node.js/#_macros) in the `nodejs-packaging` package.
 
@@ -399,14 +407,6 @@ What `%vendor_nodejs{:rpmspec}` does:
 1. Sets a `%bcond{:rpmspec}` to `vendored_nodejs{:rpmspec}` so other macros will use the vendored version.
 
 Vendored versions of NPM and NPX are subject to limitations in commands as they must be run through `exec`.
-
-<Callout type="info">
-  "Node modules" refer to JavaScript packages run using a JavaScript runtime (usually Node.js), which are hosted on the [NPM Registry](https://www.npmjs.com).
-
-  "JavaScript modules", however, refers to to JavaScript packages run using a JavaScript runtime which are hosted on *either* the NPM Registry or the [JavaScript Registry](https://jsr.io), the latter of which are also called "modern JavaScript packages." This means Node modules are JavaScript modules, but not the other way around.
-
-  NPM only officially uses Node modules. You can use JSR with NPX by using `npx jsr`, but not through NPM directly. Other package managers of new enough versions support both.
-</Callout>
 
 ### Node Module Macros
 Macros for packaging Node modules.
