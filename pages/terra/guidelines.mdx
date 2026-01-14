@@ -416,10 +416,10 @@ BuildRequires:  desktop-file-utils
 
 %install
 ...
-install -Dm644 %{SOURCE1} %{buildroot}%{_appsdir}/NeoHtop.desktop
+%desktop_file_install %{SOURCE1}
 
 %check
-desktop-file-validate %{buildroot}%{_appsdir}/NeoHtop.desktop
+%desktop_file_validate %{buildroot}%{_appsdir}/NeoHtop.desktop
 
 %files
 ...
