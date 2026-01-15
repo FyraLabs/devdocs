@@ -90,9 +90,13 @@ Used in [`%pkg_completions`](#pkg_completion), or manually when `%pkg_completion
 ### %_gnomeextensionsdir
 Expands to: `%{_datadir}/gnome-shell/extensions%{?uuid:/%{uuid}}{:rpmspec}`
 
-**NOTE:** `%{uuid}{:rpmspec}` is usually defined in gnome-shell-extension packages. if the macro is defined in your spec file (`%global uuid PKG-UUID`), it will be appended to the path upon expansion as: `%{_datadir}/gnome-shell/extensions/%{uuid}{:rpmspec}`.
+<Callout>
+`%{uuid}{:rpmspec}` is usually defined in gnome-shell-extension packages. if the macro is defined in your spec file (`%global uuid PKG-UUID`), it will be appended to the path upon expansion as: `%{_datadir}/gnome-shell/extensions/%{uuid}{:rpmspec}`.
+
 Otherwise, it will expand without `%{uuid}`, as: `%{_datadir}/gnome-shell/extensions{:rpmspec}`.
+
 Note that you SHOULD then need to add the extension's UUID after this macro.
+</Callout>
 
 ### %_hicolordir
 Expands to: `%_iconsdir/hicolor{:rpmspec}` or `/usr/share/icons/hicolor{:rpmspec}`
@@ -361,7 +365,9 @@ Example usage:
   - A second symlink called `alsoapp`.
   - A desktop file with the `Exec` line reading `Exec=/usr/lib(64)/pkgname/app --enable-features=WaylandWindowDecorations --ozone-platform=wayland %u`.
 
-NOTE: Like the webapp build macros, this macro sets the environment variable `$WEBAPP_BUILD_TOOL` to either `electron-builder` or `electron-forge` depending on which the app is built with. SHOULD NOT need to be used manually, but MAY be if needed for any reason.
+<Callout>
+Like the webapp build macros, this macro sets the environment variable `$WEBAPP_BUILD_TOOL` to either `electron-builder` or `electron-forge` depending on which the app is built with. SHOULD NOT need to be used manually, but MAY be if needed for any reason.
+</Callout>
 
 ## Go
 These macros assist with building Go projects.
@@ -442,9 +448,11 @@ Example usage:
 #### %npm_install
 Install a Node module to `%{npm_sitelib}{:rpmspec}` and symlink its executable.
 
-NOTE: This macro sets the environment variable `$_js`. This environment variable has a very simple purpose: It is defined as `.js` if a Node module's executable ends in a `.js` extension.
+<Callout>
+This macro sets the environment variable `$_js`. This environment variable has a very simple purpose: It is defined as `.js` if a Node module's executable ends in a `.js` extension.
 
 How this is used: If for any reason you need to execute a Node module itself as part of the build, you SHOULD do `/path/to/%{npm_name}$_js{:rpmspec}` after using `%npm_install{:rpmspec}`. `$_js` will expand to nothing if not defined and will expand to the `.js` extension if defined.
+</Callout>
 
 Real package example:
 ```rpmspec
@@ -534,9 +542,13 @@ Macro that sets the logging level for NPM. Defaults to `error` because NPM logs 
 If desired, it can be redefined to `silent`, `warn`, `notice`, `info`, `verbose`, or `silly`.
 
 #### %npm_common_envvars
-**NOTE:** NPM environment variables written in uppercase will be __ignored__ if the project sets different ones explicitly. This is intentional behavior which these macros do not override in order to avoid build issues. For more information, please see [this issue](https://github.com/npm/npm/issues/14528) in the original NPM GitHub repository.
-  - If for any reason you need to hardcode an environment override, use a flag passed to NPM or manually set the environment variable in all lowercase.
-  - For more information on NPM config flags and environment variables, please go [here](https://docs.npmjs.com/cli/v11/using-npm/config).
+<Callout type="important">
+NPM environment variables written in uppercase will be __ignored__ if the project sets different ones explicitly. This is intentional behavior which these macros do not override in order to avoid build issues. For more information, please see [this issue](https://github.com/npm/npm/issues/14528) in the original NPM GitHub repository.
+
+If for any reason you need to hardcode an environment override, use a flag passed to NPM or manually set the environment variable in all lowercase.
+
+For more information on NPM config flags and environment variables, please go [here](https://docs.npmjs.com/cli/v11/using-npm/config).
+</Callout>
 
 Expands to: `NPM_CONFIG_USERCONFIG=%{rpmbuilddir}/.npmrc NPM_CONFIG_GLOBALCONFIG=%{rpmbuilddir}/npmrc NPM_CONFIG_CACHE=%{_npm_cache_dir} NPM_CONFIG_LOGLEVEL=%{__npm_log_level} NPM_CONFIG_FUND=false NPM_CONFIG_UPDATE_NOTIFIER=false NO_UPDATE_NOTIFIER=1 NPM_CONFIG_COLOR=always NPM_CONFIG_INIT_MODULE=%{rpmbuilddir}/.npm-init.js`
 
@@ -879,7 +891,9 @@ Capital letter flags generally denote options that SHOULD be used with caution o
 
 For more information on each package manager, see [NPM Macros](#npm-macros), [Bun Macros](#bun-macros), [Deno Macros](#deno-macros), [PNPM Macros](#pnpm-macros), and [Yarn Macros](#yarn-macros).
 
-NOTE: All of the following macros set the environment variable `$WEBAPP_BUILD_TOOL` to either `electron-builder`, `electron-forge`, or `tauri` depending on which the app is built with. SHOULD NOT need to be used manually, but MAY be if needed for any reason.
+<Callout>
+All of the following macros set the environment variable `$WEBAPP_BUILD_TOOL` to either `electron-builder`, `electron-forge`, or `tauri` depending on which the app is built with. SHOULD NOT need to be used manually, but MAY be if needed for any reason.
+</Callout>
 
 #### %npm_build
 SHOULD be used for building Electron or Tauri apps with NPM. Has a great deal of flags to work around NPM specific limitations.
@@ -1118,7 +1132,9 @@ yadm-zsh-completion-x.x.x-x.fcxx.noarch.rpm - contains `/usr/share/zsh/site-func
 ### %pkg_devel_files
 Set the summary & description, then find development files and install them to a subpackages `%files`.
 SHOULD be used in place of manually creating `-devel` subpackages.
-**NOTE:** You still need to define a `%package devel{:rpmspec}`, and then use this macro below this.
+<Callout type="warning">
+You still need to define a `%package devel{:rpmspec}`, and then use this macro below this.
+</Callout>
 For example:
 
 ```rpmspec
@@ -1133,7 +1149,10 @@ For example:
 ### %pkg_static_files
 Set the summary & description, then find static libraries.
 SHOULD be used in place of manually creating `-static` subpackages.
-**NOTE:** You still need to define a `%package static{:rpmspec}`, and then use this macro below this.
+
+<Callout type="warning">
+You still need to define a `%package static{:rpmspec}`, and then use this macro below this.
+</Callout>
 For example:
 
 ```rpmspec
@@ -1146,7 +1165,9 @@ For example:
 ### %pkg_libs_files
 Set the summary & description, then find dynamic library files (will be placed as `%_libdir/*.so.*`).
 SHOULD be used in place of manually creating `-libs` subpackages.
-**NOTE:** You still need to define a `%package libs{:rpmspec}`, and then use this macro below this.
+<Callout type="warning">
+You still need to define a `%package libs{:rpmspec}`, and then use this macro below this.
+</Callout>
 For example:
 
 ```rpmspec
