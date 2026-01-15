@@ -90,10 +90,8 @@ Used in [`%pkg_completions`](#pkg_completion), or manually when `%pkg_completion
 Expands to: `%{_datadir}/gnome-shell/extensions%{?uuid:/%{uuid}}{:rpmspec}`
 
 <Callout>
-`%{uuid}` is usually defined in gnome-shell-extension packages. if the macro is defined in your spec file (`%global uuid PKG-UUID`), it will be appended to the path upon expansion as: `%{_datadir}/gnome-shell/extensions/%{uuid}`.
-
-Otherwise, it will expand without `%{uuid}`, as: `%{_datadir}/gnome-shell/extensions`.
-
+`%{uuid}` is usually defined in gnome-shell-extension packages. if the macro is defined in your spec file (`%global uuid PKG-UUID`), it will be appended to the path upon expansion as: `%{_datadir}/gnome-shell/extensions/%{uuid}`.<br />
+Otherwise, it will expand without `%{uuid}`, as: `%{_datadir}/gnome-shell/extensions`.<br />
 Note that you SHOULD then need to add the extension's UUID after this macro.
 </Callout>
 
@@ -254,7 +252,7 @@ These macros assist with the general packaging of applications that use [Electro
 Set up all basic requirements including build macros for building an Electron app.
 
 <Callout>
-  This does NOT install the JavaScript package managers used for builds except for NPM (e.g., `bun`, `deno`, `pnpm`, `yarnpkg`, `yarnpkg-berry`).
+  This does NOT install the JavaScript package managers used for builds except for NPM (e.g., `bun`, `deno`, `pnpm`, `yarnpkg`, `yarnpkg-berry`).<br />
   Specify these `BuildRequires:{:rpmspec}` manually.
 </Callout>
 
@@ -378,10 +376,8 @@ MAY be used to prep a Go package for online builds. Replaces `%goprep{:rpmspec}`
 These are macros to assist with the general packaging of applications that use JavaScript runtimes, such as Node.js or Bun.
 
 <Callout type="info">
-  "Node modules" refers to JavaScript packages run using a JavaScript runtime (usually Node.js), which are hosted on the [NPM Registry](https://www.npmjs.com).
-
-  "JavaScript modules," however, refers to to JavaScript packages run using a JavaScript runtime which are hosted on *either* the NPM Registry or the [JavaScript Registry](https://jsr.io), the latter of which are also called "modern JavaScript packages." This means Node modules are JavaScript modules, but not the other way around.
-
+  "Node modules" refers to JavaScript packages run using a JavaScript runtime (usually Node.js), which are hosted on the [NPM Registry](https://www.npmjs.com).<br />
+  "JavaScript modules," however, refers to to JavaScript packages run using a JavaScript runtime which are hosted on *either* the NPM Registry or the [JavaScript Registry](https://jsr.io), the latter of which are also called "modern JavaScript packages." This means Node modules are JavaScript modules, but not the other way around.<br />
   NPM only officially uses Node modules. You can use JSR with NPX by using `npx jsr`, but not through NPM directly. Other package managers of new enough versions support both.
 </Callout>
 
@@ -448,9 +444,8 @@ Example usage:
 Install a Node module to `%{npm_sitelib}{:rpmspec}` and symlink its executable.
 
 <Callout>
-This macro sets the environment variable `$_js`. This environment variable has a very simple purpose: It is defined as `.js` if a Node module's executable ends in a `.js` extension.
-
-How this is used: If for any reason you need to execute a Node module itself as part of the build, you SHOULD do `/path/to/%{npm_name}$_js` after using `%npm_install`. `$_js` will expand to nothing if not defined and will expand to the `.js` extension if defined.
+  This macro sets the environment variable `$_js`. This environment variable has a very simple purpose: It is defined as `.js` if a Node module's executable ends in a `.js` extension.<br />
+  How this is used: If for any reason you need to execute a Node module itself as part of the build, you SHOULD do `/path/to/%{npm_name}$_js` after using `%npm_install`. `$_js` will expand to nothing if not defined and will expand to the `.js` extension if defined.
 </Callout>
 
 Real package example:
@@ -542,11 +537,9 @@ If desired, it can be redefined to `silent`, `warn`, `notice`, `info`, `verbose`
 
 #### %npm_common_envvars
 <Callout type="important">
-NPM environment variables written in uppercase will be __ignored__ if the project sets different ones explicitly. This is intentional behavior which these macros do not override in order to avoid build issues. For more information, please see [this issue](https://github.com/npm/npm/issues/14528) in the original NPM GitHub repository.
-
-If for any reason you need to hardcode an environment override, use a flag passed to NPM or manually set the environment variable in all lowercase.
-
-For more information on NPM config flags and environment variables, please go [here](https://docs.npmjs.com/cli/v11/using-npm/config).
+  NPM environment variables written in uppercase will be __ignored__ if the project sets different ones explicitly. This is intentional behavior which these macros do not override in order to avoid build issues. For more information, please see [this issue](https://github.com/npm/npm/issues/14528) in the original NPM GitHub repository.<br />
+  If for any reason you need to hardcode an environment override, use a flag passed to NPM or manually set the environment variable in all lowercase.<br />
+  For more information on NPM config flags and environment variables, please go [here](https://docs.npmjs.com/cli/v11/using-npm/config).
 </Callout>
 
 Expands to: `NPM_CONFIG_USERCONFIG=%{rpmbuilddir}/.npmrc NPM_CONFIG_GLOBALCONFIG=%{rpmbuilddir}/npmrc NPM_CONFIG_CACHE=%{_npm_cache_dir} NPM_CONFIG_LOGLEVEL=%{__npm_log_level} NPM_CONFIG_FUND=false NPM_CONFIG_UPDATE_NOTIFIER=false NO_UPDATE_NOTIFIER=1 NPM_CONFIG_COLOR=always NPM_CONFIG_INIT_MODULE=%{rpmbuilddir}/.npm-init.js`
@@ -804,7 +797,7 @@ Available flags:
   - This would be used as `BuildRequires: %{tauri_buildrequires -t}{:rpmspec}`
 
 <Callout>
-  This does NOT install the JavaScript package managers used for builds except for NPM (e.g., `bun`, `deno`, `pnpm`, `yarnpkg`, `yarnpkg-berry`).
+  This does NOT install the JavaScript package managers used for builds except for NPM (e.g., `bun`, `deno`, `pnpm`, `yarnpkg`, `yarnpkg-berry`).<br />
   Specify these `BuildRequires:{:rpmspec}` manually.
 </Callout>
 
@@ -845,7 +838,7 @@ Supports the same flags as [%tauri_buildrequires](#tauri_buildrequires).
 </Callout>
 
 <Callout>
-  This does NOT install the JavaScript package managers used for builds except for NPM (e.g., `bun`, `deno`, `pnpm`, `yarnpkg`, `yarnpkg-berry`).
+  This does NOT install the JavaScript package managers used for builds except for NPM (e.g., `bun`, `deno`, `pnpm`, `yarnpkg`, `yarnpkg-berry`).<br />
   Specify these `BuildRequires:{:rpmspec}` manually.
 </Callout>
 
@@ -891,7 +884,7 @@ Capital letter flags generally denote options that SHOULD be used with caution o
 For more information on each package manager, see [NPM Macros](#npm-macros), [Bun Macros](#bun-macros), [Deno Macros](#deno-macros), [PNPM Macros](#pnpm-macros), and [Yarn Macros](#yarn-macros).
 
 <Callout>
-All of the following macros set the environment variable `$WEBAPP_BUILD_TOOL` to either `electron-builder`, `electron-forge`, or `tauri` depending on which the app is built with. SHOULD NOT need to be used manually, but MAY be if needed for any reason.
+  All of the following macros set the environment variable `$WEBAPP_BUILD_TOOL` to either `electron-builder`, `electron-forge`, or `tauri` depending on which the app is built with. SHOULD NOT need to be used manually, but MAY be if needed for any reason.
 </Callout>
 
 #### %npm_build
