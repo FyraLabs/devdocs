@@ -1133,7 +1133,7 @@ yadm-zsh-completion-x.x.x-x.fcxx.noarch.rpm - contains `/usr/share/zsh/site-func
 Set the summary & description, then find development files and install them to a subpackages `%files`.
 SHOULD be used in place of manually creating `-devel` subpackages.
 <Callout type="warning">
-You still need to define a `%package devel{:rpmspec}`, and then use this macro below this.
+  You still need to define a `%package devel`, and then use this macro below this.
 </Callout>
 For example:
 
@@ -1149,9 +1149,8 @@ For example:
 ### %pkg_static_files
 Set the summary & description, then find static libraries.
 SHOULD be used in place of manually creating `-static` subpackages.
-
 <Callout type="warning">
-You still need to define a `%package static{:rpmspec}`, and then use this macro below this.
+  You still need to define a `%package static`, and then use this macro below this.
 </Callout>
 For example:
 
@@ -1166,7 +1165,7 @@ For example:
 Set the summary & description, then find dynamic library files (will be placed as `%_libdir/*.so.*`).
 SHOULD be used in place of manually creating `-libs` subpackages.
 <Callout type="warning">
-You still need to define a `%package libs{:rpmspec}`, and then use this macro below this.
+  You still need to define a `%package libs`, and then use this macro below this.
 </Callout>
 For example:
 
