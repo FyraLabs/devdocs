@@ -299,7 +299,7 @@ The safest location is under `Name:{:rpmspec}` and above other preambles. When i
 
 <Callout>
   `%__provides_excludes` and `%__requires_excludes` can be recursively added to if needed by defining the macro again as a `%global` and appending the needed exclusions using [regex](https://wikipedia.org/wiki/Regular_expression).<br />
-  Example: `%global __provides_excludes %{__provides_excludes}|libcurl\\.so
+  Example: `%global __provides_excludes %{__provides_excludes}|libcurl\\.so`
 </Callout>
 
 Example usage:
