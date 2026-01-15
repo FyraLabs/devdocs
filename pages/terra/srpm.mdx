@@ -528,12 +528,17 @@ Expands to: `%{__npm_license_checker} --summary`
 ### NPM Macros
 Macros for using [NPM](https://www.npmjs.com).
 
+#### %__npm_log_level
+Macro that sets the logging level for NPM. Defaults to `error` because NPM logs can fill the terminal quickly.
+
+If desired, it can be redefined to `silent`, `warn`, `notice`, `info`, `verbose`, or `silly`.
+
 #### %npm_common_envvars
 **NOTE:** NPM environment variables written in uppercase will be __ignored__ if the project sets different ones explicitly. This is intentional behavior which these macros do not override in order to avoid build issues. For more information, please see [this issue](https://github.com/npm/npm/issues/14528) in the original NPM GitHub repository.
   - If for any reason you need to hardcode an environment override, use a flag passed to NPM or manually set the environment variable in all lowercase.
   - For more information on NPM config flags and environment variables, please go [here](https://docs.npmjs.com/cli/v11/using-npm/config).
 
-Expands to: `NPM_CONFIG_USERCONFIG=%{rpmbuilddir}/.npmrc NPM_CONFIG_GLOBALCONFIG=%{rpmbuilddir}/npmrc NPM_CONFIG_CACHE=%{_npm_cache_dir} NPM_CONFIG_LOGLEVEL=error NPM_CONFIG_FUND=false NPM_CONFIG_UPDATE_NOTIFIER=false NO_UPDATE_NOTIFIER=1 NPM_CONFIG_COLOR=always NPM_CONFIG_INIT_MODULE=%{rpmbuilddir}/.npm-init.js`
+Expands to: `NPM_CONFIG_USERCONFIG=%{rpmbuilddir}/.npmrc NPM_CONFIG_GLOBALCONFIG=%{rpmbuilddir}/npmrc NPM_CONFIG_CACHE=%{_npm_cache_dir} NPM_CONFIG_LOGLEVEL=%{__npm_log_level} NPM_CONFIG_FUND=false NPM_CONFIG_UPDATE_NOTIFIER=false NO_UPDATE_NOTIFIER=1 NPM_CONFIG_COLOR=always NPM_CONFIG_INIT_MODULE=%{rpmbuilddir}/.npm-init.js`
 
 What these do:
 - Forces all configuration files into the `%{rpmbuilddir}{:rpmspec}` so they are easily locatable and to prevent attempting to write to the host file system for global config.
@@ -545,7 +550,7 @@ What these do:
 #### %npm_config_opts
 Explicit NPM configuration flags of the environment variables set by the Macros.
 
-Expands to: `--userconfig=%{rpmbuilddir}/.npmrc --globalconfig=%{rpmbuilddir}/npmrc --cache=%{rpmbuilddir}/.npm --loglevel=error --fund=false --update-notifier=false --color=always --init-module=%{rpmbuilddir}/.npm-init.js{:rpmspec}`
+Expands to: `--userconfig=%{rpmbuilddir}/.npmrc --globalconfig=%{rpmbuilddir}/npmrc --cache=%{_npm_cache_dir}--loglevel=%{__npm_log_level} --fund=false --update-notifier=false --color=always --init-module=%{rpmbuilddir}/.npm-init.js{:rpmspec}`
 
 #### %__npm
 Macro to call NPM with predetermined enviroment variables.
@@ -990,7 +995,7 @@ Expands to:
 NPM_CONFIG_USERCONFIG="${NPM_CONFIG_USERCONFIG:-%{rpmbuilddir}/.npmrc}" ; export NPM_CONFIG_USERCONFIG ; \
 NPM_CONFIG_GLOBALCONFIG="${NPM_CONFIG_GLOBALCONFIG:-%{rpmbuilddir}/npmrc}" ; export NPM_CONFIG_GLOBALCONFIG ; \
 NPM_CONFIG_CACHE="${NPM_CONFIG_CACHE:-%{_npm_cache_dir}}" ; export NPM_CONFIG_CACHE ; \
-NPM_CONFIG_LOGLEVEL="${NPM_CONFIG_LOGLEVEL:-error}" ; export NPM_CONFIG_LOGLEVEL ; \
+NPM_CONFIG_LOGLEVEL="${NPM_CONFIG_LOGLEVEL:-%{__npm_log_level}}" ; export NPM_CONFIG_LOGLEVEL ; \
 NPM_CONFIG_FUND="${NPM_CONFIG_FUND:-false}" ; export NPM_CONFIG_FUND ; \
 NPM_CONFIG_UPDATE_NOTIFIER="${NPM_CONFIG_UPDATE_NOTIFIER:-false}" ; export NPM_CONFIG_UPDATE_NOTIFIER ; \
 NPM_CONFIG_COLOR="${NPM_CONFIG_COLOR:-always}" ; export NPM_CONFIG_COLOR ; \
