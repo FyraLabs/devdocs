@@ -1183,7 +1183,7 @@ These macros assist with building Zig projects.
 Build Zig projects with a specified architecture and build mode.
 
 Available flags:
-- `-c <?argument>{:rpmspec}`: Used to set a specific CPU (micro)architecture to build for. If no argument is supplied, it will fall back to the `%{_target_cpu}` set by the build. You MUST specify a CPU architecture manually in cases where Zig's architecture format and RPM's do not match (e.g., `aarch64`).
+- `-c <?argument>{:bash}`: Used to set a specific CPU (micro)architecture to build for. If no argument is supplied, it will fall back to the `%{_target_cpu}` set by the build. You MUST specify a CPU architecture manually in cases where Zig's architecture format and RPM's do not match (e.g., `aarch64`).
   - SHOULD ONLY be used in projects that would not perform correctly when built for baseline.
   - For more information on x86_64 microarchitectures, see [here](https://en.wikipedia.org/wiki/X86-64#Microarchitecture_levels).
 - `-r <argument>{:rpmspec}`: Used to set the [release/build mode](https://zig.guide/build-system/build-modes). Accepted arguments are `fast`, `small`, `safe`, and `slow`.
@@ -1199,7 +1199,7 @@ Example:
   -Demit-docs
 ```
 
-More information can be found on our [Zig packaging guidelines](../terra/policy#zig).
+More information can be found on our [Zig packaging guidelines](../terra/guidelines#zig).
 
 ## Miscellaneous
 General macros that do not fit into a specific category.
