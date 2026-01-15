@@ -269,6 +269,8 @@ Rundown of what all `%electronmeta{:rpmspec}` does:
   - This can also be used to help work with the files if you need to do anything manually.
 - Defines `%__provides_excludes{:rpmspec}` to make sure Electron apps are not flagged as providers of their bundled dependencies, such as FFmpeg libraries.
 - Defines `%__requires_excludes{:rpmspec}` based on architecture to prevent Electron projects' cross-platform builds from causing false dependency positives from RPM.
+  - `%__provides_excludes{:rpmspec}` and `%__requires_excludes{:rpmspec}` can be recursively added to if needed by defining the macro again as a `%global` and appending the needed exclusions using [regex](https://wikipedia.org/wiki/Regular_expression).
+  - Example: `%global __provides_excludes %{__provides_excludes}|libcurl\\.so
 - If using the `-D` boolean, sets `%debug_package{:rpmspec}` to `%{nil}{:rpmspec}` to prevent stripping of bundled libraries and/or build failures due to not enough data to strip.
 - Sets the build and runtime dependencies.
 - Sets the `ExclusiveArch:{:rpmspec}` tag to only the architectures Electron supports.
@@ -363,7 +365,7 @@ Example usage:
   - A desktop file with the `Exec` line reading `Exec=/usr/lib(64)/pkgname/app --enable-features=WaylandWindowDecorations --ozone-platform=wayland %u`.
 
 <Callout>
-Like the webapp build macros, this macro sets the environment variable `$WEBAPP_BUILD_TOOL` to either `electron-builder` or `electron-forge` depending on which the app is built with. SHOULD NOT need to be used manually, but MAY be if needed for any reason.
+  Like the webapp build macros, this macro sets the environment variable `$WEBAPP_BUILD_TOOL` to either `electron-builder` or `electron-forge` depending on which the app is built with. SHOULD NOT need to be used manually, but MAY be if needed for any reason.
 </Callout>
 
 ## Go
@@ -554,7 +556,7 @@ What these do:
 #### %npm_config_opts
 Explicit NPM configuration flags of the environment variables set by the Macros.
 
-Expands to: `--userconfig=%{rpmbuilddir}/.npmrc --globalconfig=%{rpmbuilddir}/npmrc --cache=%{_npm_cache_dir}--loglevel=%{__npm_log_level} --fund=false --update-notifier=false --color=always --init-module=%{rpmbuilddir}/.npm-init.js{:rpmspec}`
+Expands to: `--userconfig=%{rpmbuilddir}/.npmrc --globalconfig=%{rpmbuilddir}/npmrc --cache=%{_npm_cache_dir} --loglevel=%{__npm_log_level} --fund=false --update-notifier=false --color=always --init-module=%{rpmbuilddir}/.npm-init.js{:rpmspec}`
 
 #### %__npm
 Macro to call NPM with predetermined enviroment variables.
@@ -862,7 +864,7 @@ These are macros for use with Tauri if installed from the repo. Please note that
 #### %__tauri
 Calls Tauri while setting the Fedora Cargo environment variables.
 
-Expands to: `/usr/bin/env CARGO_HOME='%{_cargo_home}'%{!?with_rust_nightly: RUSTC_BOOTSTRAP=1}%{?with_rust_nightly: RUSTUP_HOME='%{_rustup_home}'} RUSTFLAGS='%{build_rustflags}' /usr/bin/tauri`
+Expands to: `/usr/bin/env CARGO_HOME=%{_cargo_home}%{!?with_rust_nightly: RUSTC_BOOTSTRAP=1}%{?with_rust_nightly: RUSTUP_HOME=%{_rustup_home}} RUSTFLAGS='%{build_rustflags}' /usr/bin/tauri`
 
 #### %tauri_build
 Build with system Tauri.
@@ -884,7 +886,7 @@ Capital letter flags generally denote options that SHOULD be used with caution o
 For more information on each package manager, see [NPM Macros](#npm-macros), [Bun Macros](#bun-macros), [Deno Macros](#deno-macros), [PNPM Macros](#pnpm-macros), and [Yarn Macros](#yarn-macros).
 
 <Callout>
-  All of the following macros set the environment variable `$WEBAPP_BUILD_TOOL` to either `electron-builder`, `electron-forge`, or `tauri` depending on which the app is built with. SHOULD NOT need to be used manually, but MAY be if needed for any reason.
+  All of the following macros set the environment variable `$WEBAPP_BUILD_TOOL` to `electron-builder`, `electron-forge`, or `tauri` depending on which the app is built with. SHOULD NOT need to be used manually, but MAY be if needed for any reason.
 </Callout>
 
 #### %npm_build
@@ -1290,6 +1292,9 @@ A functional macro that tells other macros if Electron is bundled or if the pack
 
 ### %__tauri_common_opts
 Common opts passed to Tauri. Used by macros which call Tauri.
+
+### %terra_rustflags
+This macro simply appends the [Mold linker arguments](/terra/guidelines#usage-of-the-mold-linker) onto the `%build_rustflags` macro. It should not need to be manually used as `%build_rustflags` will be appended automatically when using `%cargo_prep_online`.
 
 ---
 
