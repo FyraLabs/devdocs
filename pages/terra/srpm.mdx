@@ -269,8 +269,6 @@ Rundown of what all `%electronmeta{:rpmspec}` does:
   - This can also be used to help work with the files if you need to do anything manually.
 - Defines `%__provides_excludes{:rpmspec}` to make sure Electron apps are not flagged as providers of their bundled dependencies, such as FFmpeg libraries.
 - Defines `%__requires_excludes{:rpmspec}` based on architecture to prevent Electron projects' cross-platform builds from causing false dependency positives from RPM.
-  - `%__provides_excludes{:rpmspec}` and `%__requires_excludes{:rpmspec}` can be recursively added to if needed by defining the macro again as a `%global` and appending the needed exclusions using [regex](https://wikipedia.org/wiki/Regular_expression).
-  - Example: `%global __provides_excludes %{__provides_excludes}|libcurl\\.so
 - If using the `-D` boolean, sets `%debug_package{:rpmspec}` to `%{nil}{:rpmspec}` to prevent stripping of bundled libraries and/or build failures due to not enough data to strip.
 - Sets the build and runtime dependencies.
 - Sets the `ExclusiveArch:{:rpmspec}` tag to only the architectures Electron supports.
@@ -298,6 +296,11 @@ Like other meta macros (e.g., `%forgemeta{:rpmspec}` from Fedora), you MUST be m
 - MAY be used under preambles but before `%prep{:rpmspec}` if not using `%{electron_license}{:rpmspec}`.
 
 The safest location is under `Name:{:rpmspec}` and above other preambles. When in doubt, place the macro here.
+
+<Callout>
+  `%__provides_excludes` and `%__requires_excludes` can be recursively added to if needed by defining the macro again as a `%global` and appending the needed exclusions using [regex](https://wikipedia.org/wiki/Regular_expression).<br />
+  Example: `%global __provides_excludes %{__provides_excludes}|libcurl\\.so
+</Callout>
 
 Example usage:
 ```rpmspec
