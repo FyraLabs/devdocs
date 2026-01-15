@@ -527,7 +527,7 @@ Outputs a summary of the bundled licenses. Useful for determining what to put in
 
 Expands to: `%{__npm_license_checker} --summary`
 
-### Notes for JavaScript Package Managers:
+### Notes for JavaScript Package Managers
 1. The JavaScript package manager cache directories are placed in [`%{rpmbuilddir}`](#rpmbuilddir) because `$HOME{:bash}` can be different depending on if a build is in Mock or RPM Build.
   - This is very important for consistent macro behavior as well as if the cache must be modified or deleted during build for any reason.
 2. All macros calling the package managers also call NPM environment variables because most of them are using build dependencies from the NPM Registry, some even wrap NPM commands with their own. This ensures consistent NPM behavior.
