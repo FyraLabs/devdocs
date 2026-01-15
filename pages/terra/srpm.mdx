@@ -596,7 +596,7 @@ Available flags:
 LIMITATION: Cannot be used on modules installed using the `-g{:rpmspec}` flag (which is done in `%npm_prep{:rpmspec}`) which use a package lock.
 
 #### %npm_test
-Runs NPM tests. This will not be applicable to all projects or Node modules. For use in the `%check{:rpmspec}` section. For some projects it may be necessary to export `NODE_ENV=test{:bash}` first.
+Runs NPM tests. This will not be applicable to all projects or Node modules. For use in the `%check{:rpmspec}` section. For some projects it may be necessary to export `NODE_ENV=test` first.
 
 Expands to: `%{__npm} test{:rpmspec}`
 
@@ -643,7 +643,7 @@ Available flags:
 Expands to: `%{__bun} pm trust{:rpmspec}`
 
 #### %bun_test
-Runs Bun tests. This will not be applicable to all projects. For use in the `%check{:rpmspec}` section. For some projects it may be necessary to export `NODE_ENV=test{:bash}` first.
+Runs Bun tests. This will not be applicable to all projects. For use in the `%check{:rpmspec}` section. For some projects it may be necessary to export `NODE_ENV=test` first.
 
 Expands to: `%{__bun} test{:rpmspec}`
 
@@ -685,7 +685,7 @@ Available flags:
 Expands to: `%{__deno} approve-scripts{:rpmspec}`
 
 #### %deno_test
-Runs Deno tests. This will not be applicable to all projects. For use in the `%check{:rpmspec}` section. For some projects it may be necessary to export `NODE_ENV=test{:bash}` first.
+Runs Deno tests. This will not be applicable to all projects. For use in the `%check{:rpmspec}` section. For some projects it may be necessary to export `NODE_ENV=test` first.
 
 Expands to: `%{__deno} test --parallel{:rpmspec}`
 
@@ -744,7 +744,7 @@ Available flags:
 Expands to: `%{__pnpm} approve-builds{:rpmspec}`
 
 #### %pnpm_test
-Runs PNPM tests. This will not be applicable to all JavaScript modules. For use in the `%check{:rpmspec}` section. For some projects it may be necessary to export `NODE_ENV=test{:bash}` first.
+Runs PNPM tests. This will not be applicable to all JavaScript modules. For use in the `%check{:rpmspec}` section. For some projects it may be necessary to export `NODE_ENV=test` first.
 
 Expands to: `%{__pnpm} test{:rpmspec}`
 
@@ -785,7 +785,7 @@ Audit Yarn if the package uses bundled JavaScript module dependencies. For use i
 You SHOULD NOT need to fix vulnerabilities for JavaScript modules that are __not bundled in the final package__. This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
 
 #### %yarn_test
-Runs Yarn tests. This will not be applicable to all projects. For use in the `%check{:rpmspec}` section. For some projects it may be necessary to export `NODE_ENV=test{:bash}` first.
+Runs Yarn tests. This will not be applicable to all projects. For use in the `%check{:rpmspec}` section. For some projects it may be necessary to export `NODE_ENV=test` first.
 
 Expands to: `%{__yarn} test{:rpmspec}`
 
@@ -905,7 +905,7 @@ Available flags:
 - `-r <argument>{:rpmspec}`: Executes `%{__npm} run{:rpmspec}` for scripts in the `package.json`. Can run multiple scripts if they are comma separated.
 - `-B{:rpmspec}`: Execute the webapp builder (Electron Builder, Electron Forge, or Tauri) directly. Will NOT work for projects that require build steps which use Node.js or executing JavaScript scripts directly.
 - `-C <argument>{:rpmspec}`: Point NPM to the build config file if it cannot automatically detect it.
-- `-M <argument>{:rpmspec}`: Mode to use in Electron Vite builds. Accepts `production`, `development`, and `staging`. Note that this differs from `$NODE_ENV{:bash}` so you can run any combination of Vite environment modes and Node.js environment modes.
+- `-M <argument>{:rpmspec}`: Mode to use in Electron Vite builds. Accepts `production`, `development`, and `staging`. Note that this differs from `$NODE_ENV` so you can run any combination of Vite environment modes and Node.js environment modes.
 - `-V{:rpmspec}`: Execute Electron Vite. Same limitation as with `-B{:rpmspec}`.
 
 Example usage:
