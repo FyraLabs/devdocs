@@ -91,9 +91,9 @@ Used in [`%pkg_completions`](#pkg_completion), or manually when `%pkg_completion
 Expands to: `%{_datadir}/gnome-shell/extensions%{?uuid:/%{uuid}}{:rpmspec}`
 
 <Callout>
-`%{uuid}{:rpmspec}` is usually defined in gnome-shell-extension packages. if the macro is defined in your spec file (`%global uuid PKG-UUID`), it will be appended to the path upon expansion as: `%{_datadir}/gnome-shell/extensions/%{uuid}{:rpmspec}`.
+`%{uuid}` is usually defined in gnome-shell-extension packages. if the macro is defined in your spec file (`%global uuid PKG-UUID`), it will be appended to the path upon expansion as: `%{_datadir}/gnome-shell/extensions/%{uuid}`.
 
-Otherwise, it will expand without `%{uuid}`, as: `%{_datadir}/gnome-shell/extensions{:rpmspec}`.
+Otherwise, it will expand without `%{uuid}`, as: `%{_datadir}/gnome-shell/extensions`.
 
 Note that you SHOULD then need to add the extension's UUID after this macro.
 </Callout>
@@ -451,7 +451,7 @@ Install a Node module to `%{npm_sitelib}{:rpmspec}` and symlink its executable.
 <Callout>
 This macro sets the environment variable `$_js`. This environment variable has a very simple purpose: It is defined as `.js` if a Node module's executable ends in a `.js` extension.
 
-How this is used: If for any reason you need to execute a Node module itself as part of the build, you SHOULD do `/path/to/%{npm_name}$_js{:rpmspec}` after using `%npm_install{:rpmspec}`. `$_js` will expand to nothing if not defined and will expand to the `.js` extension if defined.
+How this is used: If for any reason you need to execute a Node module itself as part of the build, you SHOULD do `/path/to/%{npm_name}$_js` after using `%npm_install`. `$_js` will expand to nothing if not defined and will expand to the `.js` extension if defined.
 </Callout>
 
 Real package example:
@@ -629,7 +629,7 @@ SHOULD be used in place of calling `bunx` or `bun x` itself.
 Audit with Bun if package uses bundled JavaScript module dependencies. For use in the `%check{:rpmspec}` section.
 
 <Callout>
-  `bun audit` is currently just a wrapper for NPM audit but lacks the `fix` option; use `%npm_audit_fix{:rpmspec}` to fix vulnerabilities if they are found in Node modules.
+  `bun audit` is currently just a wrapper for NPM audit but lacks the `fix` option; use `%npm_audit_fix` to fix vulnerabilities if they are found in Node modules.
 </Callout>
 
 You SHOULD NOT need to fix vulnerabilities for JavaScript modules that are __not bundled in the final package__. This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
@@ -673,7 +673,7 @@ Audit with Deno if package uses bundled JavaScript module dependencies. For use 
 Expands to: `NPM_CONFIG_AUDIT_LEVEL=low %{__deno} audit --level=low --ignore-unfixable --socket{:rpmspec}`
 
 <Callout>
-  `deno audit` currently lacks a way to fix vulnerabilities; use you MAY try using `%npm_audit_fix{:rpmspec}` to fix vulnerabilities.
+  `deno audit` currently lacks a way to fix vulnerabilities; use you MAY try using `%npm_audit_fix` to fix vulnerabilities.
 </Callout>
 
 #### %deno_approve_scripts
@@ -841,7 +841,7 @@ Generates BuildRequires for a Tauri build.
 
 Supports the same flags as [%tauri_buildrequires](#tauri_buildrequires).
 
-<Callout>
+<Callout type="warning">
   BuildRequires generation only works in Mock.
 </Callout>
 
