@@ -359,9 +359,9 @@ Tauri builds webapps using Cargo and the system WebKit. For these reasons some o
 - You SHOULD use one of the following in your spec:
   - `BuildRequires: %{tauri_buildrequires}{:rpmspec}`
   - ```rpmspec
-  %generate_buildrequires
-  %tauri_generate_buildrequires
-  ```
+    %generate_buildrequires
+    %tauri_generate_buildrequires
+    ```
   <Callout type="warning">
     BuildRequires generation only works in Mock.
   </Callout>
