@@ -284,6 +284,92 @@ These packages SHOULD NOT contain anything **except**:
 %_libdir/pkgconfig/%{name}.pc
 # and other development files (.vapi, .typelib, .gir, etc.).
 ```
+### JavaScript
+These are guidelines for packaging projects written in oe which utilize [JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript).
+
+These guidelines also often cover things written in or which utilize [TypeScript](https://www.typescriptlang.org).
+
+#### Node Modules
+Guidelines for packaging Node modules in Terra.
+
+<Callout type="info">
+  "Node modules" in this document refers to JavaScript packages run using a JavaScript runtime (usually Node.js), which are hosted on the [NPM Registry](https://www.npmjs.com).<br />
+  "JavaScript modules," however, refers to to JavaScript packages run using a JavaScript runtime which are hosted on *either* the NPM Registry or the [JavaScript Registry](https://jsr.io), the latter of which are also called "modern JavaScript packages." This means Node modules are JavaScript modules, but not the other way around.<br />
+  NPM only officially uses Node modules. You can use JSR with NPX by using `npx jsr`, but not through NPM directly. Other package managers of new enough versions support both.
+</Callout>
+
+- You SHOULD add (at least!) the following build dependencies to your spec file:
+  - `BuildRequires: nodejs{:rpmspec}` (OR the required Node.js version if the default in a given branch of Fedora will not work)
+    - If using an alternate Node.js version be prepared that you may need to patch or otherwise edit some JS executables' shebangs.
+  - `BuildRequires: nodejs-npm{:rpmspec}`
+  - `BuildRequires: nodejs-packaging{:rpmspec}`
+- We package them like Arch and other distros, and allow bundled dependencies unlike Fedora. You however MAY use system dependencies instead for modules by removing the installed dependency and symlinking it to the one available in the package repos, but this is likely more work than it is worth.
+- You MUST either set `%global npm_name pkgname{:rpmspec}` or use `%npm_prep -n pkgname{:rpmspec}` when packaging Node modules directly. This MUST be defined as the canonical name of the module as listed on the NPM Registry.
+- You SHOULD use `%npm_license` to create the license of the bundled dependencies.
+- You MAY opt instead to follow Fedora's Node.js packaging methods but keep in mind this is very difficult to maintain and may not work on all modules.
+
+### Webapps
+Webapps refers to apps built using technologies such as Electron or Tauri.
+
+These apps embed parts of browser functionality in order to display web content. One of the most recognizable examples is [Discord](https://discord.com).
+
+The general guidelines for building webapps are:
+- Use our [JavaScript package manager macros](/terra/srpm#javascript-package-managers) and/or [webapp build macros](/terra/srpm#webapp-build-macros).
+- Use appropriate [Electron macros](/terra/srpm#electron) for Electron apps.
+- Use appropriate [Tauri macros](/terra/srpm#tauri) for Tauri apps.
+- Add the correct JavaScript package manager to your build dependencies.
+  - Examples:
+  - ```rpmspec
+  BuildRequires: bun-bin
+  BuildRequires: deno
+  BuildRequires: pnpm
+  BuildRequires: yarnpkg
+  ```
+
+#### Electron
+These are guidelines for packaging [Electron](https://www.electronjs.org) apps.
+
+<Callout>
+  Many Electron projects will default to building distro binary packages (such as RPMs and Debs) and this rarely works well in RPM builds. Packagers should be prepared to patch or otherwise modify the Electron Builder config to rectify this.
+</Callout>
+
+- You SHOULD add `%electronmeta` and make sure it is in the correct location in the spec file. The other macros for Electron also depend on the information in this being set.
+  - This meta macro automatically handles MANY common issues that can happen with Electron packages including incorrect dependencies due to bundled (or private) [shared object (`*.so`) libraries](https://en.wikipedia.org/wiki/Shared_library).
+  - It also pulls all basic build dependencies for Electron apps.
+  - Like all meta macros, must be placed carefully:
+    - MUST always come after `Name:{:rpmspec}` is defined and before the first `%description{:rpmspec}`.
+    - SHOULD come before the `License:{:rpmspec}` field if using [`%{electron_license}`](#electron_license).
+    - MAY be used under preambles but before `%description{:rpmspec}` if not using `%{electron_license}{:rpmspec}`.
+    - For more information on what all this meta macro does, please read [its section in our SRPM documentation page](/terra/srpm#electronmeta).
+- You SHOULD append any additional private (bundled) libraries that the Electron app has that are picked up by RPM [AutoReqProv](http://ftp.rpm.org/max-rpm/s1-rpm-depend-auto-depend.html) to `%{__requires_excludes}` and `%{__provides_excludes}` using a `%global{:rpmspec}` similar to the below examples.
+  - `%global __requires_excludes %{__requires_excludes}|private_library\\.so{:rpmspec}`
+  - `%global __provides_excludes %{__provides_excludes}|private_library\\.so{:rpmspec}`
+- You MAY use the macro `%{electron_license}` which contains the licenses for bundled Electron. You SHOULD double check any additional licenses you should list and make sure any other listed licenses are not duplicated or overlapping.
+  - You can double check what the macro expands to with the command `rpm --eval '%{electron_license}'{:sh}` if you have `anda-srpm-macros` installed.
+- You SHOULD use our [`%electron_install` macro](/terra/srpm#electron_install) for installing Electron apps.
+
+#### Tauri
+These are guidelines for packaging [Tauri](https://v2.tauri.app) apps.
+
+Tauri builds webapps using Cargo and the system WebKit. For these reasons some of the [Rust](#rust) guidelines also apply to Tauri. Most relevant Cargo macros have been ported into Tauri compatible ones, however it will likely still be helpful to make yourself familiar with the original macros.
+<Callout>
+  It is important to note that unlike the original Cargo macros, Tauri macros only support passing features with the `-f` flag due to how Tauri works.
+</Callout>
+
+- You SHOULD use one of the following in your spec:
+  - `BuildRequires: %{tauri_buildrequires}{:rpmspec}`
+  - ```rpmspec
+  %generate_buildrequires
+  %tauri_generate_buildrequires
+  ```
+  <Callout type="warning">
+    BuildRequires generation only works in Mock.
+  </Callout>
+- You SHOULD use `%tauri_prep{:rpmspec}` in the `%prep{:rpmspec}` section.
+- You SHOULD use either a [webapp build macro](/terra/srpm#webapp-build-macros) or the [`%tauri_build` macro](/terra/srpm#tauri_build), however the latter will not work with *all* Tauri projects. See its entry on our SRPM macros page for more information.
+- You SHOULD use `%{tauri_cargo_license} > LICENSE.dependencies` in your spec to package the Cargo dependency licenses.
+- You MAY use the `%tauri_cargo_license_summary` and `%tauri_cargo_vendor_manifest` macros in your spec for addition license and Cargo information.
+- You MAY use the [configurable macros for Tauri builds](/terra/srpm#configurable-tauri-macros) if necessary, but it should rarely be needed.
 
 ### Miscellaneous
 
