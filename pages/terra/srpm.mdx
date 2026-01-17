@@ -172,7 +172,7 @@ For example:
 install -Dm644 icons/%{name}.svg %{buildroot}%{_scalableiconsdir}/%{name}.svg
 ```
 
-If the file is a `.png`, use [`%_hicolordir{:rpmspec}`](#_hicolordir).
+If the file is a `.png`, use [`%_hicolordir`](#_hicolordir).
 
 ### %_yarn_cache_dir
 The directory where Yarn cache files are stored in.
@@ -998,7 +998,7 @@ JavaScript related macros that apply to all or do not fit into any of the above 
 #### %set_javascript_build_flags
 Set the flags and environment variables used for JavaScript package manager builds.
 
-Based on Fedora's [`%set_build_flags{:rpmspec}` macro](https://src.fedoraproject.org/rpms/redhat-rpm-config/blob/rawhide/f/buildflags.md#using-rpm-build-flags).
+Based on Fedora's [`%set_build_flags` macro](https://src.fedoraproject.org/rpms/redhat-rpm-config/blob/rawhide/f/buildflags.md#using-rpm-build-flags).
 
 Expands to:
 ```rpmspec
@@ -1087,7 +1087,7 @@ More information on subpackages can be found on the [Fedora Packaging Guidelines
 
 ### %files_libs
 This macro creates library subpackages and installs the library files.
-This is only for use in the [`%pkg_devel_files{:rpmspec}` macro](#pkg_devel_files).
+This is only for use in the [`%pkg_devel_files` macro](#pkg_devel_files).
 
 ### %pkg_completion
 This macro creates shell completion subpackages and installs the shell completion files.
