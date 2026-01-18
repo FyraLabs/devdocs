@@ -42,7 +42,10 @@ Use [`%pkg_completion`](/terra/srpm#pkg_completion) for shell completions.
 Use [`%pkg_devel_files`](/terra/srpm#pkg_devel_files), [`%pkg_libs_files`](/terra/srpm#pkg_libs_files), [`%pkg_static_files`](/terra/srpm#pkg_static_files).
 See [Development and Shared Libraries](/terra/guidelines#development-and-shared-libraries) section.
 
-Install `.desktop` file to `%_appsdir` for graphical apps. [Guide here](/terra/guidelines#providing-your-own-desktop-file). Prefer upstream provided ones over manually generating one. It is RECOMMENDED to use our [.desktop file macros](/terra/srpm#desktop-file-macros) for installing and editing .desktop files.
+Install `.desktop` file to `%_appsdir` for graphical apps. [Guide here](/terra/guidelines#providing-your-own-desktop-file).
+Prefer upstream provided ones over manually generating one.
+Use [`%desktop_file_install`](/terra/srpm#desktop_file_install) / [`%desktop_file_validate`](/terra/srpm/#desktop_file_validate).
+See [our macros](/terra/srpm#desktop-file-macros).
 
 Follow Fedora guidelines for interpreted (ex. Python/Ruby) & dynamically (ex. C/++) compiled langs.
 Statically compiled lang guidelines follow.
