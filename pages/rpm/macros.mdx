@@ -21,6 +21,14 @@ This document only covers the first type.
     This page does not cover Terra-specific (Anda SRPM) macros. For documentation on these macros, see [here](../terra/srpm). For documentation on our AppStream MetaInfo macros, see [here](../terra/appstream).
 </Callout>
 
+<Callout type="important">
+  All macro flags followed by `<…>` REQUIRE an argument passed to them.<br />
+  All macro flags followed by `[…]` MAY have an argument passed to them.<br />
+  All macro flags with `<#>` or `[#]` take only numbers as arguments.<br />
+  Additionally, if there is no space between the flag `<…>`/`<#>` or `[…]`/`[#]`, you MUST NOT have a space between the flag and the argument passed to it.<br />
+  Conversely, if there *is* a space you SHOULD assume the flag needs a space between them.
+</Callout>
+
 If you are new to RPM packaging, you should first check out the macros with the 🔰 icon.
 On a computer, the right hand side of this page shows you the list of macros.
 
@@ -550,7 +558,7 @@ Parameterized as `%forgemeta(z:isva)`:
 - `-i`: informative
 - `-s`: silent
 - `-a`: process all source archives (when you have `%forgeurl0`, `%forgeurl1`, …)
-- `-z n`: process the `n`-th source archive
+- `-z <#>`: process only `%{S:#}` (see [`%{S:}`](#S))
 
 #### `%forgeautosetup …` 🔢 [#forgeautosetup]
 
@@ -750,16 +758,16 @@ For more information: https://rpm-software-management.github.io/rpm/manual/condi
 Uncompress the specified sources. By default, uncompress `%{SOURCE0}` (i.e. [`%{S:0}`](#s)).
 
 Parameterized as `%autosetup(a:b:cCDn:TvNS:p:)`:
-- `-n …`: specify the top-level directory (i.e. root folder) name in the archive (default `%{name}-%{version}`)
-- `-p n`: specify the `-p n` argument to [`%autopatch …`](#autopatch)
-- `-a n`: unpack `%{S:n}` after changing directory
-- `-b n`: unpack `%{S:n}` before changing directory
+- `-n <…>`: specify the top-level directory (i.e. root folder) name in the archive (default `%{name}-%{version}`)
+- `-p<#>`: specify the `-p #` argument to [`%autopatch …`](#autopatch)
+- `-a<#>`: unpack `%{S:#}` after changing directory
+- `-b<#>`: unpack `%{S:#}` before changing directory
 - `-c`: create directory, `cd` into it, then unpack the source (useful if archive lacks top-level directory)
 - `-C`: I've no idea what this does! — Mado
 - `-D`: do not delete folder before unpacking sources
 - `-T`: disable unpacking `%SOURCE0`
 - `-v`: verbose. If specified, `%autosetup` will omit the `-q` argument to [`%setup`](#setup)
-- `-S …`: specify the SCM, equivalent to `%global __scm …` then `%__scm_setup_git` (replace `git` with the argument). With this argument, the specified SCM will be set up in the uncompressed directory
+- `-S <…>`: specify the SCM, equivalent to `%global __scm …` then `%__scm_setup_git` (replace `git` with the argument). With this argument, the specified SCM will be set up in the uncompressed directory
 - `-N`: do not run [`%autopatch …`](#autopatch)
 
 This is actually a wrapper around [`%setup`](#setup) and [`%autopatch …`](#autopatch).
@@ -778,9 +786,9 @@ In most cases you should use [`%autosetup …`](#autosetup) instead. If you woul
 we recommend adding the `-q` flag.
 
 Parameterized as `%setup(a:b:cCDn:Tq)`: (need confirmation)
-- `-n …`: specify the top-level directory (i.e. root folder) name in the archive (default `%{name}-%{version}`)
-- `-a n`: unpack `%{S:n}` after changing directory
-- `-b n`: unpack `%{S:n}` before changing directory
+- `-n <…>`: specify the top-level directory (i.e. root folder) name in the archive (default `%{name}-%{version}`)
+- `-a<#>`: unpack `%{S:#}` after changing directory
+- `-b<#>`: unpack `%{S:#}` before changing directory
 - `-c`: create directory, `cd` into it, then unpack the source (useful if archive lacks top-level directory)
 - `-C`: I've no idea what this does! — Mado
 - `-D`: do not delete folder before unpacking sources
@@ -809,12 +817,12 @@ Wrapper around `%__apply_patch`. No, this does not wrap around [`%patch`](#patch
 Parameterized as `%autopatch(vqp:m:M:)`:
 - `-v`: verbose
 - `-q`: don’t warn if there are no matching patches
-- `-p n`: number of top-level path components to strip (default 0) \
+- `-p<#>`: number of top-level path components to strip (default 0) \
 	For example, if the patch uses the path `a/b/hello.txt`,
 	passing in `-p1` will strip it to `b/hello.txt`,
 	and passing in `-p2` will strip it to just `hello.txt`.
-- `-m n`: apply patches starting from `n` (default 0)
-- `-M n`: apply patches up to `n` (default to the last patch number for `Patch:`)
+- `-m<#>`: apply patches starting from `n` (default 0)
+- `-M<#>`: apply patches up to `n` (default to the last patch number for `Patch:`)
 
 Examples:
 - `%autopatch -m 100`: apply patches with number &gt;= 100
