@@ -29,6 +29,10 @@ This document only covers the first type.
   Conversely, if there *is* a space you SHOULD assume the flag needs a space between them.
 </Callout>
 
+<Callout>
+  For macros which use regex([`%__requires_exclude`](#__requires_exclude), [`%__requires_exclude_from`](#__requires_exclude_from), [`%__provides_exclude`](#__provides_exclude), [`%__provides_exclude_from`](#__provides_exclude_from)) you SHOULD also note the [quirks with regex](/macro#regex-in-rpm) in RPM.
+</Callout>
+
 If you are new to RPM packaging, you should first check out the macros with the 🔰 icon.
 On a computer, the right hand side of this page shows you the list of macros.
 
@@ -661,7 +665,7 @@ what things the binaries are linked to, you may disable that by adding a regex t
 %global __requires_exclude ^((libffmpeg[.]so.*)|(lib.*\\.so.*))$
 ```
 
-<Callout type="info">If you want to disable all automatic `Requires:`, set `AutoReq: 0`.</Callout>
+<Callout type="info">If you want to disable all automatic `Requires:{:rpmspec}`, set `AutoReq: 0{:rpmspec}`.</Callout>
 
 #### `%__requires_exclude_from` 🏷️ [#__requires_exclude_from]
 
@@ -682,7 +686,7 @@ Similarly, since `rpmbuild` automatically generates `Provides:`, you may disable
 %global __requires_exclude ^((libffmpeg[.]so.*)|(lib.*\\.so.*))$
 ```
 
-<Callout type="info">If you want to disable all automatic `Provides:`, set `AutoProv: 0`.</Callout>
+<Callout type="info">If you want to disable all automatic `Provides:{:rpmspec}`, set `AutoProv: 0{:rpmspec}`.</Callout>
 
 #### `%__provides_exclude_from` 🏷️ [#__provides_exclude_from]
 
