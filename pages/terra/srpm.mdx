@@ -207,6 +207,11 @@ Available flags:
   - `%u{:rpmspec}` means that a desktop file can only read one URL at a time, `%U{:rpmspec}` means that it can read multiple at a time. These are what are known as [exec keys](https://specifications.freedesktop.org/desktop-entry/latest/exec-variables.html).
   - Defer to what the desktop file originally contained if you are unsure which to use.
 
+<Callout type="warning">
+  Keys and values MUST be listed in corresponding order.<br />
+  This means if your first key is `Exec` the first value must be what `Exec` should be set to.
+</Callout>
+
 Example usage:
 ```rpmspec
 %desktop_file_edit -k Exec,Icon -v pkg,pkgicon -u %u -f /path/to/file.desktop
@@ -223,6 +228,11 @@ Available flags:
 - `-u <...>`  MAY be used to set either `%u` or `%U` in the desktop file. If using this you MUST NOT use `u` as a macro name for any reason.
   - `%u{:rpmspec}` means that a desktop file can only read one URL at a time, `%U{:rpmspec}` means that it can read multiple at a time. These are what are known as [exec keys](https://specifications.freedesktop.org/desktop-entry/latest/exec-variables.html).
   - Defer to what the desktop file originally contained if you are unsure which to use.
+
+<Callout type="warning">
+  Keys and values MUST be listed in corresponding order.<br />
+  This means if your first key is `Exec` the first value must be what `Exec` should be set to.
+</Callout>
 
 Example usage:
 ```rpmspec
