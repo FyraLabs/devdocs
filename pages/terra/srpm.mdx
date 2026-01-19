@@ -28,7 +28,7 @@ For upstream macros available in Fedora/Terra, check out our unofficial [macros 
 
 <Callout type="important">
   All macro flags followed by `<argument>{:rpmspec}` REQUIRE an argument passed to them.<br />
-  All macro flags followed by `[argument]{:rpmspec}` MAY have an argument passed to them.
+  All macro flags followed by `[argument]{:sh}` MAY have an argument passed to them.
 </Callout>
 
 ## Directories
@@ -760,7 +760,7 @@ Available flags:
 - `-b <argument>{:rpmspec}` MUST be used when the app's executable differs from the name of the package.
 - `-d <argument>{:rpmspec}` MAY be used to install the app under a different directory than the name of the package.
 - `-i <argument>{:rpmspec}` MUST be used when the app's desktop file points to an icon name different from the name of the package.
-- `-I [argument]{:rpmspec}` MAY be used to handle automatic icon installation. It can be used to point to either the folder icons are in and the icon files themselves. You MUST include the file extension if pointing it to the icon files, otherwise it will assume you are pointing it to a directory.
+- `-I [argument]{:sh}` MAY be used to handle automatic icon installation. It can be used to point to either the folder icons are in and the icon files themselves. You MUST include the file extension if pointing it to the icon files, otherwise it will assume you are pointing it to a directory.
 - `-l{:rpmspec}` MAY be used to fetch all licenses including the bundled ones and put them in a directory called `bundled_licenses`. You SHOULD then package them in the license directory using `%license bundled_licenses/*` in the `%files` section.
   - If using this you MUST make sure there are no duplicate license names. For example, if the main application's license file is `LICENSE`, but one of its bundled license files is *also* `LICENSE`, you SHOULD rename the bundled license to an appropriate name indicating it is the license for a bundled dependency.
   - An appropriate name would be something like `LICENSE.bundleddepname` or `bundleddepname.LICENSE`. Usually, the former is used, but you MAY use either format.
@@ -769,7 +769,7 @@ Available flags:
 - `-S <argument>{:rpmspec}` MAY be used to create an additional symlink with a different name. Useful when an app has two interchangeable common names.
 - `-D{:rpmspec}` MAY be used to handle automatic installation of the .desktop file. This ONLY works if Electron Builder builds an AppImage, and should not be used if the source contains a desktop file.
 - `-E <argument>{:rpmspec}` MAY be used to set the "--enable-features" flag in the desktop file. Features to enable MUST be comma separated without spaces.
-- `-O [argument]{:rpmspec}` MAY be used to set the [Ozone platform](https://chromium.googlesource.com/chromium/src/+/lkgr/docs/ozone_overview.md) the Electron app will run on. If no arguments are supplied, it will fall back to `--ozone-platform-hint=auto`. Accepted arguments are `-Ox11` and `-Owayland`
+- `-O [argument]{:sh}` MAY be used to set the [Ozone platform](https://chromium.googlesource.com/chromium/src/+/lkgr/docs/ozone_overview.md) the Electron app will run on. If no arguments are supplied, it will fall back to `--ozone-platform-hint=auto`. Accepted arguments are `-Ox11` and `-Owayland`
 - `-U <argument>{:rpmspec}` MAY be used to set either `%u` or `%U` in the desktop file. If using this you MUST NOT use `u` as a macro name for any reason.
   - `%u{:rpmspec}` means that a desktop file can only read one URL at a time, `%U{:rpmspec}` means that it can read multiple at a time. These are what are known as [exec keys](https://specifications.freedesktop.org/desktop-entry/latest/exec-variables.html).
   - Defer to what the desktop file originally contained if you are unsure which to use.
@@ -1185,7 +1185,7 @@ This macro is the same as `%zig` but formatted to match how most macros calling 
 Build Zig projects with a specified architecture and build mode.
 
 Available flags:
-- `-c [argument]{:rpmspec}`: Used to set a specific CPU (micro)architecture to build for. If no argument is supplied, it will fall back to the `%{_target_cpu}` set by the build. You MUST specify a CPU architecture manually in cases where Zig's architecture format and RPM's do not match (e.g., `aarch64`).
+- `-c [argument]{:sh}`: Used to set a specific CPU (micro)architecture to build for. If no argument is supplied, it will fall back to the `%{_target_cpu}` set by the build. You MUST specify a CPU architecture manually in cases where Zig's architecture format and RPM's do not match (e.g., `aarch64`).
   - SHOULD ONLY be used in projects that would not perform correctly when built for baseline.
   - For more information on x86_64 microarchitectures, see [here](https://en.wikipedia.org/wiki/X86-64#Microarchitecture_levels).
 - `-r <argument>{:rpmspec}`: Used to set the [release/build mode](https://zig.guide/build-system/build-modes). Accepted arguments are `fast`, `small`, `safe`, and `slow`.
