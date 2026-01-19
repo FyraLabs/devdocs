@@ -27,8 +27,10 @@ For upstream macros available in Fedora/Terra, check out our unofficial [macros 
 </Callout>
 
 <Callout type="important">
-  All macro flags followed by `<...>` REQUIRE an argument passed to them.<br />
-  All macro flags followed by `[...]` MAY have an argument passed to them.
+  All macro flags followed by `<…>` REQUIRE an argument passed to them.<br />
+  All macro flags followed by `[…]` MAY have an argument passed to them.<br />
+  Additionally, if there is no space between the flag `<…>` or `[…]`, you MUST NOT have a space between the flag and the argument passed to it.<br />
+  Conversely, if there *is* a space you SHOULD assume the flag needs a space between them.
 </Callout>
 
 ## Directories
@@ -200,10 +202,10 @@ Expands to: `/usr/bin/update-desktop-database{:rpmspec}`
 SHOULD be used if you for any reason need to edit a .desktop file a build has already installed.
 
 Available flags:
-- `-f <...>`: MAY be used to specify the file, but is actually OPTIONAL if you list the file path after the macro and all other flags.
-- `-k <...>`: List the "keys" to change (Exec, Icon, etc.). Comma separated for multiple keys.
-- `-v <...>`: List the "values" to set for keys you are changing. Comma separated for multiple keys. MUST be listed in the same corresponding order the keys are listed in.
-- `-u <...>`  MAY be used to set either `%u` or `%U` in the desktop file. If using this you MUST NOT use `u` as a macro name for any reason.
+- `-f <…>`: MAY be used to specify the file, but is actually OPTIONAL if you list the file path after the macro and all other flags.
+- `-k <…>`: List the "keys" to change (Exec, Icon, etc.). Comma separated for multiple keys.
+- `-v <…>`: List the "values" to set for keys you are changing. Comma separated for multiple keys. MUST be listed in the same corresponding order the keys are listed in.
+- `-u <…>`  MAY be used to set either `%u` or `%U` in the desktop file. If using this you MUST NOT use `u` as a macro name for any reason.
   - `%u{:rpmspec}` means that a desktop file can only read one URL at a time, `%U{:rpmspec}` means that it can read multiple at a time. These are what are known as [exec keys](https://specifications.freedesktop.org/desktop-entry/latest/exec-variables.html).
   - Defer to what the desktop file originally contained if you are unsure which to use.
 
@@ -221,11 +223,11 @@ Example usage:
 SHOULD be used to install a .desktop file.
 
 Available flags:
-- `-f <...>`: MAY be used to specify the file, but is actually OPTIONAL if you list the file path after the macro and all other flags.
-- `-k <...>`: List the "keys" to change (Exec, Icon, etc.). Comma separated for multiple keys.
-- `-v <...>`: List the "values" to set for keys you are changing. Comma separated for multiple keys. MUST be listed in the same corresponding order the keys are listed in.
+- `-f <…>`: MAY be used to specify the file, but is actually OPTIONAL if you list the file path after the macro and all other flags.
+- `-k <…>`: List the "keys" to change (Exec, Icon, etc.). Comma separated for multiple keys.
+- `-v <…>`: List the "values" to set for keys you are changing. Comma separated for multiple keys. MUST be listed in the same corresponding order the keys are listed in.
   - Example: `%desktop_file_install -k Exec -v /usr/bin/pkg /path/to/filetoedit.desktop`
-- `-u <...>`  MAY be used to set either `%u` or `%U` in the desktop file. If using this you MUST NOT use `u` as a macro name for any reason.
+- `-u <…>`  MAY be used to set either `%u` or `%U` in the desktop file. If using this you MUST NOT use `u` as a macro name for any reason.
   - `%u{:rpmspec}` means that a desktop file can only read one URL at a time, `%U{:rpmspec}` means that it can read multiple at a time. These are what are known as [exec keys](https://specifications.freedesktop.org/desktop-entry/latest/exec-variables.html).
   - Defer to what the desktop file originally contained if you are unsure which to use.
 
@@ -243,7 +245,7 @@ Example usage:
 SHOULD be used if you for any reason need to edit a .desktop file a build has already installed.
 
 Available flags:
-- `-f <...>`: MAY be used to specify the file, but is actually OPTIONAL if you list the file path after the macro.
+- `-f <…>`: MAY be used to specify the file, but is actually OPTIONAL if you list the file path after the macro.
 
 Example usage:
 ```rpmspec
@@ -276,7 +278,7 @@ Expands to: `/usr/bin/env NVM_DIR=%{_nvm_dir} /usr/bin/nvm{:rpmspec}`
 This macro SHOULD only be used if Node.js packages available from the repos are not usable for some reason.
 
 Available flags:
-- `-v <...>` is REQUIRED for this macro to pass the version to NVM. This flag accepts a full version, the major for the latest of a major version of Node.js (e.g., `24`), or `node` to use the latest version of Node.js available.
+- `-v <…>` is REQUIRED for this macro to pass the version to NVM. This flag accepts a full version, the major for the latest of a major version of Node.js (e.g., `24`), or `node` to use the latest version of Node.js available.
 
 Usecase examples:
 - Fedora has not yet packaged the correct version of Node.js or the required version is older than what is supplied.
@@ -304,13 +306,13 @@ Macros for packaging Node modules.
 Prepare a Node module for build steps.
 
 Available flags:
-- `-n <...>` MUST be used to define `%{npm_name}{:rpmspec}` if it was not defined as a global macro.
+- `-n <…>` MUST be used to define `%{npm_name}{:rpmspec}` if it was not defined as a global macro.
 
 #### %fetch_node_tests
 Fetch self-tests from a Git repo. MUST include all necessary test files and folders. If used, it SHOULD be placed in the `%prep{:rpmspec}` section.
 
 Available flags:
-- `-u <...>` MUST be used to define the URL if the one listed in the `URL:{:rpmspec}` tag for the package is not detectable as clonable.
+- `-u <…>` MUST be used to define the URL if the one listed in the `URL:{:rpmspec}` tag for the package is not detectable as clonable.
 
 All necessary test files and folders MUST be listed after the macro. Test folders MUST start with `/{:rpmspec}`.
 
@@ -372,7 +374,7 @@ Expands to: `/usr/bin/license-checker --limitAttributes licenses`
 This is similar to [`%__npm_license_checker`](#__npm_license_checker), but limits the output to only the license.
 
 Available flags:
-- `-o <...>` MAY be used as a shorthand for `--out{:rpmspec}`.
+- `-o <…>` MAY be used as a shorthand for `--out{:rpmspec}`.
 
 Example output:
 
@@ -466,8 +468,8 @@ Installed packages with fixed dependencies SHOULD be tested first to make sure t
 Available flags:
 - `-d{:rpmspec}` will run with `--dry-run{:rpmspec}` so you can check what the fix would do.
 - `-f{:rpmspec}` will run with `--force{:rpmspec}`, ignoring package locks or other requirements set by the module to fix the dependencies. This MUST be tested locally and verified to not cause breakage.
-- `-o <...>` will omit a dependency or group (such as `dev{:rpmspec}`) from being fixed.
-- `-O <...>` will only fix a specified depency or group.
+- `-o <…>` will omit a dependency or group (such as `dev{:rpmspec}`) from being fixed.
+- `-O <…>` will only fix a specified depency or group.
 - `-p{:rpmspec}` will limit the run to the package lock.
 
 LIMITATION: Cannot be used on modules installed using the `-g{:rpmspec}` flag (which is done in `%npm_prep{:rpmspec}`) which use a package lock.
@@ -590,7 +592,7 @@ SHOULD be used in place of calling `pnpx` or `pnpm dlx` itself.
 This SHOULD only be used if PNPM is not usable/available from the available repositories.
 
 Available flags:
-- `-v <...>` MAY be used to define a desired version of PNPM.
+- `-v <…>` MAY be used to define a desired version of PNPM.
 
 Usecase examples:
 - Fedora's currently packaged PNPM is too old for the build.
@@ -767,20 +769,20 @@ By default, the install steps are:
 4. Install the app's icons.
 
 Available flags:
-- `-b <...>` MUST be used when the app's executable differs from the name of the package.
-- `-d <...>` MAY be used to install the app under a different directory than the name of the package.
-- `-i <...>` MUST be used when the app's desktop file points to an icon name different from the name of the package.
-- `-I [...]` MAY be used to handle automatic icon installation. It can be used to point to either the folder icons are in and the icon files themselves. You MUST include the file extension if pointing it to the icon files, otherwise it will assume you are pointing it to a directory.
+- `-b <…>` MUST be used when the app's executable differs from the name of the package.
+- `-d <…>` MAY be used to install the app under a different directory than the name of the package.
+- `-i <…>` MUST be used when the app's desktop file points to an icon name different from the name of the package.
+- `-I […]` MAY be used to handle automatic icon installation. It can be used to point to either the folder icons are in and the icon files themselves. You MUST include the file extension if pointing it to the icon files, otherwise it will assume you are pointing it to a directory.
 - `-l{:rpmspec}` MAY be used to fetch all licenses including the bundled ones and put them in a directory called `bundled_licenses`. You SHOULD then package them in the license directory using `%license bundled_licenses/*` in the `%files` section.
   - If using this you MUST make sure there are no duplicate license names. For example, if the main application's license file is `LICENSE`, but one of its bundled license files is *also* `LICENSE`, you SHOULD rename the bundled license to an appropriate name indicating it is the license for a bundled dependency.
   - An appropriate name would be something like `LICENSE.bundleddepname` or `bundleddepname.LICENSE`. Usually, the former is used, but you MAY use either format.
   - This MUST be done because if there are two different files with the same name, the `cp` command used in the `%license` macro for the files section will either fail or overwrite the main software's license, which is not admissible for redistribution.
-- `-s <...>` MAY be used to choose the name of the symlink.
-- `-S <...>` MAY be used to create an additional symlink with a different name. Useful when an app has two interchangeable common names.
+- `-s <…>` MAY be used to choose the name of the symlink.
+- `-S <…>` MAY be used to create an additional symlink with a different name. Useful when an app has two interchangeable common names.
 - `-D{:rpmspec}` MAY be used to handle automatic installation of the .desktop file. This ONLY works if Electron Builder builds an AppImage, and should not be used if the source contains a desktop file.
-- `-E <...>` MAY be used to set the "--enable-features" flag in the desktop file. Features to enable MUST be comma separated without spaces.
-- `-O [...]` MAY be used to set the [Ozone platform](https://chromium.googlesource.com/chromium/src/+/lkgr/docs/ozone_overview.md) the Electron app will run on. If no arguments are supplied, it will fall back to `--ozone-platform-hint=auto`. Accepted arguments are `-Ox11` and `-Owayland`
-- `-U <...>` MAY be used to set either `%u` or `%U` in the desktop file. If using this you MUST NOT use `u` as a macro name for any reason.
+- `-E <…>` MAY be used to set the "--enable-features" flag in the desktop file. Features to enable MUST be comma separated without spaces.
+- `-O[…]` MAY be used to set the [Ozone platform](https://chromium.googlesource.com/chromium/src/+/lkgr/docs/ozone_overview.md) the Electron app will run on. If no arguments are supplied, it will fall back to `--ozone-platform-hint=auto`. Accepted arguments are `-Ox11` and `-Owayland`
+- `-U <…>` MAY be used to set either `%u` or `%U` in the desktop file. If using this you MUST NOT use `u` as a macro name for any reason.
   - `%u{:rpmspec}` means that a desktop file can only read one URL at a time, `%U{:rpmspec}` means that it can read multiple at a time. These are what are known as [exec keys](https://specifications.freedesktop.org/desktop-entry/latest/exec-variables.html).
   - Defer to what the desktop file originally contained if you are unsure which to use.
 
@@ -819,13 +821,13 @@ Available flags:
 Preps a Tauri package. Wrapper for `%cargo_prep_online` that checks that the Tauri subdirectory is correct.
 
 Available flags:
-- `-n <...>`: The name of the subdirectory to `cd` into before running `%cargo_prep_online`. This value is also used when setting a macro used in other Tauri macros. If this flag is not passed, the macro will default to the most common name used for this subdirectory which is `src-tauri`.
+- `-n <…>`: The name of the subdirectory to `cd` into before running `%cargo_prep_online`. This value is also used when setting a macro used in other Tauri macros. If this flag is not passed, the macro will default to the most common name used for this subdirectory which is `src-tauri`.
 
 ##### %tauri_install
 MAY be used to install a built Tauri package. A port of `%cargo_install`.
 
 Available flags:
-- `-f <...>`: Should be the same as the features that were passed to the Tauri build. Used for installing the Cargo development files.
+- `-f <…>`: Should be the same as the features that were passed to the Tauri build. Used for installing the Cargo development files.
 
 ##### %tauri_install_bin
 A wrapper around [`%crate_install_bin`](#crate_install_bin) for Tauri.
@@ -834,13 +836,13 @@ A wrapper around [`%crate_install_bin`](#crate_install_bin) for Tauri.
 A port of `%cargo_license_online` that points to the Tauri app's Cargo.toml.
 
 Available flags:
-- `-f <...>`: Should be the same as the features that were passed to the Tauri build.
+- `-f <…>`: Should be the same as the features that were passed to the Tauri build.
 
 ##### %tauri_cargo_license_summary
 A port of `%cargo_license_summary_online` that points to the Tauri app's Cargo.toml.
 
 Available flags:
-- `-f <...>`: Should be the same as the features that were passed to the Tauri build.
+- `-f <…>`: Should be the same as the features that were passed to the Tauri build.
 
 ##### %tauri_cargo_vendor_manifest
 A port of `%cargo_vendor_manifest_online` that points to the Tauri app's Cargo.toml.
@@ -885,13 +887,13 @@ Expands to: `/usr/bin/env CARGO_HOME=%{_cargo_home}%{!?with_rust_nightly: RUSTC_
 Build with system Tauri.
 
 Available flags:
-- `-f <...>`: Features to enable in Tauri and Cargo. Comma separated.
+- `-f <…>`: Features to enable in Tauri and Cargo. Comma separated.
 
 ##### %tauri_build_crate
 A port of [%cargo_build_crate](https://codeberg.org/rust2rpm/cargo-rpm-macros/src/commit/754ec0c9a09d8a89990f454c17dc0da07861741f/macros.d/macros.cargo#L280) for Tauri.
 
 Available flags:
-- `-f <...>`: Features to enable in Tauri and Cargo. Comma separated.
+- `-f <…>`: Features to enable in Tauri and Cargo. Comma separated.
 
 #### Webapp Build Macros
 These are macros used to build webapps using JavaScript package managers and builders such as [Electron Builder](https://www.electron.build), [Electron Forge](https://www.electronforge.io), [Electron Vite](https://electron-vite.github.io), or [Tauri](#tauri_macros).
@@ -909,12 +911,12 @@ SHOULD be used for building Electron or Tauri apps with NPM. Has a great deal of
 
 Available flags:
 - `-c{:rpmspec}`: Run `%{__npm} ci{:rpmspec}` instead of `%{__npm} install{:rpmspec}`. May be necessary for projects with stricter build dependencies.
-- `-e <...>`: Execute commands and modules within the NPM build environment. Some commands may need `--` in between the command itself and the following arguments. Can accept multiple arguments if they are separated using standard shell separators (`;` and `&&`).
-- `-f <...>`: This option is only for Tauri projects. Features to pass to Tauri/Cargo. Features should be comma separated.
-- `-r <...>`: Executes `%{__npm} run{:rpmspec}` for scripts in the `package.json`. Can run multiple scripts if they are comma separated.
+- `-e <…>`: Execute commands and modules within the NPM build environment. Some commands may need `--` in between the command itself and the following arguments. Can accept multiple arguments if they are separated using standard shell separators (`;` and `&&`).
+- `-f <…>`: This option is only for Tauri projects. Features to pass to Tauri/Cargo. Features should be comma separated.
+- `-r <…>`: Executes `%{__npm} run{:rpmspec}` for scripts in the `package.json`. Can run multiple scripts if they are comma separated.
 - `-B{:rpmspec}`: Execute the webapp builder (Electron Builder, Electron Forge, or Tauri) directly. Will NOT work for projects that require build steps which use Node.js or executing JavaScript scripts directly.
-- `-C <...>`: Point NPM to the build config file if it cannot automatically detect it.
-- `-M <...>`: Mode to use in Electron Vite builds. Accepts `production`, `development`, and `staging`. Note that this differs from `$NODE_ENV` so you can run any combination of Vite environment modes and Node.js environment modes.
+- `-C <…>`: Point NPM to the build config file if it cannot automatically detect it.
+- `-M <…>`: Mode to use in Electron Vite builds. Accepts `production`, `development`, and `staging`. Note that this differs from `$NODE_ENV` so you can run any combination of Vite environment modes and Node.js environment modes.
 - `-V{:rpmspec}`: Execute Electron Vite. Same limitation as with `-B{:rpmspec}`.
 
 Example usage:
@@ -930,10 +932,10 @@ SHOULD be used to build Electron or Tauri apps with Bun.
 
 Available flags:
 - `-c{:rpmspec}`: Run `%{__bun} ci{:rpmspec}` instead of `%{__bun} install{:rpmspec}`. Analogous to `%{__bun} install --frozen-lockfile{:rpmspec}`. May be necessary for projects with stricter build dependencies.
-- `-e <...>`: Execute commands and modules within the Bun build environment. Can accept multiple arguments if they are separated using standard shell separators (`;` and `&&`).
-- `-f <...>`: This option is only for Tauri projects. Features to pass to Tauri/Cargo. Features should be comma separated.
+- `-e <…>`: Execute commands and modules within the Bun build environment. Can accept multiple arguments if they are separated using standard shell separators (`;` and `&&`).
+- `-f <…>`: This option is only for Tauri projects. Features to pass to Tauri/Cargo. Features should be comma separated.
 - `-v{:rpmspec}`: Run Electron Vite build steps. Not needed for all Electron apps.
-- `-r <...>`: Executes `%{__bun} run{:rpmspec}` for scripts in the `package.json`. Can accept multiple arguments if they are comma separated.
+- `-r <…>`: Executes `%{__bun} run{:rpmspec}` for scripts in the `package.json`. Can accept multiple arguments if they are comma separated.
 - `-F{:rpmspec}`: Runs `--force{:rpmspec}` on the `%{__bun} install{:rpmspec}` step. This will assure all dependencies are the latest versions from the registry, reinstalling them if necessary.
 - `-N{:rpmspec}`: Runs `--no-save{:rpmspec}` on the `%{__bun} install{:rpmspec}` step. This prevents updating or (re)creating a lockfile to prevent freezing.
 - `-R{:rpmspec}`: Remove the bun.lock file. SHOULD only be used if the lockfile is causing build issues or upstream builds without a lock file. Built apps using this MUST be carefully tested for problems.
@@ -950,11 +952,11 @@ The above would run `%{__bun} ci`, run script and script2, the JavaScript module
 SHOULD be used to build Electron or Tauri apps with Deno.
 
 Available flags:
-- `-f <...>`: This option is only for Tauri projects. Features to pass to Tauri/Cargo. Features should be comma separated.
-- `-t <...>`: Executes `%{__deno} task{:rpmspec}` for scripts in the `package.json`. Can accept multiple arguments if they are comma separated.
+- `-f <…>`: This option is only for Tauri projects. Features to pass to Tauri/Cargo. Features should be comma separated.
+- `-t <…>`: Executes `%{__deno} task{:rpmspec}` for scripts in the `package.json`. Can accept multiple arguments if they are comma separated.
 - `-v{:rpmspec}`: Run Electron Vite build steps. Not needed for all Electron apps.
-- `-r <...>`: Executes files with `%{__deno} run{:rpmspec}`. Can accept multiple arguments if they are comma separated.
-- `-x <...>`: Execute commands and modules within the Deno build environment. Can accept multiple arguments if they are separated using standard shell separators (`;` and `&&`).
+- `-r <…>`: Executes files with `%{__deno} run{:rpmspec}`. Can accept multiple arguments if they are comma separated.
+- `-x <…>`: Execute commands and modules within the Deno build environment. Can accept multiple arguments if they are separated using standard shell separators (`;` and `&&`).
 - `-F{:rpmspec}`: Runs `--force{:rpmspec}` on the `%{__deno} install{:rpmspec}` step. This will overwite the existing dependency installation (if any exists).
 - `-N{:rpmspec}`: Runs `--no-lock{:rpmspec}` on the `%{__deno} install{:rpmspec}` step. This prevents updating or (re)creating a lockfile to prevent freezing.
 
@@ -970,9 +972,9 @@ The above would run run script and script2, then run file1.js and file2.js with 
 SHOULD be used for building Electron or Tauri apps with PNPM.
 
 Available flags:
-- `-e <...>`: Execute JavaScript modules or installed programs in the PNPM build environment. Can accept multiple arguments if they are separated using standard shell separators (`;` and `&&`).
-- `-f <...>`: This option is only for Tauri projects. Features to pass to Tauri/Cargo. Features should be comma separated.
-- `-r <...>`: Executes `%{__pnpm} run{:rpmspec}` for scripts in the `package.json{:rpmspec}`. Not recommended for Electron Builder/Electron Forge or Electron Vite commands. Can accept multiple arguments if they are comma separated.
+- `-e <…>`: Execute JavaScript modules or installed programs in the PNPM build environment. Can accept multiple arguments if they are separated using standard shell separators (`;` and `&&`).
+- `-f <…>`: This option is only for Tauri projects. Features to pass to Tauri/Cargo. Features should be comma separated.
+- `-r <…>`: Executes `%{__pnpm} run{:rpmspec}` for scripts in the `package.json{:rpmspec}`. Not recommended for Electron Builder/Electron Forge or Electron Vite commands. Can accept multiple arguments if they are comma separated.
 - `-v{:rpmspec}`: Run Electron Vite build steps. Not needed for all Electron apps.
 - `-F{:rpmspec}`: Executes the `%{__pnpm} install{:rpmspec}` step with `--frozen-lockfile{:rpmspec}`. May be necessary for projects expecting very strict build dependencies, but can also override projects that do not enforce a lock.
 - `-N{:rpmspec}`: Executes the `%{__pnpm} install{:rpmspec}` step with `--no-frozen-lockfile{:rpmspec}`. Overrides projects that try to enforce a lockfile.
@@ -990,9 +992,9 @@ The above would run `%{__pnpm} install --no-frozen-lockfile`, run script and scr
 SHOULD be used to build Electron or Tauri apps with Yarn or Yarn Berry.
 
 Available flags:
-- `-e <...>`: Execute JavaScript modules or installed programs in the Yarn build environment.
-- `-f <...>`: This option is only for Tauri projects. Features to pass to Tauri/Cargo. Features should be comma separated.
-- `-r <...>`: Executes `%{__yarn} run{:rpmspec}` for scripts in the `package.json`. Not recommended for Electron Builder, Electron Forge, or Electron Vite commands. Can accept multiple arguments if they are comma separated.
+- `-e <…>`: Execute JavaScript modules or installed programs in the Yarn build environment.
+- `-f <…>`: This option is only for Tauri projects. Features to pass to Tauri/Cargo. Features should be comma separated.
+- `-r <…>`: Executes `%{__yarn} run{:rpmspec}` for scripts in the `package.json`. Not recommended for Electron Builder, Electron Forge, or Electron Vite commands. Can accept multiple arguments if they are comma separated.
 - `-v{:rpmspec}`: Run Electron Vite build steps. Not needed for all Electron apps.
 - `-F{:rpmspec}`: Executes the `%{__yarn} install{:rpmspec}` step with `--frozen-lockfile{:rpmspec}`. May be necessary for projects expecting very strict build dependencies, but can also override projects that do not enforce a lock.
 - `-N{:rpmspec}`: Executes the `%{__yarn} install{:rpmspec}` step with `--no-lockfile{:rpmspec}`. Makes Yarn not update the lockfile on dependency installation.
@@ -1195,10 +1197,10 @@ This macro is the same as `%zig` but formatted to match how most macros calling 
 Build Zig projects with a specified architecture and build mode.
 
 Available flags:
-- `-c [...]`: Used to set a specific CPU (micro)architecture to build for. If no argument is supplied, it will fall back to the `%{_target_cpu}` set by the build. You MUST specify a CPU architecture manually in cases where Zig's architecture format and RPM's do not match (e.g., `aarch64`).
+- `-c[…]`: Used to set a specific CPU (micro)architecture to build for. If no argument is supplied, it will fall back to the `%{_target_cpu}` set by the build. You MUST specify a CPU architecture manually in cases where Zig's architecture format and RPM's do not match (e.g., `aarch64`).
   - SHOULD ONLY be used in projects that would not perform correctly when built for baseline.
   - For more information on x86_64 microarchitectures, see [here](https://en.wikipedia.org/wiki/X86-64#Microarchitecture_levels).
-- `-r <...>`: Used to set the [release/build mode](https://zig.guide/build-system/build-modes). Accepted arguments are `fast`, `small`, `safe`, and `slow`.
+- `-r <…>`: Used to set the [release/build mode](https://zig.guide/build-system/build-modes). Accepted arguments are `fast`, `small`, `safe`, and `slow`.
   - SHOULD be used if a project would have performance issues if built for `safe` (what Fedora sets by default).
 - `-s{:rpmspec}`: used to allow the project to link statically.
   - SHOULD ONLY be used if a project either has no dependencies to link, OR dependencies from the repos either aren't present or are incompatible versions.
