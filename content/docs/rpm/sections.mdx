@@ -1,12 +1,7 @@
 ---
 title: Sections
 description: "Documentations for different RPM sections, steps and preambles."
-# vi: noet ci pi sts=0 sw=2 ts=2
 ---
-
-import { Callout } from "nextra/components";
-
-# Sections and Steps
 
 <Callout type="info">
   This section of the document lists out steps in their actual execution order.
@@ -115,7 +110,6 @@ the latter ones refer to packages required during `%pre{:rpmspec}`, `%post{:rpms
   are expanded. This means you may expand preambles from macros too.
 </Callout>
 
-
 ### Specifying (Build) Dependencies
 
 `Requires:{:rpmspec}` or `BuildRequires:{:rpmspec}` must be followed by a space-separated
@@ -133,7 +127,9 @@ Provides: pkgconfig(gtk4-unix-print)  = 0:4.18.2
 Provides: pkgconfig(gtk4-wayland)     = 0:4.18.2
 Provides: pkgconfig(gtk4-x11)         = 0:4.18.2
 ```
-Then each of the followings may be used to pull in `gtk4-devel` as a build dependency.
+
+Then each of the following may be used to pull in `gtk4-devel` as a build dependency.
+
 ```rpmspec
 BuildRequires: gtk4-devel
 BuildRequires: pkgconfig(gtk4)
@@ -325,7 +321,7 @@ The following is an exhaustive list of file attributes available:
 # ╰─ mado: personally never seen this used
 %config(…) …
 # ╰─ exhaustive list:
-# - config(missingok) 
+# - config(missingok)
 # - config(noreplace)
 %dir …
 # ╰─ specify a directory the package owns
@@ -361,7 +357,11 @@ For more information about `%attr{:rpmspec}` and `%defattr{:rpmspec}`, see: http
 [expression]: #rpm-expression
 [RPM manual]: https://github.com/rpm-software-management/rpm/blob/b043604b9eb684dc761aeacf55a784632ca0ebcd/docs/manual/macros.md
 [boolean dependencies]: https://rpm-software-management.github.io/rpm/manual/boolean_dependencies.html
+
 [^1]: https://docs.fedoraproject.org/en-US/legal/license-field/
+
 [^2]: https://rpm-software-management.github.io/rpm/manual/buildsystem.html
+
 [^3]: https://rpm-software-management.github.io/rpm/manual/spec.html#virtual-file-attributes
+
 [^4]: http://ftp.rpm.org/max-rpm/s1-rpm-inside-files-list-directives.html
