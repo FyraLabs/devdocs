@@ -154,7 +154,7 @@ If `subpkg` is given without `-n`, specify the description of the subpackage `%{
 
 Each subpackage requires its own `%description{:rpmspec}` too.
 
-### `%package`
+## `%package`
 
 Not a step. Optional. `%package [-n] subpkg{:rpmspec}`
 
@@ -171,7 +171,7 @@ As the name suggests, this step creates the build directory.
 
 This is automatically generated and you should never need to specify this.
 
-### `%prep`
+## `%prep`
 
 Step `Executing(%prep)`. Required.
 
@@ -187,7 +187,7 @@ The most common body of `%prep` is simply:
 %autosetup
 ```
 
-### `%generate_buildrequires`
+## `%generate_buildrequires`
 
 Step `Executing(%generate_buildrequires)`. Optional. Since `rpm >= 4.15`.
 
@@ -204,7 +204,7 @@ executes, usually by calling the package manager (e.g. `dnf`) with Internet acce
 >
 > On success the found build dependencies are also added to the source package. As always they depend on the exact circumstance of the build and may be different when bulding based on other packages or even another architecture.
 
-### `%conf`
+## `%conf`
 
 Step `Executing(%conf)`. Optional. Since `rpm >= 4.18`.
 
@@ -220,7 +220,7 @@ Step `Executing(%conf)`. Optional. Since `rpm >= 4.18`.
 When in doubt, you can always put `%configure{:rpmspec}` and other commands at the start of
 `%build{:rpmspec}` instead.
 
-### `%build`
+## `%build`
 
 Step `Executing(%build)`. Optional.
 
@@ -233,7 +233,7 @@ Step `Executing(%build)`. Optional.
 > %make_build
 > ```
 
-### `%install`
+## `%install`
 
 Step `Executing(%install)`. Required.
 
@@ -254,15 +254,15 @@ install -Dpm755 my_binary -t %{buildroot}/usr/bin/
 install -Dpm644 rand_file -t %{buildroot}/usr/share/my_software/
 ```
 
-### `%doc`
+## `%doc`
 
 Step `Executing(%doc)`. **Not a section**. See [`%files{:rpmspec}`](#files).
 
-### `%license`
+## `%license`
 
 Step `Executing(%license)`. **Not a section**. See [`%files{:rpmspec}`](#files).
 
-### `%check`
+## `%check`
 
 Step `Executing(%check)`. Optional.
 
@@ -271,13 +271,13 @@ Step `Executing(%check)`. Optional.
 If you would like to make sure the software actually works properly, you may optionally
 choose to execute unit tests here.
 
-### `%clean`
+## `%clean`
 
 Step `Executing(%clean)`. Optional. **Obsolete**.
 
 > Packages should place all their temporaries inside their designated `%builddir`, which rpm will automatically clean up. Needing a package specific `%clean` section generally suggests flaws in the spec.
 
-### `%rmbuild`
+## `%rmbuild`
 
 Step `Executing(%rmbuild)`. Optional.
 
