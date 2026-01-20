@@ -1,0 +1,39 @@
+import {
+  defineConfig,
+  defineDocs,
+  frontmatterSchema,
+  metaSchema,
+} from "fumadocs-mdx/config";
+import RPMSpec from "./spec.json";
+import rhai from "./rhai.json";
+
+// You can customise Zod schemas for frontmatter and `meta.json` here
+// see https://fumadocs.dev/docs/mdx/collections
+export const docs = defineDocs({
+  dir: "content/docs",
+  docs: {
+    schema: frontmatterSchema,
+    postprocess: {
+      includeProcessedMarkdown: true,
+    },
+  },
+  meta: {
+    schema: metaSchema,
+  },
+});
+
+export default defineConfig({
+  mdxOptions: {
+    rehypeCodeOptions: {
+      langs: [
+        // @ts-expect-error these actually work, even if it doesn't think the grammar is compatible
+        { ...RPMSpec, aliases: ["rpmspec"] },
+        // @ts-expect-error these actually work, even if it doesn't think the grammar is compatible
+        { ...rhai, aliases: ["rhai"] },
+      ],
+      inline: "tailing-curly-colon",
+    },
+
+    // MDX options
+  },
+});

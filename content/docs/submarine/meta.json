@@ -1,0 +1,6 @@
+{
+  "title": "Submarine",
+  "description": "The bootloader for Chromebooks on stock firmware",
+  "icon": "Anchor",
+  "root": true
+}

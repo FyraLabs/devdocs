@@ -1,0 +1,1273 @@
+---
+title: Macros
+description: "Documentations for different RPM macros."
+# vi: noet ci pi sts=0 sw=2 ts=2
+---
+
+import * as Split from "../../../components/split";
+
+# RPM Macros
+
+Technically, there are 3 types of "macros":
+
+- `%{rpm_macro}`: Normal RPM macros
+- `%(echo "hi" | sed 's/hi/hello/')`: Shell macros that expands to the output of the commands
+- `%[v"1.2.3~1" < v"1.2.3"]`: RPM [expression]
+
+This document only covers the first type.
+
+<Callout type="info">
+    This page does not cover Terra-specific (Anda SRPM) macros. For documentation on these macros, see [here](../terra/srpm). For documentation on our AppStream MetaInfo macros, see [here](../terra/appstream).
+</Callout>
+
+If you are new to RPM packaging, you should first check out the macros with the 🔰 icon.
+On a computer, the right hand side of this page shows you the list of macros.
+
+If you would like to learn more about the RPM macro syntax, check out [Macro syntax](./macro).
+
+## Legend
+
+- 🔢 : Parameterized macro.
+- 🔦 : Relatively uncommon.
+- 🔰 : Relatively common.
+- 🚸 : Not recommended in Terra.
+- 🛠️ : Advanced.
+- 🔩 : Usually used with `rpm -E` but not in spec files.
+- 🏷️ : Usually defined but not used directly.
+
+## RPM Built-in Macros
+
+### Macro Manipulation
+
+<Callout type="info">
+  This list is obtained from
+  [rpmspec-rs](https://github.com/rpm-rs/rpmspec-rs/blob/464c8caab5d451517691cc2885bd77912aa53190/src/macros.rs),
+  which is obtained from [RPM
+  docs](https://github.com/rpm-software-management/rpm/blob/b043604b9eb684dc761aeacf55a784632ca0ebcd/docs/manual/macros.md#builtin-macros).
+</Callout>
+
+#### `%define` 🔰 [#define]
+
+Defines a macro locally.
+
+Macros defined with `%define` will not last to another RPM section.
+For example, if used in preamble section, the macro will be automatically undefined in `%prep`.
+
+To make sure a macro lasts for the entire spec file, use `%global` instead.
+
+<Split.Root>
+  <div>
+    ```rpmspec filename="example.spec"
+    %build
+    %define my_macro Hello, World!
+    echo %my_macro
+
+    %install
+    echo %my_macro
+    ```
+
+  </div>
+  <div>
+    ```rpmspec filename="expand.spec"
+    %build
+    echo Hello, World!
+
+    %install
+    echo %my_macro
+    ```
+
+  </div>
+</Split.Root>
+
+#### `%global` 🔰 [#global]
+
+Defines a macro globally.
+
+As oppose to [`%define`](#define), macros defined with `%global` will last for the entire spec file.
+
+<Split.Root>
+  <div>
+    ```rpmspec filename="example.spec"
+    %global cat Meow!!!
+
+    %prep
+    echo nya %cat
+
+    %build
+    echo %cat
+    ```
+
+  </div>
+  <div>
+    ```rpmspec filename="expand.spec"
+    %prep
+    echo nya Meow!!!
+
+    %build
+    echo Meow!!!
+    ```
+
+  </div>
+</Split.Root>
+
+#### `%undefine` 🔦 [#undefine]
+
+Undefine a macro.
+
+Technically this does not always undefine the macro specified.
+Instead, this pops the latest definition from the macro stack.
+
+<Split.Root>
+  <div>
+    ```rpmspec filename="example.spec"
+    %global cat Meow!
+
+    %prep
+    %global cat Nyaa!
+    echo %cat
+
+    %build
+    %undefine cat
+    echo %cat
+
+    %install
+    %undefine cat
+    echo %cat
+    ```
+
+  </div>
+  <div>
+    ```rpmspec filename="expand.spec"
+    %prep
+    echo Nyaa!
+
+    %build
+    echo Meow!
+
+    %install
+    echo %cat
+    ```
+
+  </div>
+</Split.Root>
+
+#### `%dnl` 🔰 [#dnl]
+
+Comments.
+
+Similar to `# …`, this can comment out anything in `%{dnl:…}` or after `%dnl …`.
+The difference with `# …` is that `%dnl` prevents macro expansions,
+while macros in `# …` are actually expanded.
+
+<Split.Root>
+  <div>
+    ```rpmspec filename="example.spec"
+		%define meow a
+		# comment %meow
+		%dnl comment %meow
+		```
+  </div>
+  <div>
+		```rpmspec filename="expand.spec"
+    # comment a
+		```
+	</div>
+</Split.Root>
+
+#### `%{load:…}` 🔦🚸 [#load]
+
+Load a macro file.
+
+#### `%{expr:…}` 🔦 [#expr]
+
+Expand all macros in the body, then evaluate the body as an [expression].
+
+```sh
+$ rpm -D 'foo 1 + 2' -E '%[%foo]'
+error: macro expansion did not return an integer: %foo
+error:                                            ^
+error: expanded string: 1 + 2
+
+$ rpm -D 'foo 1 + 2' -E '%{expr:%foo}'
+3
+```
+
+#### `%{expand:…}` 🛠️ [#expand]
+
+Double-expand the macro.
+
+  <Split.Root>
+    <div>
+      ```rpmspec filename="example.spec"
+      %define nya foo
+      %define meow %{expand:%%nya}
+    
+      echo %meow
+      ```
+    </div>
+    <div>
+      ```rpmspec filename="expand.spec"
+      echo foo
+      ```
+    </div>
+  </Split.Root>
+
+#### `%{lua:…}` 🛠️ [#lua]
+
+Embed lua code.
+
+<Callout type="warning">
+  Since RPM expands macros when the source RPM (SRPM) is created,
+  the lua code is executed during that stage.
+
+This means that the lua code is executed not during the stage it is defined in, but
+way before even `%prep`.
+
+</Callout>
+<Callout type="warning">
+  Do NOT comment out lua code using `# …`, `%dnl …` or `%{dnl:…}`.
+
+Lua comments must start with `-- …`.
+
+In `rpmspec-rs`, a space must be present after `--`.
+
+</Callout>
+<Callout type="info">
+  Documentations for the embedded Lua interpreter, including specific functions available,
+  are available at https://rpm-software-management.github.io/rpm/manual/lua.html.
+</Callout>
+
+<Split.Root>
+  <div>
+    ```rpmspec filename="example.spec"
+    %global my_macro Hello
+    %{lua:
+      -- this lua block expands to the input
+      -- to all `print()` statements
+      print("%prep\necho " ..
+        rpm.expand("%my_macro from lua!") ..
+        "\n")
+    }
+    ```
+  </div>
+  <div>
+    ```rpmspec filename="expand.spec"
+    %prep
+    echo Hello from lua!
+    ```
+  </div>
+</Split.Root>
+
+#### `%{macrobody:…}` 🔩 [#macrobody]
+
+Expand to the definition of the given macro.
+
+```sh
+$ rpm -E '%dist'
+.um41
+
+$ rpm -E '%macrobody dist'
+%{?distprefix}.um41%{?with_bootstrap:~bootstrap}
+```
+
+#### `%{quote:…}` 🔦🛠️ [#quote]
+
+Does nothing. You heard me, this macro literally does nothing.
+
+But because of that it's very useful.
+This can be used to pass arguments with spaces to parameterized macros:
+
+<Split.Root>
+  <div>
+    ```rpmspec filename="example.spec"
+    echo %gsub %{quote:hello hello} %{quote:^hello} bye
+    ```
+  </div>
+  <div>
+    ```rpmspec filename="expand.spec"
+    echo bye hello
+    ```
+  </div>
+</Split.Root>
+
+### String Operations
+
+#### `%gsub …` 🔢🔦🛠️ [#gsub]
+
+Equivalent to `%{lua: string.gsub("%1", "%2", %3, %?4)}`,
+where `%n` represents the n-th argument to `%gsub`.
+
+In short, this replaces `%?4` occurrences of `%2` in `%1` to `%3`.
+`%4` is optional and defaults to infinity.
+
+`%2` is treated as a [lua pattern](https://www.lua.org/pil/20.2.html).
+
+<Split.Root>
+  <div>
+    ```rpmspec filename="example.spec"
+    echo %gsub %{quote:hello hello} %{quote:^hello} bye
+    ```
+  </div>
+  <div>
+    ```rpmspec filename="expand.spec"
+    echo bye hello
+    ```
+  </div>
+</Split.Root>
+
+#### `%{len:…}` [#len]
+
+Obtains the length of the given text.
+
+<Split.Root>
+  <div>
+    ```rpmspec filename="example.spec"
+    %define foo meow now!
+    echo %{len:%foo}
+    ```
+  </div>
+  <div>
+    ```rpmspec filename="expand.spec"
+    echo 9
+    ```
+  </div>
+</Split.Root>
+
+#### `%{lower:…}` [#lower]
+
+Turn the input into ASCII-lowercase.
+
+#### `%{upper:…}` [#upper]
+
+ASCII-uppercase.
+
+#### `%rep …` 🔢🔦 [#rep]
+
+Repeat the first input (`%1`) `n`-times, `n` given by `%2` (lua `string.rep()`).
+
+#### `%{reverse:…}` [#reverse]
+
+#### `%sub …` 🔢🔰 [#sub]
+
+Expand to substring (lua `string.sub()`).
+
+```sh
+$ rpm -E '%sub abc 2 3'
+bc
+```
+
+#### `%{shescape:…}` [#shescape]
+
+Wrap the input with single quotes and also escape preexisting single-quotes correctly,
+so that the input can be safely passed as arguments to shell commands.
+
+```sh
+$ rpm -E "echo %{shescape:this is some 'text'}"
+echo 'this is some '\''text'\'''
+
+$ rpm -E "%(echo %{shescape:this is some 'text'})"
+this is some 'text'
+```
+
+#### `%{shrink:…}` [#shrink]
+
+Trim leading and trailing ASCII-whitespace, and reduce intermediate whitespace to a single space.
+
+### File and Path Operations
+
+#### `%{basename:…}` 🔦 [#basename]
+
+> basename(1) macro analogue
+
+#### `%{dirname:…}` 🔦 [#dirname]
+
+> dirname(1) macro analogue
+
+#### `%{exists:…}` 🔦 [#exists]
+
+> test file existence, expands to 1/0
+
+#### `%{suffix:…}` 🔦 [#suffi]
+
+> expand to suffix part of a file name
+
+#### `%{url2path:…}` 🔦 [#url2path]
+
+> convert url to a local path
+
+#### `%{uncompress:…}` [#uncompress]
+
+> expand to a command for outputting argument file to stdout, uncompressing as needed
+
+This macro is used in [`%setup …`](#setup) for uncompressing source files.
+
+### Environment info
+
+#### `%{getncpus:…}` [#getncpus]
+
+When used as `%{getncpus}` with no arguments, expand to the number of available CPU cores.
+
+Also accept extra arguments:
+
+> accepts arguments `total`, `proc` and `thread`, additionally accounting for available memory (e.g. address space limitations for threads)
+
+However, `%getncpus total`, `%getncpus proc` and `%getncpus thread` produce the same results as far as
+concerned. It is suspected that the arguments in most cases have no effect to the output.
+
+#### `%getconfdir` 🔦 [#getconfdir]
+
+> expand to rpm "home" directory (typically /usr/lib/rpm)
+
+#### `%{getenv:...}` 🔦 [#getenv]
+
+> getenv(3) macro analogue
+
+#### `%rpmversion` 🔦 [#rpmversion]
+
+> expand to running rpm version
+
+### Output
+
+#### `%{echo:…}` 🔦 [#echo]
+
+> print ... to stdout
+
+<Callout type="warning">
+  The printing happens when the macro is evaluated and expanded, not at the
+  section/position it is written.
+</Callout>
+
+#### `%{warn:…}` 🔦 [#warn]
+
+> print warning: ... to stderr
+
+Produce an RPM warning, which is immediately shown in console stderr,
+and displayed again at the end of the `rpmbuild` execution (after `Executing(rmbuild)`).
+
+<Callout type="warning">
+  The printing happens when the macro is evaluated and expanded, not at the
+  section/position it is written.
+</Callout>
+
+#### `%{error:…}` 🔦 [#error]
+
+> print error: ... to stderr and return an error
+
+Produce an RPM warning, which is immediately shown in console stderr, then immediately
+perform `Executing(rmbuild)` and exit with a summary of all warnings and errors.
+
+<Callout type="warning">
+  The printing happens when the macro is evaluated and expanded, not at the
+  section/position it is written.
+</Callout>
+
+#### `%{verbose:…}` 🔦 [#verbose]
+
+> `%verbose`: expand to 1 if rpm is in verbose mode, 0 if not
+>
+> `%{verbose:...}`: expand to ... if rpm is in verbose mode, the empty string if not
+
+### Spec-specific Macros
+
+#### `%{S:…}` [#S]
+
+> expand ... to &lt;source&gt; file name
+
+Expand to the path to the source file. This is just a fancy macro that transforms `%{S:123}` to `%SOURCE123`.
+
+	<Split.Root>
+		<div>
+			```rpmspec filename="example.spec"
+			Source0: https://repos.fyralabs.com/um42/comps.xml
+			
+			%prep
+			cat %{S:0}
+			echo %{S:1}
+			```
+		</div>
+		<div>
+			```rpmspec filename="expand.spec"
+			Source0: https://repos.fyralabs.com/um42/comps.xml
+			
+			%prep
+			cat %{_sourcedir}/comps.xml
+			echo %SOURCE1
+			```
+		</div>
+	</Split.Root>
+
+#### `%{P:…}` [#P]
+
+> expand ... to &lt;patch&gt; file name
+
+As you may have guessed, this is basically the `Patch:` version of [`%{S:…}`](#S).
+
+### Diagnostics
+
+#### `%trace` 🔦🛠️ [#trace]
+
+> toggle print of debugging information before/after expansion
+
+#### `%dump` 🔩 [#dump]
+
+> print the active (i.e. non-covered) macro table
+
+When you want to find a macro that has the string `x86_64_v3`, you can run:
+
+```sh
+rpm -E '%dump' 2>&1 | grep x86_64_v3
+```
+
+Or you can just use `less` instead of `grep`.
+
+#### `%__file_name` 🔦 [#__file_name]
+
+> current file (if parsing a file)
+
+#### `%__file_lineno` 🔦 [#__file_lineno]
+
+> line number in current file (if parsing a file)
+
+## Common Macros
+
+### Miscellaneous
+
+#### `%nil` 🔰 [#nil]
+
+Expand to nothing.
+
+Defined as `%{!?nil}`.
+
+### In Preamble
+
+#### `%forgemeta …` 🔢🔰 [#forgemeta]
+
+See https://docs.fedoraproject.org/en-US/packaging-guidelines/SourceURL/#_using_forges_hosted_revision_control.
+
+Parameterized as `%forgemeta(z:isva)`:
+- `-v`: verbose
+- `-i`: informative
+- `-s`: silent
+- `-a`: process all source archives (when you have `%forgeurl0`, `%forgeurl1`, …)
+- `-z n`: process the `n`-th source archive
+
+#### `%forgeautosetup …` 🔢 [#forgeautosetup]
+
+Somehow pretty rare.
+
+Parameterized as `%forgeautosetup(z:vNS:p:q)`.
+
+#### `%forgesetup …` 🔢🔰 [#forgesetup]
+
+Parameterized as `%forgesetup(z:va)`.
+
+#### `%forgeversion …` 🔢🔦 [#forgeversion]
+
+Parameterized as `%forgeversion(pz:ab:)`.
+
+#### `%debug_package` 🔰🏷️ [#debug_package]
+
+When you see:
+
+```ansi
+error: Empty %files file [1;3m%_builddir[0m/[1;3m%buildsubdir[0m/debugsourcefiles.list
+```
+
+This means RPM is trying to generate a `%{name}-debuginfo`/`%{name}-debugsource` package.
+You can disable this automatic behavior by setting:
+
+```rpmspec
+%define debug_package %nil
+```
+
+Then RPM will not strip debug symbols.
+
+#### `%_build_id_links` 🏷️ [#_build_id_links]
+
+When you see problems with `/usr/lib/.build-id`, try setting this to `none`.
+
+In `/usr/lib/rpm/macros`:
+```rpmspec
+#
+# Defines how and if build_id links are generated for ELF files.
+# The following settings are supported:
+#
+# - none
+#   No build_id links are generated.
+#
+# - alldebug
+#   build_id links are generated only when the __debug_package global is
+#   defined. This will generate build_id links in the -debuginfo package
+#   for both the main file as /usr/lib/debug/.build-id/xx/yyy and for
+#   the .debug file as /usr/lib/debug/.build-id/xx/yyy.debug.
+#   This is the old style build_id links as generated by the original
+#   find-debuginfo.sh script.
+#
+# - separate
+#   build_id links are generate for all binary packages. If this is a
+#   main package (the __debug_package global isn't set) then the
+#   build_id link is generated as /usr/lib/.build-id/xx/yyy. If this is
+#   a -debuginfo package (the __debug_package global is set) then the
+#   build_id link is generated as /usr/lib/debug/.build-id/xx/yyy.
+#
+# - compat
+#   Same as for "separate" but if the __debug_package global is set then
+#   the -debuginfo package will have a compatibility link for the main
+#   ELF /usr/lib/debug/.build-id/xx/yyy -> /usr/lib/.build-id/xx/yyy
+%_build_id_links compat
+```
+
+#### `%_missing_build_ids_terminate_build` 🏷️ [#_missing_build_ids_terminate_build]
+
+Still having problems with `/usr/lib/.build-id`? Try setting this to `0`.
+
+In `/usr/lib/rpm/macros`:
+```rpmspec
+#
+# Should an ELF file processed by find-debuginfo.sh having no build ID
+# terminate a build?  This is left undefined to disable it and defined to
+# enable.
+#
+%_missing_build_ids_terminate_build    1
+```
+
+#### `%__strip` 🏷️ [#__strip]
+
+In some cases (e.g. JavaScript binaries) stripping the binaries may break the
+executable. To disable stripping, override the strip call:
+```rpmspec
+%global __strip /bin/true
+```
+
+#### `%__requires_exclude` 🏷️ [#__requires_exclude]
+
+Since `rpmbuild` automatically generates `Requires:` by looking at
+what things the binaries are linked to, you may disable that by adding a regex to this macro:
+```rpmspec filename="example.spec" {6}
+# https://github.com/terrapkg/packages/blob/7f0fd6b6a8993d17832403960d4343899cfb0474/anda/apps/youtube-music/youtube-music.spec#L5
+%define debug_package %nil
+
+# Exclude private libraries since this is bundled with electron
+%global __provides_exclude ^((libffmpeg[.]so.*)|(lib.*\\.so.*))$
+%global __requires_exclude ^((libffmpeg[.]so.*)|(lib.*\\.so.*))$
+```
+
+<Callout type="info">If you want to disable all automatic `Requires:`, set `AutoReq: 0`.</Callout>
+
+#### `%__requires_exclude_from` 🏷️ [#__requires_exclude_from]
+
+```rpmspec filename="example.spec"
+# https://github.com/terrapkg/packages/blob/7f0fd6b6a8993d17832403960d4343899cfb0474/anda/system/opentabletdriver/opentabletdriver.spec#L6
+%global __requires_exclude_from ^/usr/lib/opentabletdriver/.*$
+```
+
+#### `%__provides_exclude` 🏷️ [#__provides_exclude]
+
+Similarly, since `rpmbuild` automatically generates `Provides:`, you may disable that:
+```rpmspec filename="example.spec" {5}
+# https://github.com/terrapkg/packages/blob/7f0fd6b6a8993d17832403960d4343899cfb0474/anda/apps/youtube-music/youtube-music.spec#L4
+%define debug_package %nil
+
+# Exclude private libraries since this is bundled with electron
+%global __provides_exclude ^((libffmpeg[.]so.*)|(lib.*\\.so.*))$
+%global __requires_exclude ^((libffmpeg[.]so.*)|(lib.*\\.so.*))$
+```
+
+<Callout type="info">If you want to disable all automatic `Provides:`, set `AutoProv: 0`.</Callout>
+
+#### `%__provides_exclude_from` 🏷️ [#__provides_exclude_from]
+
+```rpmspec filename="example.spec" {8}
+# https://github.com/terrapkg/packages/blob/7f0fd6b6a8993d17832403960d4343899cfb0474/anda/devs/asar/asar.spec#L7
+%define debug_package %nil
+%define __strip /bin/true
+%global _build_id_links none
+
+# Exclude private libraries
+%global __requires_exclude libffmpeg.so
+%global __provides_exclude_from %{_datadir}/%{name}/.*\\.so
+```
+
+#### `%__brp_mangle_shebangs_exclude_from` 🔰🏷️ [#__brp_mangle_shebangs_exclude_from]
+
+RPM tries to mangle shebangs (`#!`) by default (see
+[`%__brp_mangle_shebangs`](#__brp_mangle_shebangs)).
+If this breaks, you can ask it to exclude the files that matches a given regex.
+
+```rpmspec filename="example.spec" {6}
+# https://github.com/terrapkg/packages/blob/frawhide/anda/devs/zed/nightly/zed-nightly.spec#L9
+
+%bcond_with check
+
+# Exclude input files from mangling
+%global __brp_mangle_shebangs_exclude_from ^/usr/src/.*$
+
+%global crate zed
+%global app_id dev.zed.Zed-Nightly
+
+%global rustflags_debuginfo 0
+```
+
+#### `%__brp_mangle_shebangs_exclude` 🏷️ [#__brp_mangle_shebangs_exclude]
+
+Similar to above, but takes in regex for shebangs to exclude instead.
+
+#### `%__brp_mangle_shebangs_exclude_file` 🏷️ [#__brp_mangle_shebangs_exclude_file]
+
+Similar to above, but takes in path to file that contains the regexes.
+
+#### `%__brp_mangle_shebangs_exclude_from_file` 🏷️ [#__brp_mangle_shebangs_exclude_from_file]
+
+#### `%__brp_mangle_shebangs` 🏷️
+
+As a last resort to fixing bugs related to shebangs mangling shenanigans,
+undefine this macro. You really should try using
+[`%__brp_mangle_shebangs_exclude_from`](#__brp_mangle_shebangs_exclude_from) first though.
+
+#### `%bcond_with …` 🔢🔰 [#bcond_with]
+
+**DISABLE** a "conditional".
+
+Parameterized as `%bcond_with()`.
+Takes in 1 argument: the name of the "conditional".
+
+For more information: https://rpm-software-management.github.io/rpm/manual/conditionalbuilds.html
+
+#### `%bcond_without …` 🔢🔰 [#bcond_without]
+
+**ENABLE** a "conditional".
+
+Parameterized as `%bcond_without()`.
+Takes in 1 argument: the name of the "conditional".
+
+For more information: https://rpm-software-management.github.io/rpm/manual/conditionalbuilds.html
+
+### In `%prep`
+
+#### `%autosetup …` 🔢🔰 [#autosetup]
+
+Uncompress the specified sources. By default, uncompress `%{SOURCE0}` (i.e. [`%{S:0}`](#s)).
+
+Parameterized as `%autosetup(a:b:cCDn:TvNS:p:)`:
+- `-n …`: specify the top-level directory (i.e. root folder) name in the archive (default `%{name}-%{version}`)
+- `-p n`: specify the `-p n` argument to [`%autopatch …`](#autopatch)
+- `-a n`: unpack `%{S:n}` after changing directory
+- `-b n`: unpack `%{S:n}` before changing directory
+- `-c`: create directory, `cd` into it, then unpack the source (useful if archive lacks top-level directory)
+- `-C`: I've no idea what this does! — Mado
+- `-D`: do not delete folder before unpacking sources
+- `-T`: disable unpacking `%SOURCE0`
+- `-v`: verbose. If specified, `%autosetup` will omit the `-q` argument to [`%setup`](#setup)
+- `-S …`: specify the SCM, equivalent to `%global __scm …` then `%__scm_setup_git` (replace `git` with the argument). With this argument, the specified SCM will be set up in the uncompressed directory
+- `-N`: do not run [`%autopatch …`](#autopatch)
+
+This is actually a wrapper around [`%setup`](#setup) and [`%autopatch …`](#autopatch).
+
+If you need to unpack multiple sources, see: http://ftp.rpm.org/max-rpm/s1-rpm-inside-macros.html
+
+#### `%setup …` 🔢🚸 [#setup]
+
+Uncompress the specified sources. By default, uncompress `%{SOURCE0}` (i.e. [`%{S:0}`](#s)).
+
+<Callout type="warning">
+  Only available in a spec file.
+</Callout>
+
+In most cases you should use [`%autosetup …`](#autosetup) instead. If you would like to use `%setup …`,
+we recommend adding the `-q` flag.
+
+Parameterized as `%setup(a:b:cCDn:Tq)`: (need confirmation)
+- `-n …`: specify the top-level directory (i.e. root folder) name in the archive (default `%{name}-%{version}`)
+- `-a n`: unpack `%{S:n}` after changing directory
+- `-b n`: unpack `%{S:n}` before changing directory
+- `-c`: create directory, `cd` into it, then unpack the source (useful if archive lacks top-level directory)
+- `-C`: I've no idea what this does! — Mado
+- `-D`: do not delete folder before unpacking sources
+- `-T`: disable unpacking `%SOURCE0`
+- `-q`: quiet, because by default `%setup …` is verbose
+
+If you need to unpack multiple sources, see: http://ftp.rpm.org/max-rpm/s1-rpm-inside-macros.html
+
+The `%setup …` macro does 3 things:
+- prepare the destination
+	- `%global %{buildsubdir}` to the argument given in `-n …`
+	- `mkdir -p %{builddir}`
+		- note: `%{builddir}` is defined only during `rpmbuild`
+		- see [`%{_builddir}`](#_builddir)
+	- `cd %{builddir}`
+- uncompress the archive
+  - internally uses [`%{uncompress:…}`](#uncompress)
+- `cd %{?buildsubdir}`
+
+#### `%autopatch …` 🔢 [#autopatch]
+
+Apply patches.
+
+Wrapper around `%__apply_patch`. No, this does not wrap around [`%patch`](#patch)!
+
+Parameterized as `%autopatch(vqp:m:M:)`:
+- `-v`: verbose
+- `-q`: don’t warn if there are no matching patches
+- `-p n`: number of top-level path components to strip (default 0) \
+	For example, if the patch uses the path `a/b/hello.txt`,
+	passing in `-p1` will strip it to `b/hello.txt`,
+	and passing in `-p2` will strip it to just `hello.txt`.
+- `-m n`: apply patches starting from `n` (default 0)
+- `-M n`: apply patches up to `n` (default to the last patch number for `Patch:`)
+
+Examples:
+- `%autopatch -m 100`: apply patches with number &gt;= 100
+- `%autopatch -M 400`: apply patches with number &lt;= 400
+- `%autopatch -m 80 -M 99`: apply patches 80 to 99 inclusive
+- `%autopatch 1 4 6`: apply patches 1, 4 and 6
+
+Reference: https://rpm-software-management.github.io/rpm/manual/autosetup.html#autopatch
+
+#### `%patch …` 🔢🚸 [#patch]
+
+Apply a patch.
+
+<Callout type="warning">
+  Only available in a spec file.
+</Callout>
+
+We recommend [`%autopatch`](#autopatch) over this.
+
+Parameterized as `%patch(b:p:P:REz:)`.
+
+### Paths
+
+This list is NOT exhaustive. Some macros are not built-in. If your
+machine does not come with them, try `dnf install 'rpm_macro(macro_name)'{:sh}`.
+Macros with the '(Terra only)' warning are part of the `anda-srpm-macros` package in Terra, documentation for these can be found on the [Terra SRPM devdocs page](https://developer.fyralabs.com/terra/srpm#directories).
+
+```
+/
+┣╸boot
+┃ ┗╸efi
+┃   ┗╸EFI             ⇒ %{efi_esp_efi}
+┃     ┗╸fedora        ⇒ %{efi_esp_dir}
+┣╸etc                 ⇒ %{_sysconfdir}
+┃ ┣╸fonts             ⇒ %{_fontconfig_masterdir}
+┃ ┃ ┗╸conf.d          ⇒ %{_fontconfig_confdir}
+┃ ┣╸java              ⇒ %{_javaconfdir}
+┃ ┣╸jvm-common        ⇒ %{_jvmcommonsysconfdir}
+┃ ┣╸jvm               ⇒ %{_jvmsysconfdir}
+┃ ┣╸pam.d             ⇒ %{_pam_confdir}
+┃ ┣╸rc.d
+┃ ┃ ┗╸init.d          ⇒ %{_initddir} %{_initrddir}
+┃ ┗╸security          ⇒ %{_pam_secconfdir}
+┣╸run                 ⇒ %{_rundir} %{_runstatedir}
+┣╸usr                 ⇒ %{_usr} %{_prefix} %{_exec_prefix}
+┃ ┣╸bin               ⇒ %{_bindir} (%{fedora}>=42: %{_sbindir})
+┃ ┣╸sbin              ⇒ %{_sbindir} (older fedora versions)
+┃ ┣╸src               ⇒ %{_usrsrc}
+┃ ┣╸tmp               ⇒ %{_tmppath}
+┃ ┣╸include           ⇒ %{_includedir} %{_oldincludedir}
+┃ ┃ ┗╸d               ⇒ %{_d_includedir}
+┃ ┣╸lib64             ⇒ %{_libdir} %{_pam_libdir} %{_usr}/%{_lib}
+┃ ┃ ┣╸gfortran
+┃ ┃ ┃ ┗╸modules       ⇒ %{_fmoddir}
+┃ ┃ ┣╸lua
+┃ ┃ ┃ ┗╸%{lua_version} ⇒ %{lua_libdir}
+┃ ┃ ┣╸ocaml           ⇒ %{ocamldir}
+┃ ┃ ┣╸pkgconfig       ⇒ %{_pkgconfigdir} (Terra only)
+┃ ┃ ┗╸security        ⇒ %{_pam_moduledir}
+┃ ┣╸lib               ⇒ %{_libdir} ONLY ON `noarch` OR 32-BIT PLATFORMS
+┃ ┃ ┣╸binfmt.d        ⇒ %{_binfmtdir}
+┃ ┃ ┣╸clang
+┃ ┃ ┃ ┗╸%{clang_major_version} ⇒ %{clang_resource_dir}
+┃ ┃ ┣╸environment.d   ⇒ %{_environmentdir}
+┃ ┃ ┣╸java            ⇒ %{_jnidir}
+┃ ┃ ┣╸jvm             ⇒ %{_jvmdir} %{_jvmlibdir}
+┃ ┃ ┣╸jvm-common      ⇒ %{_jvmcommonlibdir}
+┃ ┃ ┣╸jvm-private     ⇒ %{_jvmprivdir}
+┃ ┃ ┣╸kernel
+┃ ┃ ┃ ┗╸install.d     ⇒ %{_kernel_install_dir}
+┃ ┃ ┣╸modprobe.d      ⇒ %{_modprobedir}
+┃ ┃ ┣╸modules-load.d  ⇒ %{_modulesloaddir}
+┃ ┃ ┣╸mono            ⇒ %{_monodir}
+┃ ┃ ┃ ┗╸gac           ⇒ %{_monogacdir}
+┃ ┃ ┣╸rpm             ⇒ %{_rpmconfigdir} %{getconfdir}
+┃ ┃ ┃ ┣╸fileattrs     ⇒ %{_fileattrsdir}
+┃ ┃ ┃ ┣╸lua           ⇒ %{_rpmluadir}
+┃ ┃ ┃ ┗╸macros.d      ⇒ %{_rpmmacrodir} %{rpmmacrodir}
+┃ ┃ ┣╸sysctl.d        ⇒ %{_sysctldir}
+┃ ┃ ┣╸sysusers.d      ⇒ %{_sysusersdir}
+┃ ┃ ┣╸swidtag
+┃ ┃ ┃ ┗╸fedoraproject.org ⇒ %{_swidtagdir}
+┃ ┃ ┣╸systemd         ⇒ %{_systemd_util_dir}
+┃ ┃ ┃ ┣╸catalog       ⇒ %{_journalcatalogdir}
+┃ ┃ ┃ ┣╸user          ⇒ %{_userunitdir}
+┃ ┃ ┃ ┣╸user-environment-generators   ⇒ %{_systemd_user_env_generator_dir}
+┃ ┃ ┃ ┣╸user-preset   ⇒ %{_userpresetdir}
+┃ ┃ ┃ ┣╸user-generators   ⇒ %{_systemdusergeneratordir}
+┃ ┃ ┃ ┣╸system        ⇒ %{_unitdir}
+┃ ┃ ┃ ┣╸system-environment-generators ⇒ %{_systemd_system_env_generator_dir}
+┃ ┃ ┃ ┣╸system-generators ⇒ %{_systemdgeneratordir}
+┃ ┃ ┃ ┗╸system-preset ⇒ %{_presetdir}
+┃ ┃ ┣╸tmpfiles.d      ⇒ %{_tmpfilesdir}
+┃ ┃ ┗╸udev
+┃ ┃   ┣╸hwdb.d        ⇒ %{_udevhwdbdir}
+┃ ┃   ┗╸rules.d       ⇒ %{_udevrulesdir}
+┃ ┣╸libexec           ⇒ %{_libexecdir}
+┃ ┃ ┗╸perl5-tests     ⇒ %{perl_testdir}
+┃ ┗╸share             ⇒ %{_datadir} %{_datarootdir}
+┃   ┣╸applications    ⇒ %{_appsdir} (Terra only)
+┃   ┣╸bash-completion
+┃   ┃ ┗╸completions   ⇒ %{bash_completions_dir}
+┃   ┣╸cargo
+┃   ┃ ┗╸registry      ⇒ %{cargo_registry}
+┃   ┃   ┗╸%{crate}-%{version_no_tilde} ⇒ %{crate_instdir}
+┃   ┣╸color           ⇒ %{_colordir} %{_syscolordir}
+┃   ┃ ┣╸cmms          ⇒ %{_cmmscolordir}
+┃   ┃ ┣╸icc           ⇒ %{_icccolordir}
+┃   ┃ ┗╸settings      ⇒ %{_settingscolordir}
+┃   ┣╸doc             ⇒ %{_docdir} %{_defaultdocdir}
+┃   ┃ ┗╸%{name}      ⇒ %{_pkgdocdir}
+┃   ┣╸elvish
+┃   ┃ ┗╸lib
+┃   ┃   ┗╸completions ⇒ %{elvish_completions_dir} (Terra only)
+┃   ┣╸fish
+┃   ┃ ┗╸vendor_completions.d ⇒ %{fish_completions_dir}
+┃   ┣╸fonts           ⇒ %{_fontbasedir}
+┃   ┣╸fontconfig
+┃   ┃ ┗╸conf.avail    ⇒ %{_fontconfig_templatedir}
+┃   ┣╸gnome-shell
+┃   ┃ ┗╸extensions    ⇒ %{_gnomeextensionsdir} (Terra only)
+┃   ┃   ┗╸%{uuid}     ⇒ %{_gnomeextensionsdir} (When %{uuid} is defined in a spec) (Terra only)
+┃   ┣╸icons           ⇒ %{_iconsdir}
+┃   ┃ ┗╸hicolor       ⇒ %{_hicolordir} (Terra only)
+┃   ┃   ┗╸scalable
+┃   ┃     ┗╸apps      ⇒ %{_scalableiconsdir} (Terra only)
+┃   ┣╸info            ⇒ %{_infodir}
+┃   ┣╸ivy-xmls        ⇒ %{_ivyxmldir}
+┃   ┣╸java            ⇒ %{_javadir}
+┃   ┣╸javadoc         ⇒ %{_javadocdir}
+┃   ┣╸jvm             ⇒ %{_jvmdatadir}
+┃   ┣╸jvm-common      ⇒ %{_jvmcommondatadir}
+┃   ┣╸licenses        ⇒ %{_defaultlicensedir}
+┃   ┣╸lua
+┃   ┃ ┗╸%{lua_version} ⇒ %{lua_pkgdir}
+┃   ┣╸man             ⇒ %{_mandir}
+┃   ┣╸maven-poms      ⇒ %{_mavenpomdir}
+┃   ┣╸metainfo        ⇒ %{_metainfodir}
+┃   ┣╸nushell
+┃   ┃ ┗╸vendor
+┃   ┃   ┗╸autoload    ⇒ %{nushell_completions_dir} (Terra only)
+┃   ┣╸pam.d           ⇒ %{_pam_vendordir}
+┃   ┣╸pkgconfig
+┃   ┃ ┗╸personality.d ⇒ %{pkgconfig_personalitydir}
+┃   ┣╸systemtap
+┃   ┃ ┗╸tapset        ⇒ %{_systemtap_tapsetdir}
+┃   ┣╸user-tmpfiles.d ⇒ %{_user_tmpfilesdir}
+┃   ┣╸zsh
+┃   ┃ ┗╸site-functions ⇒ %{zsh_completions_dir}
+┃   ┗╸%{python_wheel_pkg_prefix}-wheels ⇒ %{python_wheel_dir}
+┗╸var                 ⇒ %{_var} %{_localstatedir}
+  ┗╸lib               ⇒ %{_sharedstatedir}
+```
+```
+/home/mado/rpmbuild   ⇒ %{_topdir}
+┣╸BUILD               ⇒ %{_builddir}
+┃ ┗╸%{buildsubdir}
+┃   ┣╸.pyproject-builddir%{_pyproject_files_pkgversion} ⇒ %{_pyproject_builddir}
+┃   ┗╸pyproject-wheeldir%{_pyproject_files_pkgversion}  ⇒ %{_pyproject_wheeldir}
+┣╸RPMS                ⇒ %{_rpmdir}
+┣╸SOURCES             ⇒ %{_sourcedir}
+┣╸SPECS               ⇒ %{_specdir}
+┗╸SRPMS               ⇒ %{_srcrpmdir}
+```
+
+#### Common Paths 🔰 [#common-paths]
+
+```
+/etc                                   ⇒ %{_sysconfdir}
+/run                                   ⇒ %{_rundir}
+/usr                                   ⇒ %{_usr}
+/usr/bin                               ⇒ %{_bindir}
+/usr/sbin                              ⇒ %{_sbindir} maybe?
+/usr/src                               ⇒ %{_usrsrc}
+/usr/include                           ⇒ %{_includedir}
+/usr/lib64                             ⇒ %{_libdir}
+/usr/lib                               ⇒ %{_libdir} if `noarch` or 32-bit platforms
+/usr/lib/sysctl.d                      ⇒ %{_sysctldir}
+/usr/lib/sysusers.d                    ⇒ %{_sysusersdir}
+/usr/lib/systemd/user                  ⇒ %{_userunitdir}
+/usr/lib/systemd/user-preset           ⇒ %{_userpresetdir}
+/usr/lib/systemd/system                ⇒ %{_unitdir}
+/usr/lib/systemd/system-preset         ⇒ %{_presetdir}
+/usr/libexec                           ⇒ %{_libexecdir}
+/usr/share                             ⇒ %{_datadir}
+/usr/share/doc                         ⇒ %{_docdir}
+/usr/share/icons                       ⇒ %{_iconsdir}
+/usr/share/info                        ⇒ %{_infodir}
+/usr/share/licenses                    ⇒ %{_defaultlicensedir}
+/usr/share/man                         ⇒ %{_mandir}
+/usr/share/metainfo                    ⇒ %{_metainfodir}
+/var                                   ⇒ %{_var}
+/var/lib                               ⇒ %{_sharedstatedir}
+
+/usr/share/bash-completion/completions ⇒ %{bash_completions_dir}
+/usr/share/elvish/lib/completions      ⇒ %{elvish_completions_dir} (Terra only)
+/usr/share/fish/vendor_completions.d   ⇒ %{fish_completions_dir}
+/usr/share/zsh/site-functions          ⇒ %{zsh_completions_dir}
+```
+
+### In `%install`
+
+#### `%buildroot` 🔰 [#buildroot]
+
+<Callout type="warning">
+  Only available in a spec file.
+</Callout>
+
+Path to a specific directory where files, that get packaged into the final RPM, should live.
+This is the same as `$pkgdir` in Arch Linux PKGBUILDs.
+
+#### `%find_lang` 🔰 [#find_lang]
+
+From `/usr/lib/rpm/find-lang.sh`:
+> ```
+> automagically generate list of language specific files
+> for inclusion in an rpm spec file.
+> This does assume that the *.mo files are under .../locale/...
+> ```
+
+Expand to exactly `/usr/lib/rpm/find-lang.sh %{buildroot}`.
+Used with the `-f` flag for `%files`.
+Useful for packaging `/usr/share/locale/*/LC_MESSAGES/%{app_id}.mo` files.
+
+```
+$ /usr/lib/rpm/find-lang.sh
+
+Usage: /usr/lib/rpm/find-lang.sh TOP_DIR PACKAGE_NAME [prefix]
+
+where TOP_DIR is
+the top of the tree containing the files to be processed--should be
+$RPM_BUILD_ROOT usually. TOP_DIR gets sed'd out of the output list.
+PACKAGE_NAME is the %{name} of the package. This should also be
+the basename of the .mo files.  the output is written to
+PACKAGE_NAME.lang unless $3 is given in which case output is written
+to $3.
+Additional options:
+  --with-gnome          find GNOME help files
+  --with-mate           find MATE help files
+  --with-kde            find KDE help files
+  --with-qt             find Qt translation files
+  --with-html           find HTML files
+  --with-man            find localized man pages
+  --all-name            match all package/domain names
+  --without-mo          do not find locale files
+  --generate-subpackages move language files in one sub package per language
+```
+
+```rpmspec filename="example.spec" {7,9} /%find_lang/ /-f mugshot.lang/
+# https://github.com/terrapkg/packages/blob/2635988e63fa5a05bd2c42d34c893d9e2bb13580/anda/apps/mugshot/mugshot.spec#L41-L46
+%install
+%pyproject_install
+%pyproject_save_files -L 'mugshot*'
+install -Dm644 data/glib-2.0/schemas/%{lower:%app}.gschema.xml %buildroot%_datadir/glib-2.0/schemas/
+
+%find_lang mugshot
+
+%files -f %{pyproject_files} -f mugshot.lang
+%doc README.md NEWS
+…
+```
+
+#### `%fdupes …` 🔢 [#fdupes]
+
+Hard-link (or symlink) files to save space.
+
+Parameterized as `%fdupes(s)`:
+- `-s`: use symlinks instead of hard links
+
+Take in exactly 1 argument: a glob path that lists out files to be deduplicated.
+
+```rpmspec filename="example.spec" {2,12}
+# https://github.com/terrapkg/packages/blob/2635988e63fa5a05bd2c42d34c893d9e2bb13580/anda/themes/fluent-theme/fluent-theme.spec#L31
+BuildRequires:  fdupes
+# or BuildRequires:  rpm_macro(fdupes)
+
+…
+
+%install
+mkdir -p %{buildroot}%{_datadir}/themes
+./install.sh -i simple -t all -d %{buildroot}%{_datadir}/themes
+./install.sh -i simple -t all --tweaks round float -d %{buildroot}%{_datadir}/themes
+
+%fdupes %buildroot%_datadir
+
+%files
+%license COPYING
+%doc README.md
+
+%{_datadir}/themes/Fluent*/
+```
+
+<Callout>
+	Use [`%{quote:…}{:rpmspec}`](#quote) to feed in multiple paths:
+	```rpmspec
+	%fdupes %{quote:%buildroot%_datadir %buildroot%_sysconfdir}
+	```
+</Callout>
+
+## Per Language
+
+If your language / buildsystem is not listed here, go to
+https://docs.fedoraproject.org/en-US/packaging-guidelines/
+and find them on the navigation rail on the left.
+
+### C and C++
+
+#### `%configure` [#configure]
+
+Expand to `./configure` with the correct flags and arguments.
+If you need to execute `./configure`, in most cases you should use this macro instead.
+
+In some cases where `./configure` is not directly available, you may need to run
+`autoreconf -fi` or `-fiv`.
+
+#### `%make_build` 🔰 [#make_build]
+
+⇒ `%__make -O -j${RPM_BUILD_NCPUS} V=1 VERBOSE=1{:sh}`,
+where `%{__make}` ⇒ `/usr/bin/make`.
+Further arguments to `make` can be attached.
+
+#### `%make_install` 🔰 [#make_install]
+
+⇒ `%__make install DESTDIR=%?buildroot INSTALL="%__install -p"{:sh}`.
+
+#### `%makeinstall` 🚸 [#makeinstall]
+
+Deprecated. Use [`%make_install`](#make_install) instead.
+
+#### `%cmake` 🔰 [#cmake]
+
+Expand to `%{__cmake}` (⇒ `/usr/bin/cmake`) with the correct flags,
+such as `-B "%__cmake_builddir"{:sh}` (⇒ `-B "redhat-linux-build"{:sh}`).
+
+#### `%cmake_build` 🔰 [#cmake_build]
+
+⇒ `%__cmake --build "%__cmake_builddir" %?_smp_mflags --verbose{:sh}`.
+
+#### `%cmake_install` 🔰 [#cmake_install]
+
+⇒ `DESTDIR="%buildroot" %__cmake --install "%__cmake_builddir"{:sh}`.
+
+#### `%meson` 🔰 [#meson]
+
+≈ `%__meson setup{:sh}` with correct flags.
+
+#### `%meson_build` 🔰 [#meson_build]
+
+⇒ `%__meson compile -C "%_vpath_builddir" -j %_smp_build_ncpus %{?__meson_verbose:--verbose}{:sh}`
+
+⇒ `/usr/bin/meson compile -C redhat-linux-build -j 20 --verbose{:sh}` (on my machine).
+
+#### `%meson_install` 🔰 [#meson_install]
+
+⇒ `DESTDIR=%buildroot %__meson install -C %_vpath_builddir --no-rebuild{:sh}`.
+Used in `%install{:rpmspec}`.
+
+#### `%meson_test` 🔰 [#meson_test]
+
+⇒ `%__meson test -C %_vpath_builddir --no-rebuild %{!?__meson_verbose:--quiet}{:sh}`.
+Used in `%check{:rpmspec}`.
+
+#### `%ninja_build` [#ninja_build]
+
+⇒ `%__ninja %__ninja_common_opts{:sh}`
+
+⇒ `%__ninja -v -j${RPM_BUILD_NCPUS}{:sh}`.
+
+#### `%ninja_install` [#ninja_install]
+
+⇒ `DESTDIR=%buildroot %__ninja install %__ninja_common_opts{:sh}`.
+
+#### `%ninja_test` [#ninja_test]
+
+⇒ `%__ninja test %__ninja_common_opts{:sh}`.
+
+#### `%build_cflags` 🏷️ [#build_cflags]
+
+Flags to be passed to the C compiler.
+
+⇒ `%{__build_flags_lang_c} %{?_distro_extra_cflags}`
+
+#### `%_distro_extra_cflags` 🏷️ [#_distro_extra_cflags]
+
+For example, if the compiler is emitting errors that could be disabled with some
+`-Wno-…` flags, you can define this macro with extra flags.
+
+This macro is not defined by default on Fedora.
+
+#### `%build_cxxflags` 🏷️ [#build_cxxflags]
+
+Flags to be passed to the C++ compiler.
+
+⇒ `%{__build_flags_lang_cxx} %{?_distro_extra_cxxflags}`
+
+#### `%_distro_extra_cxxflags` 🏷️ [#_distro_extra_cxxflags]
+
+For example, if the compiler is emitting errors that could be disabled with some
+`-Wno-…` flags, you can define this macro with extra flags.
+
+This macro is not defined by default on Fedora.
+
+### D
+
+#### `%ldc_arches` [#ldc_arches]
+
+#### `%_d_optflags` [#_d_optflags]
+
+### Java
+
+https://docs.fedoraproject.org/en-US/java-packaging-howto/
+
+### Nim
+
+This section is only applicable to Terra (because Fedora does not ship Nim).
+
+#### `%nim_prep` [#nim_prep]
+
+Set `mold` as the linker and run `nimble setup -y`.
+
+#### `%nim_build` [#nim_build]
+
+Same as [`%nim_c`](#nim_c).
+
+#### `%nim_c` [#nim_c]
+
+⇒ `nim c -d:release -t:"%nim_tflags" -l:"%nim_lflags"{:sh}`.
+
+### Python
+
+https://docs.fedoraproject.org/en-US/packaging-guidelines/Python/
+
+### Rust
+
+https://docs.fedoraproject.org/en-US/packaging-guidelines/Rust/
+
+#### `%rustflags_debuginfo` 🏷️ [#rustflags_debuginfo]
+
+If `gdb` crashes in `find-debuginfo`, you might want to lower the value to `1` or even `0`.
+
+The default value is `2`.
+
+```rpmspec filename="example.spec" {11}
+https://github.com/terrapkg/packages/blob/2df55dad60a58ecf5f8fbe962f877f2834bdfa25/anda/devs/zed/nightly/zed-nightly.spec#L14
+
+%bcond_with check
+
+# Exclude input files from mangling
+%global __brp_mangle_shebangs_exclude_from ^/usr/src/.*$
+
+%global crate zed
+%global app_id dev.zed.Zed-Nightly
+
+%global rustflags_debuginfo 0
+```
+
+[expression]: ./expr
