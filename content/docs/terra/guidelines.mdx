@@ -3,10 +3,9 @@ title: Guidelines
 description: "Terra-specific guidelines."
 ---
 
-import { Callout } from "nextra/components";
-import { Split } from "../../components/split";
+import * as Split from "../../../components/split";
 
-# Terra Guidelines
+# Overview
 
 <Callout type="info">
   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
@@ -62,8 +61,8 @@ EITHER add `%global gomodulesmode GO111MODULE=on{:rpmspec}` OR replace `%goprep`
 
 For [Nim](#nim), use one of below. Also `%nim_c` = `%nim_build`, [see our macros](/terra/srpm#nim).
 
-<Split>
-  <Split.Left>
+<Split.Root>
+  <div>
     ```rpmspec
     %prep
     %autosetup
@@ -72,8 +71,8 @@ For [Nim](#nim), use one of below. Also `%nim_c` = `%nim_build`, [see our macros
     %build
     %nim_c src/dive
     ```
-  </Split.Left>
-  <Split.Right>
+  </div>
+  <div>
     ```rpmspec
     %prep
     %autosetup -Sgit
@@ -83,8 +82,8 @@ For [Nim](#nim), use one of below. Also `%nim_c` = `%nim_build`, [see our macros
     atlas rep atlas.lock
     %nim_c src/netto
     ```
-  </Split.Right>
-</Split>
+  </div>
+</Split.Root>
 
 For [Zig](#zig), `BuildRequires: zig zig-rpm-macros zig-srpm-macros{:rpmspec}`.
 If doesn't build with build arguments provided by Fedora `%zig_build`
