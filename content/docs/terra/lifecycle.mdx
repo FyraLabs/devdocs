@@ -8,15 +8,15 @@ description: "Learn more about the supported lifecycle for Terra repositories, p
   for these repos corresponds to the Fedora release version.
 </Callout>
 
-# Latest stable version of Fedora
+## Latest stable version of Fedora
 
 Full support. This branch is the main entrypoint for contributions and new packages. Packages are updated on a rolling release basis by Terra’s autoupdate system.
 
-# Non-latest, but supported versions of Fedora
+## Non-latest, but supported versions of Fedora
 
 We will provide updates for security issues, as tracked by Repology. Additionally we _may_ provide updates to resolve critical bugs. Besides those two cases, no new updates will be issued. No new packages may be directly submitted. It is also not guaranteed that the packages are up to date.
 
-# Branched Development Release
+## Branched Development Release
 
 <Callout type="warning">
   This branch may not exist if there is no current branched development release
@@ -25,7 +25,7 @@ We will provide updates for security issues, as tracked by Repology. Additionall
 
 When Fedora creates a new branched development release, we’ll branch off Terra’s stable repository to create a development/”preparatory” branch. This branch will automatically pull any additional contributions from stable and acts as a working ground to get Terra ready for the new release. When Fedora promotes this branched release to stable, we’ll do the same, setting this one as default. No guarantees are made for this branch during the development period.
 
-# Rawhide (Fedora’s rolling release)
+## Rawhide (Fedora’s rolling release)
 
 <Callout type="warning">
   You shouldn't be using this branch (or Rawhide in general) unless you know
@@ -34,6 +34,6 @@ When Fedora creates a new branched development release, we’ll branch off Terra
 
 Similarly to branched development releases, this branch will automatically pull contributions from the current stable branch. The purpose of this branch is to allow Rawhide users (usually enthusiast/developers) to have access to the vast Terra ecosystem, in addition to acting as a canary for any issues that might impact a future stable release. No guarantees are made for this branch.
 
-# EOL versions of Fedora
+## EOL versions of Fedora
 
 Completely unsupported. We will not provide any updates, even for critical security issues. While these repos might stay accessible on the internet, we reserve the right to purge them without notice.
