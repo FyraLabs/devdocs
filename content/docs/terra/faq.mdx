@@ -3,11 +3,9 @@ title: FAQ
 description: "Frequently Asked Questions"
 ---
 
-# FAQ
+# Repo Information
 
-## Repo Information
-
-### What packages does Terra have?
+## What packages does Terra have?
 
 A lot!
 
@@ -22,7 +20,7 @@ Some popular packages include:
 
 You can search packages via `dnf search`, [pkgs.org], or [Repology].
 
-### Why YET another repository? Why not RPM Fusion? Why not Copr?
+## Why YET another repository? Why not RPM Fusion? Why not Copr?
 
 The main principles that guide Terra are:
 - Ease of use, for users, maintainers, distros, and projects.
@@ -48,15 +46,15 @@ Due to our principles, our goals for Terra are different than the goals of other
 
 A much more detailed answer can be found from one of our maintainers: https://github.com/terrapkg/packages/issues/6897#issuecomment-3447981771.
 
-### Why do you hate Fedora?
+## Why do you hate Fedora?
 
 We don't. We maintain a good relationship with the Fedora Project, several maintainers, and other downstreams. Note that Terra does not replace Fedora, it depends on and supplements Fedora.
 While we may have disagreements of principle with upstream, we still highly value and respect their work, in which Terra would not be possible without.
 We do market Terra in a way that some may feel provocative, but our intent is not to denegrate the work of others, but rather differentiate ourselves as a project.
 
-## Technical details
+# Technical details
 
-### Where is the file server?
+## Where is the file server?
 
 https://repos.fyralabs.com/terrarawhide/
 
@@ -66,31 +64,31 @@ https://repos.fyralabs.com/terrarawhide-source/
 
 Replace `rawhide` with your Fedora version release number.
 
-### What is your Build Infrastructure?
+## What is your Build Infrastructure?
 
 [Andaman]. x86 packages are built in [Github Actions], while ARM packages are built using a cluster of Mac Minis owned and operated by Fyra Labs. These builds are then pushed to the repo.
 
-### Why [Andaman]?
+## Why [Andaman]?
 
 Written in rust, it provides an easy and efficient way to manage packages. [Ultramarine Linux] did use Koji, but the complexity makes it harder for us to maintain packages, which is why we decided to create anda.
 
 Anda is responsible for handling autoupdate and building the output artifacts. It supports both `rpmbuild` and `mock`, which couldn't be done using koji.
 
-### What is [Subatomic]?
+## What is [Subatomic]?
 
 It manages, uploads, and signs packages.
 
-### Where does the package signing key live, and how is it protected?
+## Where does the package signing key live, and how is it protected?
 
 [Subatomic] runs on JWT tokens, and only Cappy (one of the maintainers) and the pipeline have them. The secret changes once in a while (and no one has it). The GPG signing key lives separately from the actual repositories.
 
 The repo server is only accessible via HTTPS at https://repos.fyralabs.com/, and is only accessible by system administrators.
 
-### Who has direct access to Terra?
+## Who has direct access to Terra?
 
 See [team members of `terrapkg`](https://github.com/orgs/terrapkg/people).
 
-### How can I grab the SRPMs?
+## How can I grab the SRPMs?
 
 https://repos.fyralabs.com/terrarawhide-source/
 
