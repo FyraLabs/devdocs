@@ -3,15 +3,9 @@ title: Installing
 description: "Get access to the 1000+ packages that Fedora doesn't ship."
 ---
 
-import { Callout } from "nextra/components";
+# Adding Terra
 
-# Installing
-
-Currently (June 2025), Terra only supports RPM packages.
-
-## Adding Terra
-
-### Fedora and Derivatives
+## Fedora and Derivatives
 
 Directly install `terra-release`:
 
@@ -42,7 +36,7 @@ Or, just don't use the fancy script. I guess.
 
 </Callout>
 
-#### Ultramarine Linux
+### Ultramarine Linux
 
 Ultramarine already comes with Terra out of the box, simply `dnf` away!
 
@@ -55,11 +49,11 @@ curl -fsSL https://github.com/terrapkg/subatomic-repos/raw/main/terra.repo | pke
 sudo rpm-ostree install terra-release
 ```
 
-#### Bazzite and Aurora
+### Bazzite and Aurora
 
 Bazzite and Aurora come with Terra out of the box, simply `rpm-ostree` away!
 
-#### Bluefin
+### Bluefin
 
 Bluefin no longer comes with Terra, and disables package layering by default.
 
@@ -72,11 +66,11 @@ To enable layering, edit `/etc/rpm-ostreed.conf` and set `LockLayering` to `fals
 
 Then follow the installation instructions for Fedora Atomic.
 
-### Enterprise Linux
+## Enterprise Linux
 
 Terra EL contains a subset of packages for RHEL 10 and its derivatives.
 
-#### RHEL
+### RHEL
 
 Terra EL requires EPEL, which requires CodeReady Builder, let's start by enabling that:
 
@@ -96,7 +90,7 @@ Now you can install Terra!
 sudo dnf install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terrael$releasever' terra-release
 ```
 
-#### AlmaLinux, CentOS Stream, and RockyLinux
+### AlmaLinux, CentOS Stream, and RockyLinux
 
 Start by enabling CodeReady Builder:
 
@@ -116,7 +110,7 @@ Now you can install Terra!
 sudo dnf install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terrael$releasever' terra-release
 ```
 
-## Subrepos
+# Subrepos
 
 <Callout type="info">
     Subrepos are not available on Enterprise Linux.
@@ -127,15 +121,15 @@ Terra provides additional packages in separate repositories. These packages migh
 The current list of subrepos are `extras`, `nvidia`, `mesa`, `multimedia` (f43+ only).
 They can be enabled by installing `terra-release-extras`, `terra-release-nvidia`, etc.
 
-### Extras
+## Extras
 
 The extras subrepo provides miscellaneous packages that conflict with Fedora. Things like patched WINE and Switcheroo control are in Extras.
 
-### Mesa
+## Mesa
 
 The Mesa subrepo provides our build of Mesa, with patches from our friends at Universal Blue and most features enabled, unlike RPMFusion and Fedora's builds.
 
-### NVIDIA
+## NVIDIA
 
 The NVIDIA subrepo provides a selection of drivers and software for NVIDIA GPUs. We offer drivers based on [Negativo17](https://negativo17.org/) builds, and CUDA packages.
 
@@ -143,15 +137,15 @@ The NVIDIA subrepo provides a selection of drivers and software for NVIDIA GPUs.
 
 The multimedia subrepo is only available on Fedora 43 and newer. It provides multimedia codecs and related software, like `gstreamer1` packages and `ffmpeg`.
 
-## Using Terra
+# Using Terra
 
-### Install
+## Install
 
 ```sh
 sudo dnf install package-name another-package
 ```
 
-### Search
+## Search
 
 ```sh
 dnf search package-name
@@ -159,13 +153,13 @@ dnf search package-name
 dnf provides package-name
 ```
 
-### Remove
+## Remove
 
 ```sh
 sudo dnf remove package-name another-package
 ```
 
-### Upgrade
+## Upgrade
 
 ```sh
 sudo dnf upgrade
