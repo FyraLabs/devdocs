@@ -724,8 +724,10 @@ Like other meta macros (e.g., `%forgemeta{:rpmspec}` from Fedora), you MUST be m
 The safest location is under `Name:{:rpmspec}` and above other preambles. When in doubt, place the macro here.
 
 <Callout>
-  `%__provides_excludes` and `%__requires_excludes` can be recursively added to if needed by defining the macro again as a `%global` and appending the needed exclusions using [regex](https://wikipedia.org/wiki/Regular_expression).<br />
-  Example: `%global __provides_excludes %{__provides_excludes}|libcurl\\.so`
+  `%__provides_exclude` and `%__requires_exclude` can be recursively added to if needed by defining the macro again as a `%global` and appending the needed exclusions using [regex](https://wikipedia.org/wiki/Regular_expression).<br />
+  Example: `%global __provides_exclude %{__provides_exclude}|libcurl\\.so`<br />
+  MUST be done after setting `%electronmeta`.<br />
+  You SHOULD double check [the notes for regex in macros](/rpm/macro#regex-in-rpm) on our macro syntax page for more information as RPM has some notable quirks with regex.
 </Callout>
 
 Example usage:

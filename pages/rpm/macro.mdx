@@ -344,6 +344,18 @@ $ rpm -D 'p(-) %**' -E '%p -o'
 -o
 ```
 
+## Regex in RPM
+
+Regex in RPM has some notable differences especially when it comes to escapes.
+
+For example, if you wanted to escape a literal dot (`.`), you would need `\\.` instead of `\.`.
+
+And if you need a literal backslash (`\`), you would then need `\\\\`.
+
+In [Lua macros](/rpm/macros#lua) this can get even more complicated as you must sometimes escape in Lua *and* RPM.
+
+For example, if you need a `.`, in Lua macros you need to escape this as `\\\\.`.
+
 ---
 
 [^1]: https://github.com/rpm-software-management/rpm/blob/master/docs/manual/macros.md#defining-a-macro, permalink: https://github.com/rpm-software-management/rpm/blob/1ca57c6cfe264a211a6a93bf4fe68b463bd4861a/docs/manual/macros.md#defining-a-macro
