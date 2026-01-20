@@ -196,6 +196,17 @@ with any blank lines present. Blank lines must end with a `\`:
   you'll need `\` at the end of each line.
 </Callout>
 
+#### Escaping Regex in RPM Macros
+Regex in RPM has some notable differences from regular regex usage especially when it comes to escapes. These are imporant to be aware of when using exlusions macros such as `%__requires_exclude`.
+
+For example, if you wanted to escape a literal dot (`.`), you would need `\\.` instead of `\.`.
+
+And if you need a literal backslash (`\`), you would then need `\\\\`.
+
+In [Lua macros](/rpm/macros#lua) which are in a macros file (*not* in a spec!) this can get even more complicated as you must sometimes escape in Lua *and* RPM.
+
+For example, if you need a `.`, in Lua macros you need to escape this as `\\\\.`.
+
 ### Comments
 
 In [`%{lua:…}`](./macros#lua), comments must start with `-- ` (with the space).
@@ -341,18 +352,6 @@ error: Unknown option o in p()
 $ rpm -D 'p(-) %**' -E '%p -o'
 -o
 ```
-
-## Regex in RPM
-
-Regex in RPM has some notable differences especially when it comes to escapes.
-
-For example, if you wanted to escape a literal dot (`.`), you would need `\\.` instead of `\.`.
-
-And if you need a literal backslash (`\`), you would then need `\\\\`.
-
-In [Lua macros](/rpm/macros#lua) this can get even more complicated as you must sometimes escape in Lua *and* RPM.
-
-For example, if you need a `.`, in Lua macros you need to escape this as `\\\\.`.
 
 ---
 
