@@ -1,0 +1,6 @@
+{
+  "title": "Andaman",
+  "description": "The buildsystem for managing packages at scale",
+  "icon": "Hammer",
+  "root": true
+}

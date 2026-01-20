@@ -11,8 +11,7 @@ The unified documentation experience for developers hacking on Fyra Labs project
 Please make sure you have these dependencies first before building.
 
 ```bash
-node
-pnpm
+bun
 ```
 
 ## 🏗️ Building
@@ -20,6 +19,6 @@ pnpm
 Simply clone this repo, then:
 
 ```bash
-pnpm install
-pnpm build # or `pnpm dev` to run a development server
+bun run install
+bun run build # or `pnpm run dev` to run a development server
 ```

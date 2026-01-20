@@ -1,0 +1,6 @@
+{
+  "title": "SuzyQ Board",
+  "description": "The open debug board for Chromebooks",
+  "icon": "CircuitBoard",
+  "root": true
+}

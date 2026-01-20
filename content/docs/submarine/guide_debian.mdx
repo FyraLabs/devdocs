@@ -1,0 +1,36 @@
+---
+title: Install Debian Linux with Submarine
+description: Install Debian Linux on a Chromebook using Submarine.
+---
+
+<Callout type="info">This works best when using a live ISO.</Callout>
+
+## Partitioning
+
+Ensure that your disk uses a GPT partition table.
+
+1. Create a 16MB partition to store Submarine. If you're on aarch64, make it 64MB instead.
+
+2. Add the necessary flags by using `cgpt add -i <partition number> -t kernel -P 15 -T 1 -S 1 /dev/sdX`, don't forget to change the partition number and block device for your disk.
+
+3. Flash `submarine-<arch>.kpart` to the partition you just made.
+
+4. Create a second partition to store GRUB, this can be from 64 to 256 MB.
+
+5. Last, create a third partition to store the root of your system. It needs to be at least 10 GB, but it would be most logical to fill up the rest of the disk with it.
+
+## Installing
+
+At this point, begin installing Debian. Proceed with the installation as normal until you get to the partitioning screen. Choose to partition manually and mount the partition that will be used to store GRUB as `/boot/efi` and the system partition as `/`. Now, finish installing Debian and the rest should be handled by the installer.
+
+## Postinstall
+
+After it finishes installing, boot from your disk. If you did everything right, you should be looking at the Submarine boot menu. Select the number that corresponds to your system to boot into Debian.
+
+You should use [Tree's audio script](https://github.com/WeirdTreeThing/chromebook-linux-audio) to get the audio working. Note that this will install the chrultrabook kernel and you'll have a new entry in the boot menu.
+
+### Note
+
+Fyra Labs is not affiliated with the developers of Debian Linux, this guide is unofficial.
+
+If you're a developer of Debian reading this, and want to make it official, [let us know](mailto:contact@fyralabs.com)!
