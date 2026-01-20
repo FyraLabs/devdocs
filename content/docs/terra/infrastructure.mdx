@@ -23,7 +23,7 @@ pages) because things might change over time.
 
 ![](./terra-infra-graph.png)
 
-#### Andaman
+### Andaman
 
 Also known as `anda`, a package build toolchain in Rust, designed to simplify building various package types.
 
@@ -33,7 +33,7 @@ Also known as `anda`, a package build toolchain in Rust, designed to simplify bu
 
 Anda internally calls [Mock] and `rpmbuild` to build RPM packages.
 
-##### AndaX (`update.rhai`)
+#### AndaX (`update.rhai`)
 
 A scripting language based on [Rhai](https://rhai.rs) specifically made for writing update scripts.
 
@@ -41,14 +41,14 @@ A scripting language based on [Rhai](https://rhai.rs) specifically made for writ
 - Devdocs: https://developer.fyralabs.com/terra/autoupdate
 - Rhai playground: https://rhai.rs/playground/stable/
 
-#### Builder
+### Builder
 
 CI images for Terra CI operations. They are based on the Fedora minimal Docker images, with tools installed so
 we don't have to install them inside CI. Basically an image with preinstalled CI tools for our specific use.
 
 - GitHub: https://github.com/terrapkg/builder
 
-#### Madoguchi
+### Madoguchi
 
 API for handling Terra-related queries, recording build failures/successes, spec location in the git repo,
 and redirecting Repology links to the monorepo.
@@ -56,7 +56,7 @@ and redirecting Repology links to the monorepo.
 - GitHub: https://github.com/terrapkg/madoguchi
 - URL: https://madoguchi.fyralabs.com
 
-#### Monorepo for Terra Sources
+### Monorepo for Terra Sources
 
 A monorepo hosted on GitHub with all the packages sources, including `.spec` files, update scripts
 (`update.rhai`s), `anda.hcl`s, etc. If you want to submit package requests, go to this repository (since it's
@@ -65,7 +65,7 @@ the main issue tracker).
 - GitHub: https://github.com/terrapkg/packages
 - Devdocs: you are here
 
-#### Subatomic
+### Subatomic
 
 A modern package delivery system for RPMs. It generates repodata and manages package uploads. `subatomic-cli`
 is the command line tool used to upload the packages.
@@ -74,7 +74,7 @@ is the command line tool used to upload the packages.
 - URL: https://subatomic.fyralabs.com
 - API Interactive Docs: https://subatomic.fyralabs.com/docs/index.html
 
-#### Tetsudou
+### Tetsudou
 
 A metalink generator, so the clients (dnf/dnf5) know what mirrors a repo has and which ones are preferred.
 
