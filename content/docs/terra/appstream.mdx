@@ -3,9 +3,7 @@ title: AppStream
 description: "How to use AppStream MetaInfo in Terra packages."
 ---
 
-import { Callout } from "nextra/components";
-
-# AppStream MetaInfo in Terra packages
+# Overview
 
 Terra supports AppStream MetaInfo, which enables your package to be picked up by graphical software 'store' applications, such as [KDE Plasma's Discover](https://apps.kde.org/discover/) or [GNOME's Software app](https://apps.gnome.org/Software/).
 In Ultramarine, we encourage the use of these graphical store, so adding AppStream MetaInfo is great for discoverability.
@@ -14,11 +12,10 @@ This page will cover creating and installing AppStream MetaInfo to your package,
 If you have difficulty populating the `.metainfo.xml` file, hop into our [Discord](https://fyralabs.com/discord) server, or make a draft pull request asking for assistance.
 
 <Callout type="info">
-  The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
-  NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and
-  "OPTIONAL" in this document are to be interpreted as described in
-  [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and
-  [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
+  The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+  "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+  interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119)
+  and [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
 </Callout>
 
 ## When Should I Use AppStream MetaInfo?
@@ -143,7 +140,7 @@ Freedesktop's example:
     <image type="source" width="1600" height="900">https://example.com/foobar/screenshot-1_gnome_dark.png</image>
   </screenshot>
  </screenshots>
- ```
+```
 
 ### Macros
 
@@ -190,5 +187,7 @@ Source1: %appid.metainfo.xml   # This specifies your metainfo.xml file as a sour
 
 [^1]: libraries are also supported, see Freedesktop docs for tag provides: https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html#tag-provides
 [^2]: https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html#tag-keywords
+
 [^3]: https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html#tag-developer
+
 [^4]: https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html#tag-screenshots
