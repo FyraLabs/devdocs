@@ -1,13 +1,11 @@
 ---
 title: Macro Syntax
 description: "Documentations for how macro expansion works."
-# vi: noet ci pi sts=0 sw=2 ts=2
 ---
 
-import { Callout } from "nextra/components";
-import { Split } from "../../components/split";
+import * as Split from "../../../components/split";
 
-# Macro Syntax
+## Syntax
 
 RPM is a very powerful packaging system. One very reason is its macro support.
 
@@ -114,8 +112,8 @@ line except the last line of the macro body. To write the character `\`, use `\\
 Since the same shell command when spanned multiple lines requires the same mechanism,
 in many cases you will need to use `\\\`:
 
-<Split>
-	<Split.Left>
+<Split.Root>
+	<div>
 		```rpmspec filename="/usr/lib/rpm/macros.d/macros.example"
 		%say_hello echo \\\
 		Hello, World! && \\\
@@ -123,8 +121,8 @@ in many cases you will need to use `\\\`:
 		echo This is a second line of shell command. && \\\
 		echo Pretty cool.
 		```
-	</Split.Left>
-	<Split.Right>
+	</div>
+	<div>
 		```sh
 		$ rpm -E '%say_hello'
 		echo \
@@ -133,11 +131,11 @@ in many cases you will need to use `\\\`:
 		echo This is a second line of shell command. && \
 		echo Pretty cool.
 		```
-	</Split.Right>
-</Split>
+	</div>
+</Split.Root>
 
-<Split>
-	<Split.Left>
+<Split.Root>
+	<div>
 		```rpmspec filename="/usr/lib/rpm/macros.d/macros.example"
 		%say_hello %{lua:
 			print("echo 'Hello, ")
@@ -147,15 +145,15 @@ in many cases you will need to use `\\\`:
 			print("echo 'from %say_hello using %{lua:…}!'")
 		}
 		```
-	</Split.Left>
-	<Split.Right>
+	</div>
+	<div>
 		```sh
 		$ rpm -E '%say_hello'
 		echo 'Hello, World!'
 		echo 'from %say_hello using %{lua:…}!'
 		```
-	</Split.Right>
-</Split>
+	</div>
+</Split.Root>
 
 But that does not mean `\` is needed when dealing with a multi-line macro body.
 
