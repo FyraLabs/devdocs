@@ -41,7 +41,7 @@ If you ever need help, hop into [our Discord server](https://fyralabs.com/discor
   - Anda is also available via [Cargo](https://crates.io/crates/anda).
   - If on an atomic system, this command works using Podman: `podman run --rm --cap-add=SYS_ADMIN --privileged --volume ./:/anda --volume mock_cache:/var/lib/mock --workdir /anda ghcr.io/terrapkg/builder:frawhide anda`
 - You are now ready for the [Writing Sources](<[contributing#writing-sources](https://developer.fyralabs.com/terra/contributing#writing-sources)>) section below.
-
+  
 #### Dev Container
 
 You can create, build, and push a package all from within our Dev Container.
@@ -58,7 +58,6 @@ You can run this devcontainer from Linux, macOS, or Windows.
 #### Language Support in Editors
 
 The most common languages you will see:
-
 - RPMSPEC (`.spec`), for the package build scripts
 - rhai, for the auto-update scripts
 - hcl, for informing `anda` of the package

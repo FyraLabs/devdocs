@@ -76,8 +76,7 @@ You can obtain the branch name during runtime in Rhai using `labels.branch` (str
   You MUST NOT use this feature if the script ends up bumping versions across all branches at the same time.
   This feature should only be used under cases where the version is different for different branch but for the same package.
 
-Consequently, under normal circumstances and without approval, you are NOT allowed to use GitHub/GitLab related functions.
-
+  Consequently, under normal circumstances and without approval, you are NOT allowed to use GitHub/GitLab related functions.
 </Callout>
 
 #### Weekly packages
@@ -143,12 +142,9 @@ However, it is uncertain if the above will be the actual format as HeadPAT is st
   is because GitHub has an API rate-limit.
 </Callout>
 <Callout type="info">
-  You might see scripts with `if filters.contains("nightly")`. This `if`
-  statement is no longer needed.
+  You might see scripts with `if filters.contains("nightly")`. This `if` statement is no longer needed.
 </Callout>
-<Callout type="warning">
-  Avoid running code unrelated to updating/bumping packages.
-</Callout>
+<Callout type="warning">Avoid running code unrelated to updating/bumping packages.</Callout>
 
 [rhai]: https://rhai.rs/
 [headpat]: https://github.com/terrapkg/headpat

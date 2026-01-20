@@ -10,10 +10,10 @@ From the [RPM manual],
 
 > Expression expansion can be performed using `%[expression]`. An
 > expression consists of terms that can be combined using
-> operators. Rpm supports three kinds of terms, numbers made up
+> operators. RPM supports three kinds of terms, numbers made up
 > from digits, strings enclosed in double quotes (eg `"somestring"`) and
 > versions enclosed in double quotes preceded by v (eg `v"3:1.2-1"`).
-> Rpm will expand macros when evaluating terms.
+> RPM will expand macros when evaluating terms.
 >
 > You can use the standard operators to combine terms: logical
 > operators `&&`, `||`, `!`, relational operators `!=`, `==`, `<`,
@@ -49,13 +49,12 @@ First, a (way simpler) Rust declarative implementation is available
 [in `rpmspec-rs`](https://github.com/rpm-rs/rpmspec-rs/blob/master/rpmexpr/src/lib.rs).
 
 <Callout type="info">
-  The following section uses the following symbols: - 🟰: 2 inputs must be of
-  the same type. - 🟩: not fallible (i.e. never produces an error), given 🟰 is
-  satisfied.
+  The following section uses the following symbols:<br />
+  - 🟰: 2 inputs must be of the same type.<br />
+  - 🟩: not fallible (i.e. never produces an error), given 🟰 is satisfied.
 </Callout>
 
 Second, there are 4 unary, 10 binary, and 1 tertiary operators:
-
 - `-a`: negate a numerical value.
   - Err when used on non-numerical values.
 - `!a`: negate the value, return either 1 or 0. 🟩

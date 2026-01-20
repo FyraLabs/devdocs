@@ -326,9 +326,10 @@ In case you are not familiar with [`getopt(3)`], there are basically 3 rules:
 	- `(ABCxyz)` means `-A`, `-B`, `-C`, `-x`, `-y`, `-z` are possible flags
 	- only ASCII characters that are not `-`, `:` and `;` are accepted
 - any of the above characters followed by a single colon `:` indicates the flag *requires* an argument.
-	- `(n:)` means the macro expects `-n …` (or the caller can just not supply any flags at all)
+	- `(n:)` means the macro expects `-n <…>` (or the caller can just not supply any flags at all)
 - any followed by a double colon `::` indicates the flag takes in an *optional* argument.
-	- `(x::)` means `-x` or `-x …` are both accepted
+	- `(x::)` means `-x` or `-x[…]` are both accepted
+	- Macro flags using `::` MUST NOT have a space between them and the argument passed to them if used with an argument.
 
 Special: `(-)` means no flags are processed:
 
@@ -340,6 +341,18 @@ error: Unknown option o in p()
 $ rpm -D 'p(-) %**' -E '%p -o'
 -o
 ```
+
+## Regex in RPM
+
+Regex in RPM has some notable differences especially when it comes to escapes.
+
+For example, if you wanted to escape a literal dot (`.`), you would need `\\.` instead of `\.`.
+
+And if you need a literal backslash (`\`), you would then need `\\\\`.
+
+In [Lua macros](/rpm/macros#lua) this can get even more complicated as you must sometimes escape in Lua *and* RPM.
+
+For example, if you need a `.`, in Lua macros you need to escape this as `\\\\.`.
 
 ---
 

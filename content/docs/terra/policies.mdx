@@ -4,10 +4,11 @@ description: "One of Terra's main focuses is package quality. Users should be ab
 ---
 
 <Callout type="info">
-  The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
-  "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
-  interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119)
-  and [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
+  The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+  NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and
+  "OPTIONAL" in this document are to be interpreted as described in
+  [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and
+  [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
 </Callout>
 
 ## TL;DR
@@ -51,7 +52,6 @@ End.
     | Libraries required to build or use the aforementioned packages                                                                                                                                              | These libraries are required to build or use the aforementioned packages, and are usually not sandboxed.                                                                                           |
 
     Other applications that are not specified here may be allowed on a case-by-case basis.
-
 - You MUST have the rights or permission to redistribute the packaged software. Please check the license of the software. Besides that, there is no prohibition on proprietary licenses.
 - Submissions must be maintained. We will reject submissions of unmaintained software.
 - Submissions MUST NOT be malicious.
@@ -101,7 +101,6 @@ For UX reasons, some packages MAY consider specifying `Provides: %{rawname}-%{ta
 ### Versioning
 
 {/* https://github.com/terrapkg/packages/issues/1907 */}
-
 <div style={{ float: "right", margin: "1em" }}>
   | VCS | ID | |------------------|-------| | Git | `git` | | SVN | `svn` | |
   CVS | `cvs` | | Bazaar | `bzr` | | Mercurial | `hg` | | Perforce (Helix) |
@@ -170,9 +169,7 @@ For example, `terra-mesa` should be in extra as the dependency solver will resol
 
 ## AppStream MetaInfo & Desktop Files
 
-<Callout>
-  Our AppStream guidelines are documented [here](/terra/appstream).
-</Callout>
+<Callout>Our AppStream guidelines are documented [here](/terra/appstream).</Callout>
 
 All graphical applications that can be started by the user MUST provide a [desktop entry](/terra/guidelines#providing-your-own-desktop-file) and [AppStream MetaInfo](https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#qsr-app-example) file. Other applications are also RECOMMENDED to do so.
 
