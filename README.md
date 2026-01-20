@@ -19,6 +19,6 @@ bun
 Simply clone this repo, then:
 
 ```bash
-bun run install
-bun run build # or `pnpm run dev` to run a development server
+bun install
+bun run build # or `bun run dev` to run a development server
 ```
