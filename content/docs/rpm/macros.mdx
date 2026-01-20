@@ -4,8 +4,7 @@ description: "Documentations for different RPM macros."
 # vi: noet ci pi sts=0 sw=2 ts=2
 ---
 
-import { Callout } from "nextra/components";
-import { Split } from "../../components/split";
+import * as Split from "../../../components/split";
 
 # RPM Macros
 
@@ -68,8 +67,8 @@ For example, if used in preamble section, the macro will be automatically undefi
 
 To make sure a macro lasts for the entire spec file, use `%global` instead.
 
-<Split>
-  <Split.Left>
+<Split.Root>
+  <div>
     ```rpmspec filename="example.spec"
     %build
     %define my_macro Hello, World!
@@ -79,8 +78,8 @@ To make sure a macro lasts for the entire spec file, use `%global` instead.
     echo %my_macro
     ```
 
-  </Split.Left>
-  <Split.Right>
+  </div>
+  <div>
     ```rpmspec filename="expand.spec"
     %build
     echo Hello, World!
@@ -89,17 +88,17 @@ To make sure a macro lasts for the entire spec file, use `%global` instead.
     echo %my_macro
     ```
 
-  </Split.Right>
-</Split>
+  </div>
+</Split.Root>
 
 #### `%global` 🔰 [#global]
 
 Defines a macro globally.
 
-As oppose to [`%define`](#define), macros defined with `%global` will last for the entire spec file.
+As opposed to [`%define`](#define), macros defined with `%global` will last for the entire spec file.
 
-<Split>
-  <Split.Left>
+<Split.Root>
+  <div>
     ```rpmspec filename="example.spec"
     %global cat Meow!!!
 
@@ -110,8 +109,8 @@ As oppose to [`%define`](#define), macros defined with `%global` will last for t
     echo %cat
     ```
 
-  </Split.Left>
-  <Split.Right>
+  </div>
+  <div>
     ```rpmspec filename="expand.spec"
     %prep
     echo nya Meow!!!
@@ -120,8 +119,8 @@ As oppose to [`%define`](#define), macros defined with `%global` will last for t
     echo Meow!!!
     ```
 
-  </Split.Right>
-</Split>
+  </div>
+</Split.Root>
 
 #### `%undefine` 🔦 [#undefine]
 
@@ -130,8 +129,8 @@ Undefine a macro.
 Technically this does not always undefine the macro specified.
 Instead, this pops the latest definition from the macro stack.
 
-<Split>
-  <Split.Left>
+<Split.Root>
+  <div>
     ```rpmspec filename="example.spec"
     %global cat Meow!
 
@@ -148,8 +147,8 @@ Instead, this pops the latest definition from the macro stack.
     echo %cat
     ```
 
-  </Split.Left>
-  <Split.Right>
+  </div>
+  <div>
     ```rpmspec filename="expand.spec"
     %prep
     echo Nyaa!
@@ -161,8 +160,8 @@ Instead, this pops the latest definition from the macro stack.
     echo %cat
     ```
 
-  </Split.Right>
-</Split>
+  </div>
+</Split.Root
 
 #### `%dnl` 🔰 [#dnl]
 
@@ -172,20 +171,20 @@ Similar to `# …`, this can comment out anything in `%{dnl:…}` or after `%dnl
 The difference with `# …` is that `%dnl` prevents macro expansions,
 while macros in `# …` are actually expanded.
 
-<Split>
-  <Split.Left>
+<Split.Root>
+  <div>
     ```rpmspec filename="example.spec"
 		%define meow a
 		# comment %meow
 		%dnl comment %meow
 		```
-  </Split.Left>
-  <Split.Right>
+  </div>
+  <div>
 		```rpmspec filename="expand.spec"
     # comment a
 		```
-	</Split.Right>
-</Split>
+	</div>
+</Split.Root>
 
 #### `%{load:…}` 🔦🚸 [#load]
 
@@ -209,21 +208,21 @@ $ rpm -D 'foo 1 + 2' -E '%{expr:%foo}'
 
 Double-expand the macro.
 
-  <Split>
-    <Split.Left>
+  <Split.Root>
+    <div>
       ```rpmspec filename="example.spec"
       %define nya foo
       %define meow %{expand:%%nya}
     
       echo %meow
       ```
-    </Split.Left>
-    <Split.Right>
+    </div>
+    <div>
       ```rpmspec filename="expand.spec"
       echo foo
       ```
-    </Split.Right>
-  </Split>
+    </div>
+  </Split.Root>
 
 #### `%{lua:…}` 🛠️ [#lua]
 
@@ -250,8 +249,8 @@ In `rpmspec-rs`, a space must be present after `--`.
   are available at https://rpm-software-management.github.io/rpm/manual/lua.html.
 </Callout>
 
-<Split>
-  <Split.Left>
+<Split.Root>
+  <div>
     ```rpmspec filename="example.spec"
     %global my_macro Hello
     %{lua:
@@ -262,14 +261,14 @@ In `rpmspec-rs`, a space must be present after `--`.
         "\n")
     }
     ```
-  </Split.Left>
-  <Split.Right>
+  </div>
+  <div>
     ```rpmspec filename="expand.spec"
     %prep
     echo Hello from lua!
     ```
-  </Split.Right>
-</Split>
+  </div>
+</Split.Root>
 
 #### `%{macrobody:…}` 🔩 [#macrobody]
 
@@ -290,18 +289,18 @@ Does nothing. You heard me, this macro literally does nothing.
 But because of that it's very useful.
 This can be used to pass arguments with spaces to parameterized macros:
 
-<Split>
-  <Split.Left>
+<Split.Root>
+  <div>
     ```rpmspec filename="example.spec"
     echo %gsub %{quote:hello hello} %{quote:^hello} bye
     ```
-  </Split.Left>
-  <Split.Right>
+  </div>
+  <div>
     ```rpmspec filename="expand.spec"
     echo bye hello
     ```
-  </Split.Right>
-</Split>
+  </div>
+</Split.Root>
 
 ### String Operations
 
@@ -315,36 +314,36 @@ In short, this replaces `%?4` occurrences of `%2` in `%1` to `%3`.
 
 `%2` is treated as a [lua pattern](https://www.lua.org/pil/20.2.html).
 
-<Split>
-  <Split.Left>
+<Split.Root>
+  <div>
     ```rpmspec filename="example.spec"
     echo %gsub %{quote:hello hello} %{quote:^hello} bye
     ```
-  </Split.Left>
-  <Split.Right>
+  </div>
+  <div>
     ```rpmspec filename="expand.spec"
     echo bye hello
     ```
-  </Split.Right>
-</Split>
+  </div>
+</Split.Root>
 
 #### `%{len:…}` [#len]
 
 Obtains the length of the given text.
 
-<Split>
-  <Split.Left>
+<Split.Root>
+  <div>
     ```rpmspec filename="example.spec"
     %define foo meow now!
     echo %{len:%foo}
     ```
-  </Split.Left>
-  <Split.Right>
+  </div>
+  <div>
     ```rpmspec filename="expand.spec"
     echo 9
     ```
-  </Split.Right>
-</Split>
+  </div>
+</Split.Root>
 
 #### `%{lower:…}` [#lower]
 
@@ -482,14 +481,14 @@ perform `Executing(rmbuild)` and exit with a summary of all warnings and errors.
 
 ### Spec-specific Macros
 
-#### `%{S:…}` [#S]
+#### `%{S:#}` [#S]
 
 > expand ... to &lt;source&gt; file name
 
 Expand to the path to the source file. This is just a fancy macro that transforms `%{S:123}` to `%SOURCE123`.
 
-	<Split>
-		<Split.Left>
+	<Split.Root>
+		<div>
 			```rpmspec filename="example.spec"
 			Source0: https://repos.fyralabs.com/um42/comps.xml
 			
@@ -497,8 +496,8 @@ Expand to the path to the source file. This is just a fancy macro that transform
 			cat %{S:0}
 			echo %{S:1}
 			```
-		</Split.Left>
-		<Split.Right>
+		</div>
+		<div>
 			```rpmspec filename="expand.spec"
 			Source0: https://repos.fyralabs.com/um42/comps.xml
 			
@@ -506,10 +505,10 @@ Expand to the path to the source file. This is just a fancy macro that transform
 			cat %{_sourcedir}/comps.xml
 			echo %SOURCE1
 			```
-		</Split.Right>
-	</Split>
+		</div>
+	</Split.Root>
 
-#### `%{P:…}` [#P]
+#### `%{P:#}` [#P]
 
 > expand ... to &lt;patch&gt; file name
 
