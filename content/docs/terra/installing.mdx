@@ -3,6 +3,12 @@ title: Installing
 description: "Get access to the 1000+ packages that Fedora doesn't ship."
 ---
 
+import { Callout } from "nextra/components";
+
+# Installing
+
+Currently (June 2025), Terra only supports RPM packages.
+
 ## Adding Terra
 
 ### Fedora and Derivatives
@@ -112,7 +118,9 @@ sudo dnf install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/t
 
 ## Subrepos
 
-<Callout type="info">Subrepos are not available on Enterprise Linux.</Callout>
+<Callout type="info">
+    Subrepos are not available on Enterprise Linux.
+</Callout>
 
 Terra provides additional packages in separate repositories. These packages might conflict with RPM Fusion or the Fedora repositories. Extra care and technical knowledge may be needed.
 

@@ -1,11 +1,13 @@
 ---
 title: Macro Syntax
 description: "Documentations for how macro expansion works."
+# vi: noet ci pi sts=0 sw=2 ts=2
 ---
 
-import * as Split from "../../../components/split";
+import { Callout } from "nextra/components";
+import { Split } from "../../components/split";
 
-## Syntax
+# Macro Syntax
 
 RPM is a very powerful packaging system. One very reason is its macro support.
 
@@ -112,8 +114,8 @@ line except the last line of the macro body. To write the character `\`, use `\\
 Since the same shell command when spanned multiple lines requires the same mechanism,
 in many cases you will need to use `\\\`:
 
-<Split.Root>
-	<div>
+<Split>
+	<Split.Left>
 		```rpmspec filename="/usr/lib/rpm/macros.d/macros.example"
 		%say_hello echo \\\
 		Hello, World! && \\\
@@ -121,8 +123,8 @@ in many cases you will need to use `\\\`:
 		echo This is a second line of shell command. && \\\
 		echo Pretty cool.
 		```
-	</div>
-	<div>
+	</Split.Left>
+	<Split.Right>
 		```sh
 		$ rpm -E '%say_hello'
 		echo \
@@ -131,11 +133,11 @@ in many cases you will need to use `\\\`:
 		echo This is a second line of shell command. && \
 		echo Pretty cool.
 		```
-	</div>
-</Split.Root>
+	</Split.Right>
+</Split>
 
-<Split.Root>
-	<div>
+<Split>
+	<Split.Left>
 		```rpmspec filename="/usr/lib/rpm/macros.d/macros.example"
 		%say_hello %{lua:
 			print("echo 'Hello, ")
@@ -145,15 +147,15 @@ in many cases you will need to use `\\\`:
 			print("echo 'from %say_hello using %{lua:…}!'")
 		}
 		```
-	</div>
-	<div>
+	</Split.Left>
+	<Split.Right>
 		```sh
 		$ rpm -E '%say_hello'
 		echo 'Hello, World!'
 		echo 'from %say_hello using %{lua:…}!'
 		```
-	</div>
-</Split.Root>
+	</Split.Right>
+</Split>
 
 But that does not mean `\` is needed when dealing with a multi-line macro body.
 
@@ -326,9 +328,10 @@ In case you are not familiar with [`getopt(3)`], there are basically 3 rules:
 	- `(ABCxyz)` means `-A`, `-B`, `-C`, `-x`, `-y`, `-z` are possible flags
 	- only ASCII characters that are not `-`, `:` and `;` are accepted
 - any of the above characters followed by a single colon `:` indicates the flag *requires* an argument.
-	- `(n:)` means the macro expects `-n …` (or the caller can just not supply any flags at all)
+	- `(n:)` means the macro expects `-n <…>` (or the caller can just not supply any flags at all)
 - any followed by a double colon `::` indicates the flag takes in an *optional* argument.
-	- `(x::)` means `-x` or `-x …` are both accepted
+	- `(x::)` means `-x` or `-x[…]` are both accepted
+	- Macro flags using `::` MUST NOT have a space between them and the argument passed to them if used with an argument.
 
 Special: `(-)` means no flags are processed:
 
@@ -340,6 +343,18 @@ error: Unknown option o in p()
 $ rpm -D 'p(-) %**' -E '%p -o'
 -o
 ```
+
+## Regex in RPM
+
+Regex in RPM has some notable differences especially when it comes to escapes.
+
+For example, if you wanted to escape a literal dot (`.`), you would need `\\.` instead of `\.`.
+
+And if you need a literal backslash (`\`), you would then need `\\\\`.
+
+In [Lua macros](/rpm/macros#lua) this can get even more complicated as you must sometimes escape in Lua *and* RPM.
+
+For example, if you need a `.`, in Lua macros you need to escape this as `\\\\.`.
 
 ---
 

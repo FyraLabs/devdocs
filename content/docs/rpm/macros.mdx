@@ -4,7 +4,8 @@ description: "Documentations for different RPM macros."
 # vi: noet ci pi sts=0 sw=2 ts=2
 ---
 
-import * as Split from "../../../components/split";
+import { Callout } from "nextra/components";
+import { Split } from "../../components/split";
 
 # RPM Macros
 
@@ -18,6 +19,18 @@ This document only covers the first type.
 
 <Callout type="info">
     This page does not cover Terra-specific (Anda SRPM) macros. For documentation on these macros, see [here](../terra/srpm). For documentation on our AppStream MetaInfo macros, see [here](../terra/appstream).
+</Callout>
+
+<Callout type="important">
+  All macro flags followed by `<…>` REQUIRE an argument passed to them.<br />
+  All macro flags followed by `[…]` MAY have an argument passed to them.<br />
+  All macro flags with `<#>` or `[#]` take only numbers as arguments.<br />
+  Additionally, if there is no space between the flag `<…>`/`<#>` or `[…]`/`[#]`, you MUST NOT have a space between the flag and the argument passed to it.<br />
+  Conversely, if there *is* a space you SHOULD assume the flag needs a space between them.
+</Callout>
+
+<Callout>
+  For macros which use regex ([`%__requires_exclude`](#__requires_exclude), [`%__requires_exclude_from`](#__requires_exclude_from), [`%__provides_exclude`](#__provides_exclude), [`%__provides_exclude_from`](#__provides_exclude_from), [`%__brp_mangle_shebangs_exclude_from`](#__brp_mangle_shebangs_exclude_from)) you SHOULD also note the [quirks with regex](/rpm/macro#regex-in-rpm) in RPM.
 </Callout>
 
 If you are new to RPM packaging, you should first check out the macros with the 🔰 icon.
@@ -55,8 +68,8 @@ For example, if used in preamble section, the macro will be automatically undefi
 
 To make sure a macro lasts for the entire spec file, use `%global` instead.
 
-<Split.Root>
-  <div>
+<Split>
+  <Split.Left>
     ```rpmspec filename="example.spec"
     %build
     %define my_macro Hello, World!
@@ -66,8 +79,8 @@ To make sure a macro lasts for the entire spec file, use `%global` instead.
     echo %my_macro
     ```
 
-  </div>
-  <div>
+  </Split.Left>
+  <Split.Right>
     ```rpmspec filename="expand.spec"
     %build
     echo Hello, World!
@@ -76,8 +89,8 @@ To make sure a macro lasts for the entire spec file, use `%global` instead.
     echo %my_macro
     ```
 
-  </div>
-</Split.Root>
+  </Split.Right>
+</Split>
 
 #### `%global` 🔰 [#global]
 
@@ -85,8 +98,8 @@ Defines a macro globally.
 
 As oppose to [`%define`](#define), macros defined with `%global` will last for the entire spec file.
 
-<Split.Root>
-  <div>
+<Split>
+  <Split.Left>
     ```rpmspec filename="example.spec"
     %global cat Meow!!!
 
@@ -97,8 +110,8 @@ As oppose to [`%define`](#define), macros defined with `%global` will last for t
     echo %cat
     ```
 
-  </div>
-  <div>
+  </Split.Left>
+  <Split.Right>
     ```rpmspec filename="expand.spec"
     %prep
     echo nya Meow!!!
@@ -107,8 +120,8 @@ As oppose to [`%define`](#define), macros defined with `%global` will last for t
     echo Meow!!!
     ```
 
-  </div>
-</Split.Root>
+  </Split.Right>
+</Split>
 
 #### `%undefine` 🔦 [#undefine]
 
@@ -117,8 +130,8 @@ Undefine a macro.
 Technically this does not always undefine the macro specified.
 Instead, this pops the latest definition from the macro stack.
 
-<Split.Root>
-  <div>
+<Split>
+  <Split.Left>
     ```rpmspec filename="example.spec"
     %global cat Meow!
 
@@ -135,8 +148,8 @@ Instead, this pops the latest definition from the macro stack.
     echo %cat
     ```
 
-  </div>
-  <div>
+  </Split.Left>
+  <Split.Right>
     ```rpmspec filename="expand.spec"
     %prep
     echo Nyaa!
@@ -148,8 +161,8 @@ Instead, this pops the latest definition from the macro stack.
     echo %cat
     ```
 
-  </div>
-</Split.Root>
+  </Split.Right>
+</Split>
 
 #### `%dnl` 🔰 [#dnl]
 
@@ -159,20 +172,20 @@ Similar to `# …`, this can comment out anything in `%{dnl:…}` or after `%dnl
 The difference with `# …` is that `%dnl` prevents macro expansions,
 while macros in `# …` are actually expanded.
 
-<Split.Root>
-  <div>
+<Split>
+  <Split.Left>
     ```rpmspec filename="example.spec"
 		%define meow a
 		# comment %meow
 		%dnl comment %meow
 		```
-  </div>
-  <div>
+  </Split.Left>
+  <Split.Right>
 		```rpmspec filename="expand.spec"
     # comment a
 		```
-	</div>
-</Split.Root>
+	</Split.Right>
+</Split>
 
 #### `%{load:…}` 🔦🚸 [#load]
 
@@ -196,21 +209,21 @@ $ rpm -D 'foo 1 + 2' -E '%{expr:%foo}'
 
 Double-expand the macro.
 
-  <Split.Root>
-    <div>
+  <Split>
+    <Split.Left>
       ```rpmspec filename="example.spec"
       %define nya foo
       %define meow %{expand:%%nya}
     
       echo %meow
       ```
-    </div>
-    <div>
+    </Split.Left>
+    <Split.Right>
       ```rpmspec filename="expand.spec"
       echo foo
       ```
-    </div>
-  </Split.Root>
+    </Split.Right>
+  </Split>
 
 #### `%{lua:…}` 🛠️ [#lua]
 
@@ -237,8 +250,8 @@ In `rpmspec-rs`, a space must be present after `--`.
   are available at https://rpm-software-management.github.io/rpm/manual/lua.html.
 </Callout>
 
-<Split.Root>
-  <div>
+<Split>
+  <Split.Left>
     ```rpmspec filename="example.spec"
     %global my_macro Hello
     %{lua:
@@ -249,14 +262,14 @@ In `rpmspec-rs`, a space must be present after `--`.
         "\n")
     }
     ```
-  </div>
-  <div>
+  </Split.Left>
+  <Split.Right>
     ```rpmspec filename="expand.spec"
     %prep
     echo Hello from lua!
     ```
-  </div>
-</Split.Root>
+  </Split.Right>
+</Split>
 
 #### `%{macrobody:…}` 🔩 [#macrobody]
 
@@ -277,18 +290,18 @@ Does nothing. You heard me, this macro literally does nothing.
 But because of that it's very useful.
 This can be used to pass arguments with spaces to parameterized macros:
 
-<Split.Root>
-  <div>
+<Split>
+  <Split.Left>
     ```rpmspec filename="example.spec"
     echo %gsub %{quote:hello hello} %{quote:^hello} bye
     ```
-  </div>
-  <div>
+  </Split.Left>
+  <Split.Right>
     ```rpmspec filename="expand.spec"
     echo bye hello
     ```
-  </div>
-</Split.Root>
+  </Split.Right>
+</Split>
 
 ### String Operations
 
@@ -302,36 +315,36 @@ In short, this replaces `%?4` occurrences of `%2` in `%1` to `%3`.
 
 `%2` is treated as a [lua pattern](https://www.lua.org/pil/20.2.html).
 
-<Split.Root>
-  <div>
+<Split>
+  <Split.Left>
     ```rpmspec filename="example.spec"
     echo %gsub %{quote:hello hello} %{quote:^hello} bye
     ```
-  </div>
-  <div>
+  </Split.Left>
+  <Split.Right>
     ```rpmspec filename="expand.spec"
     echo bye hello
     ```
-  </div>
-</Split.Root>
+  </Split.Right>
+</Split>
 
 #### `%{len:…}` [#len]
 
 Obtains the length of the given text.
 
-<Split.Root>
-  <div>
+<Split>
+  <Split.Left>
     ```rpmspec filename="example.spec"
     %define foo meow now!
     echo %{len:%foo}
     ```
-  </div>
-  <div>
+  </Split.Left>
+  <Split.Right>
     ```rpmspec filename="expand.spec"
     echo 9
     ```
-  </div>
-</Split.Root>
+  </Split.Right>
+</Split>
 
 #### `%{lower:…}` [#lower]
 
@@ -475,8 +488,8 @@ perform `Executing(rmbuild)` and exit with a summary of all warnings and errors.
 
 Expand to the path to the source file. This is just a fancy macro that transforms `%{S:123}` to `%SOURCE123`.
 
-	<Split.Root>
-		<div>
+	<Split>
+		<Split.Left>
 			```rpmspec filename="example.spec"
 			Source0: https://repos.fyralabs.com/um42/comps.xml
 			
@@ -484,8 +497,8 @@ Expand to the path to the source file. This is just a fancy macro that transform
 			cat %{S:0}
 			echo %{S:1}
 			```
-		</div>
-		<div>
+		</Split.Left>
+		<Split.Right>
 			```rpmspec filename="expand.spec"
 			Source0: https://repos.fyralabs.com/um42/comps.xml
 			
@@ -493,8 +506,8 @@ Expand to the path to the source file. This is just a fancy macro that transform
 			cat %{_sourcedir}/comps.xml
 			echo %SOURCE1
 			```
-		</div>
-	</Split.Root>
+		</Split.Right>
+	</Split>
 
 #### `%{P:…}` [#P]
 
@@ -549,7 +562,7 @@ Parameterized as `%forgemeta(z:isva)`:
 - `-i`: informative
 - `-s`: silent
 - `-a`: process all source archives (when you have `%forgeurl0`, `%forgeurl1`, …)
-- `-z n`: process the `n`-th source archive
+- `-z <#>`: process only `%{S:#}` (see [`%{S:}`](#S))
 
 #### `%forgeautosetup …` 🔢 [#forgeautosetup]
 
@@ -749,16 +762,16 @@ For more information: https://rpm-software-management.github.io/rpm/manual/condi
 Uncompress the specified sources. By default, uncompress `%{SOURCE0}` (i.e. [`%{S:0}`](#s)).
 
 Parameterized as `%autosetup(a:b:cCDn:TvNS:p:)`:
-- `-n …`: specify the top-level directory (i.e. root folder) name in the archive (default `%{name}-%{version}`)
-- `-p n`: specify the `-p n` argument to [`%autopatch …`](#autopatch)
-- `-a n`: unpack `%{S:n}` after changing directory
-- `-b n`: unpack `%{S:n}` before changing directory
+- `-n <…>`: specify the top-level directory (i.e. root folder) name in the archive (default `%{name}-%{version}`)
+- `-p<#>`: specify the `-p #` argument to [`%autopatch …`](#autopatch)
+- `-a<#>`: unpack `%{S:#}` after changing directory
+- `-b<#>`: unpack `%{S:#}` before changing directory
 - `-c`: create directory, `cd` into it, then unpack the source (useful if archive lacks top-level directory)
 - `-C`: I've no idea what this does! — Mado
 - `-D`: do not delete folder before unpacking sources
 - `-T`: disable unpacking `%SOURCE0`
 - `-v`: verbose. If specified, `%autosetup` will omit the `-q` argument to [`%setup`](#setup)
-- `-S …`: specify the SCM, equivalent to `%global __scm …` then `%__scm_setup_git` (replace `git` with the argument). With this argument, the specified SCM will be set up in the uncompressed directory
+- `-S <…>`: specify the SCM, equivalent to `%global __scm …` then `%__scm_setup_git` (replace `git` with the argument). With this argument, the specified SCM will be set up in the uncompressed directory
 - `-N`: do not run [`%autopatch …`](#autopatch)
 
 This is actually a wrapper around [`%setup`](#setup) and [`%autopatch …`](#autopatch).
@@ -777,9 +790,9 @@ In most cases you should use [`%autosetup …`](#autosetup) instead. If you woul
 we recommend adding the `-q` flag.
 
 Parameterized as `%setup(a:b:cCDn:Tq)`: (need confirmation)
-- `-n …`: specify the top-level directory (i.e. root folder) name in the archive (default `%{name}-%{version}`)
-- `-a n`: unpack `%{S:n}` after changing directory
-- `-b n`: unpack `%{S:n}` before changing directory
+- `-n <…>`: specify the top-level directory (i.e. root folder) name in the archive (default `%{name}-%{version}`)
+- `-a<#>`: unpack `%{S:#}` after changing directory
+- `-b<#>`: unpack `%{S:#}` before changing directory
 - `-c`: create directory, `cd` into it, then unpack the source (useful if archive lacks top-level directory)
 - `-C`: I've no idea what this does! — Mado
 - `-D`: do not delete folder before unpacking sources
@@ -808,12 +821,12 @@ Wrapper around `%__apply_patch`. No, this does not wrap around [`%patch`](#patch
 Parameterized as `%autopatch(vqp:m:M:)`:
 - `-v`: verbose
 - `-q`: don’t warn if there are no matching patches
-- `-p n`: number of top-level path components to strip (default 0) \
+- `-p<#>`: number of top-level path components to strip (default 0) \
 	For example, if the patch uses the path `a/b/hello.txt`,
 	passing in `-p1` will strip it to `b/hello.txt`,
 	and passing in `-p2` will strip it to just `hello.txt`.
-- `-m n`: apply patches starting from `n` (default 0)
-- `-M n`: apply patches up to `n` (default to the last patch number for `Patch:`)
+- `-m<#>`: apply patches starting from `n` (default 0)
+- `-M<#>`: apply patches up to `n` (default to the last patch number for `Patch:`)
 
 Examples:
 - `%autopatch -m 100`: apply patches with number &gt;= 100
