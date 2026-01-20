@@ -33,7 +33,7 @@ From the [RPM manual],
 > rpm --define 'foo 1 + 2' --eval '%{expr:%foo}'
 > ```
 >
-> will print "3".  Using `%[%foo]` instead will result in the
+> will print "3". Using `%[%foo]` instead will result in the
 > error that "1 + 2" is not a number.
 >
 > Doing the macro expansion when evaluating the terms has two
