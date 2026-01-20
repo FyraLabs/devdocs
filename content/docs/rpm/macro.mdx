@@ -197,7 +197,8 @@ with any blank lines present. Blank lines must end with a `\`:
 </Callout>
 
 #### Escaping Regex in RPM Macros
-Regex in RPM has some notable differences from regular regex usage especially when it comes to escapes. These are imporant to be aware of when using exlusions macros such as `%__requires_exclude`.
+
+Escaping characters in regex inside RPM macros has some notable differences from regular regex usage especially when it comes to escapes. These are imporant to be aware of when using exlusions macros such as `%__requires_exclude`.
 
 For example, if you wanted to escape a literal dot (`.`), you would need `\\.` instead of `\.`.
 
