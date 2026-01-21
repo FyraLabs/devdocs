@@ -1279,6 +1279,8 @@ URL:           https://github.com/ad-oliviero/uwufetch
 
 `%git_clone` SHOULD only be used when the source tarballs provided by upstream does not include all required sources in the repository (e.g., if the build process expects a Git environment or the tarball doesn't contain submodules).
 
+It is RECOMMENDED to still include a source tarball even if it is not used so that the source RPM is not empty.
+
 ### %go_task
 Expands to: `go-task --parallel --concurrency %{?_smp_build_ncpus} --verbose --yes`
 SHOULD be used in place of `go-task` if using Go Task.
@@ -1317,8 +1319,6 @@ Common opts passed to Tauri. Used by macros which call Tauri.
 This macro simply appends the [Mold linker arguments](/terra/guidelines#usage-of-the-mold-linker) onto the `%build_rustflags` macro. It should not need to be manually used as `%build_rustflags` will be appended automatically when using `%cargo_prep_online`.
 
 ---
-
-# Footnotes
 
 [^1]: `x86_64`, `x86_64_v2`, `x86_64_v3`, `x86_64_v4`, `amd64`, `em64t`
 [^2]: `i386`, `i486`, `i586`, `i686`, `pentium3`, `pentium4`, `athlon`, `geode`
