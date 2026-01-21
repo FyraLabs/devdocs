@@ -337,28 +337,6 @@ C[%electron_install];
 A-->B-->C;"
 />
 
-<Mermaid
-  chart="
-graph JT;
-A[JS Module Tauri];
-B[%tauri_prep];
-C[Webapp Build Macro];
-D[%tauri_install];
-E[%tauri_cargo_license];
-A-->B-->C-->D-->E;"
-/>
-
-<Mermaid
-  chart="
-graph CT;
-A[System Tauri];
-B[%tauri_prep];
-C[%tauri_build;
-D[%tauri_install];
-E[%tauri_cargo_license];
-A-->B-->C-->D-->E;"
-/>
-
 #### Electron
 These are guidelines for packaging [Electron](https://www.electronjs.org) apps.
 
