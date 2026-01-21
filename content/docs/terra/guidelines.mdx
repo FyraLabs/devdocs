@@ -338,10 +338,14 @@ graph TD;
   C[Using JS Module Tauri];
   D[Using System Tauri];
   E[%tauri_prep];
+  subgraph BB [Build Macros]
   F[Webapp Build Macros];
   G[%tauri_build];
+  end
+  subgraph CC [Install Macros]
   H[%electron_install];
   I[%tauri_install];
+  end
   J[%tauri_cargo_license];
   A-->F-->H;
   B-->C-->E-->F-->I-->J;
