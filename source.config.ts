@@ -4,6 +4,7 @@ import {
   frontmatterSchema,
   metaSchema,
 } from "fumadocs-mdx/config";
+import { remarkMdxMermaid } from 'fumadocs-core/mdx-plugins';
 import RPMSpec from "./spec.json";
 import rhai from "./rhai.json";
 
@@ -35,5 +36,8 @@ export default defineConfig({
     },
 
     // MDX options
+    mdxOptions: {
+      remarkPlugins: [remarkMdxMermaid],
+    },
   },
 });
