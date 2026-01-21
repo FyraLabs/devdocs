@@ -328,6 +328,7 @@ The general guidelines for building webapps are:
     BuildRequires: yarnpkg
     ```
 
+The basic rundown of what macros to use to assist with building webapps can be sorted into the following:
 <Mermaid
   chart="
 graph LR;
@@ -340,12 +341,15 @@ A-->B-->C;"
 <Mermaid
   chart="
 graph LR;
-A[JS Module Tauri];
-B[%tauri_prep];
-C[Webapp Build Macro];
+A[%tauri_prep];
+B[Webapp Build Macro];
+C[%tauri_build];
 D[%tauri_install];
 E[%tauri_cargo_license];
-A-->B-->C-->D-->E;"
+A -- Using JS Module Tauri -->B;
+A -- Using System Tauri -->C;
+B-->D-->E;
+C-->D-->E;"
 />
 
 #### Electron
