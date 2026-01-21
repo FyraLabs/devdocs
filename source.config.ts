@@ -33,8 +33,8 @@ export default defineConfig({
         { ...rhai, aliases: ["rhai"] },
       ],
       inline: "tailing-curly-colon",
+      remarkPlugins: [remarkMdxMermaid],
     },
-    remarkPlugins: [remarkMdxMermaid],
 
     // MDX options
   },
