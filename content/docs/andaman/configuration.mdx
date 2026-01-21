@@ -9,7 +9,7 @@ Andaman uses the HashiCorp Configuration Language (HCL) for its configuration fo
 
 `{ }` represents a dictionary (empty by default) with keys and string values. `""` represents a string with no default value. Unless otherwise stated, all the attributes are optional. Here's an example:
 
-```hcl custom="noscroll"
+```hcl
 config {
   mock_config = "" // default mock config for `anda build -c custom_mock_config`
   strip_prefix = "" // strip prefix to form new project alias
