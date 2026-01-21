@@ -802,6 +802,13 @@ Macros for using [Tauri](https://v2.tauri.app).
 
 Tauri apps always require JavaScript package managers AND Cargo, so for this reason the [Rust macros](#rust) are also relevant.
 
+<Callout>
+  Take notice of the section [System Tauri Macros](#system-tauri-macros)' description. Those are macros for using Tauri *installed via the repository,* AKA installed to the system.<br />
+  You probably are *not* looking for these by default, especially because there are many cases that system Tauri may not match the version needed by a project.<br />
+  You are welcome to try them, but if you hit a version mismatch (unless it is a bug, such as noted [here](#__tauri_ignore_version_mismatches)), use the [webapp build macros](#webapp-build-macros) instead.<br />
+  TL;DR: Use [System Tauri Macros](#system-tauri-macros) for Cargo Tauri installed from the repository, use [Webapp Build Macros](#webapp-build-macros) for JavaSript Tauri installed as a JS module dependency, and the latter will fit most usecases.
+</Callout>
+
 ##### %tauri_buildrequires
 MAY be used in a spec by setting `BuildRequires: %{tauri_buildrequires}{:rpmspec}`
 
@@ -834,6 +841,10 @@ A wrapper around [`%crate_install_bin`](#crate_install_bin) for Tauri.
 
 ##### %tauri_cargo_license
 A port of `%cargo_license_online` that points to the Tauri app's Cargo.toml.
+
+<Callout type="warning">
+  Cargo license macros MUST be wrapped in `{}` when being used to write a license file.
+</Callout>
 
 Available flags:
 - `-f <…>`: Should be the same as the features that were passed to the Tauri build.
@@ -904,6 +915,9 @@ For more information on each package manager, see [NPM Macros](#npm-macros), [Bu
 
 <Callout>
   All of the following macros set the environment variable `$WEBAPP_BUILD_TOOL` to `electron-builder`, `electron-forge`, or `tauri` depending on which the app is built with. SHOULD NOT need to be used manually, but MAY be if needed for any reason.
+</Callout>
+<Callout type="important">
+  All webapp build macros run the `install` step for dependencies as part of their build process, this is never manually required when using them.
 </Callout>
 
 ##### %npm_build
@@ -1079,6 +1093,10 @@ Enables internet access for `%cargo_prep{:rpmspec}`. Replaces `%cargo_prep{:rpms
 ### %cargo_license_online
 Enables internet access for `%cargo_license{:rpmspec}`.
 Replaces `%cargo_license{:rpmspec}` in `%build{:rpmspec}`.
+
+<Callout type="warning">
+  Cargo license macros MUST be wrapped in `{}` when being used to write a license file.
+</Callout>
 
 ### %cargo_license_summary_online
 Enables internet access for `%cargo_license_summary{:rpmspec}`.
