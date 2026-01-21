@@ -330,9 +330,24 @@ The general guidelines for building webapps are:
 
 ```mermaid
 graph TD;
-  Electron-->Webapp build macro-->%electron_install;
-  Tauri JavaScript-->%tauri_prep-->Webapp build macro-->%tauri_install;
-  Tauri Cargo-->%tauri_prep-->%tauri_build-->%tauri_install;
+  subgraph AA [Webapp Frameworks]
+  A[Electron];
+  B[JS Module Tauri];
+  C[System Tauri];
+  end
+  subgraph BB [Prep Macros]
+  D[%tauri_prep];
+  subgraph CC [Build Macros]
+  E[Webapp Build Macros];
+  F[%tauri_build];
+  end
+  subgraph CC [Install Macros]
+  G[%electron_install];
+  H[%tauri_install];
+  end
+  A-->E-->G;
+  B-->D-->E-->H;
+  C-->D-->F-->H;
 ```
 
 #### Electron
