@@ -3,15 +3,13 @@ title: Configuration
 description: Configure Andaman
 ---
 
-import { CodeBlock, Pre } from 'fumadocs-ui/components/codeblock';
-
 ## Overview
 
 Andaman uses the HashiCorp Configuration Language (HCL) for its configuration format, you may be familiar with it if you've used Vault. Its syntax is similar to UCL and NGINX's configuration format.
 
 `{ }` represents a dictionary (empty by default) with keys and string values. `""` represents a string with no default value. Unless otherwise stated, all the attributes are optional. Here's an example:
 
-```hcl js custom="noscroll"
+```hcl custom="noscroll"
 config {
   mock_config = "" // default mock config for `anda build -c custom_mock_config`
   strip_prefix = "" // strip prefix to form new project alias
