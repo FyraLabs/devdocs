@@ -328,27 +328,26 @@ The general guidelines for building webapps are:
     BuildRequires: yarnpkg
     ```
 
-```mermaid
+<Mermaid
+  chart="
 graph TD;
-  subgraph AA [Webapp Frameworks]
   A[Electron];
-  B[JS Module Tauri];
-  C[System Tauri];
+  B[Tauri];
+  C[Using JS Module Tauri];
+  D[Using System Tauri];
+  E[%tauri_prep];
+  F[Webapp Build Macros];
+  G[%tauri_build];
+  H[%electron_install];
+  I[%tauri_install];
+  J[%tauri_cargo_license];
+  subgraph AA [Optional Macros]
+  K[%tauri_cargo_license_summary];
   end
-  subgraph BB [Prep Macros]
-  D[%tauri_prep];
-  subgraph CC [Build Macros]
-  E[Webapp Build Macros];
-  F[%tauri_build];
-  end
-  subgraph CC [Install Macros]
-  G[%electron_install];
-  H[%tauri_install];
-  end
-  A-->E-->G;
-  B-->D-->E-->H;
-  C-->D-->F-->H;
-```
+  A-->F-->H;
+  B-->C-->E-->F-->J;
+  B-->D-->E-->G-->J;"
+/>
 
 #### Electron
 These are guidelines for packaging [Electron](https://www.electronjs.org) apps.
