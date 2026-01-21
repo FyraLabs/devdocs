@@ -331,30 +331,32 @@ The general guidelines for building webapps are:
 <Mermaid
   chart="
 graph TD;
-  A[Electron];
-  B[Webapp Build Macro];
-  C[%electron_install];
-  A-->B-->C;"
+A[Electron];
+B[Webapp Build Macro];
+C[%electron_install];
+A-->B-->C;"
 />
+
 <Mermaid
   chart="
 graph TD;
-  A[JS Module Tauri];
-  B[%tauri_prep];
-  C[Webapp Build Macro];
-  D[%tauri_install];
-  E[%tauri_cargo_license];
-  A-->B-->C-->D;"
+A[JS Module Tauri];
+B[%tauri_prep];
+C[Webapp Build Macro];
+D[%tauri_install];
+E[%tauri_cargo_license];
+A-->B-->C-->D-->E;"
 />
+
 <Mermaid
   chart="
 graph TD;
-  A[System Tauri];
-  B[%tauri_prep];
-  C[%tauri_build;
-  D[%tauri_install];
-  E[%tauri_cargo_license];
-  A-->B-->C-->D;"
+A[System Tauri];
+B[%tauri_prep];
+C[%tauri_build;
+D[%tauri_install];
+E[%tauri_cargo_license];
+A-->B-->C-->D-->E;"
 />
 
 #### Electron
