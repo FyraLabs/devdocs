@@ -523,6 +523,7 @@ To make specs easier to read, you SHOULD use `%ifarch{:rpmspec}` followed by `%e
 
 Incorrect:
 
+<Callout title="Incorrect:" type="error">
 ```rpmspec 
 %ifarch x86_64
 %define arch %{nil}
@@ -531,8 +532,9 @@ Incorrect:
 %define arch arm64-
 %endif
 ```
+</Callout>
 
-Correct:
+<Callout title="Correct:" type="success">
 
 ```rpmspec
 %ifarch x86_64
@@ -541,6 +543,7 @@ Correct:
 %define arch arm64-
 %endif
 ```
+</Callout>
 
 ---
 

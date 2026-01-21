@@ -24,7 +24,7 @@ For upstream macros available in Fedora/Terra, check out our unofficial [macros 
   [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
 </Callout>
 
-<Callout type="important">
+<Callout title="Macro Argument Syntax" type="important">
   All macro flags followed by `<…>` REQUIRE an argument passed to them.<br />
   All macro flags followed by `[…]` MAY have an argument passed to them.<br />
   Additionally, if there is no space between the flag `<…>` or `[…]`, you MUST NOT have a space between the flag and the argument passed to it.<br />
@@ -802,7 +802,7 @@ Macros for using [Tauri](https://v2.tauri.app).
 
 Tauri apps always require JavaScript package managers AND Cargo, so for this reason the [Rust macros](#rust) are also relevant.
 
-<Callout type="idea">
+<Callout title="Important Note for Tauri Macros" type="idea">
   Take notice of the section [System Tauri Macros](#system-tauri-macros)' description. Those are macros for using Tauri *installed via the repository,* AKA installed to the system.<br />
   You probably are *not* looking for these by default, especially because there are many cases that system Tauri may not match the version needed by a project.<br />
   You are welcome to try them, but if you hit a version mismatch (unless it is a bug, such as noted [here](#__tauri_ignore_version_mismatches)), use the [webapp build macros](#webapp-build-macros) instead.<br />
@@ -819,7 +819,7 @@ Available flags:
 - `-t{:rpmspec}`: Pull Tauri itself from the repos.
   - This would be used as `BuildRequires: %{tauri_buildrequires -t}{:rpmspec}`
 
-<Callout type="success">
+<Callout type="idea">
   This does NOT install the JavaScript package managers used for builds except for NPM (e.g., `bun`, `deno`, `pnpm`, `yarnpkg`, `yarnpkg-berry`).<br />
   Specify these `BuildRequires:{:rpmspec}` manually.
 </Callout>
