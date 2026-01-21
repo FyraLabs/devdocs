@@ -331,8 +331,10 @@ The general guidelines for building webapps are:
 <Mermaid
   chart="
 graph TD;
+  subgraph AA [Webapp Frameworks]
   A[Electron];
   B[Tauri];
+  end
   C[Using JS Module Tauri];
   D[Using System Tauri];
   E[%tauri_prep];
@@ -341,9 +343,6 @@ graph TD;
   H[%electron_install];
   I[%tauri_install];
   J[%tauri_cargo_license];
-  subgraph AA [Optional Macros]
-  K[%tauri_cargo_license_summary];
-  end
   A-->F-->H;
   B-->C-->E-->F-->I-->J;
   B-->D-->E-->G-->-->I-->J;"
