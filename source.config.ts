@@ -4,6 +4,7 @@ import {
   frontmatterSchema,
   metaSchema,
 } from "fumadocs-mdx/config";
+import { remarkMdxMermaid } from 'fumadocs-core/mdx-plugins';
 import RPMSpec from "./spec.json";
 import rhai from "./rhai.json";
 
@@ -33,6 +34,7 @@ export default defineConfig({
       ],
       inline: "tailing-curly-colon",
     },
+    remarkPlugins: [remarkMdxMermaid],
 
     // MDX options
   },
