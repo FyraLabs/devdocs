@@ -331,7 +331,7 @@ The general guidelines for building webapps are:
 #### Electron
 These are guidelines for packaging [Electron](https://www.electronjs.org) apps.
 
-<Callout>
+<Callout type="idea">
   Many Electron projects will default to building distro binary packages (such as RPMs and Debs) and this rarely works well in RPM builds. Packagers should be prepared to patch or otherwise modify the Electron Builder config to rectify this.
 </Callout>
 
@@ -354,7 +354,7 @@ These are guidelines for packaging [Electron](https://www.electronjs.org) apps.
 These are guidelines for packaging [Tauri](https://v2.tauri.app) apps.
 
 Tauri builds webapps using Cargo and the system WebKit. For these reasons some of the [Rust](#rust) guidelines also apply to Tauri. Most relevant Cargo macros have been ported into Tauri compatible ones, however it will likely still be helpful to make yourself familiar with the original macros.
-<Callout>
+<Callout type="idea">
   It is important to note that unlike the original Cargo macros, Tauri macros only support passing features with the `-f` flag due to how Tauri works.
 </Callout>
 
@@ -543,8 +543,6 @@ Correct:
 ```
 
 ---
-
-# Footnotes
 
 [^1]: https://github.com/terrapkg/packages/blob/e65a762352246f918d12e7c5a0e032ba0b1be73b/anda/langs/nim/dive/umdive.spec
 [^2]: https://github.com/terrapkg/packages/blob/e65a762352246f918d12e7c5a0e032ba0b1be73b/anda/langs/nim/netto/netto.spec
