@@ -415,10 +415,10 @@ In the case of an 'illegal character' in a `Version:{:rpmspec}` tag (such as a `
 To do this, add the following lines to your spec file (assuming a `-` is used in the upstream version):
 
 ```rpmspec
-%global ver UPSTREAM-VERSION
+%global ver 2005-05-14
 %global sanitized_ver %(echo %{ver} | sed 's/-//g')
 ...
-Version:  %sanitized_ver # This will expand to UPSTREAMVERSION in this example
+Version: %sanitized_ver # This will expand to 20250514 in this example
 ```
 
 Then, the `update.rhai` needs to be appended to replace the globaly defined `ver` instead of the usual `Version` tag.
