@@ -14,6 +14,13 @@ import * as Split from "../../../components/split";
   [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and
   [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
 </Callout>
+<Callout title="Macro Argument Syntax" icon="‼️">
+  All macro flags followed by `<…>` REQUIRE an argument passed to them.<br />
+  All macro flags followed by `[…]` MAY have an argument passed to them.<br />
+  All macro flags with `<#>` or `[#]` take only numbers as arguments.<br />
+  Additionally, if there is no space between the flag `<…>`/`<#>` or `[…]`/`[#]`, you MUST NOT have a space between the flag and the argument passed to it.<br />
+  Conversely, if there *is* a space you SHOULD assume the flag needs a space between them.
+</Callout>
 
 Packagers and maintainers MUST follow the policies and guidelines listed in this document.
 Everything covered here is one of 3 things:
@@ -332,10 +339,28 @@ The basic rundown of what macros to use to assist with building webapps can be s
 <Mermaid
   chart="
 graph LR;
+subgraph AA [Webapp Frameworks]
 A[Electron];
-B[Webapp Build Macro];
-C[%electron_install];
-A-->B-->C;"
+B[Tauri];
+end
+C[%tauri_prep];
+subgraph BB [Build Macros];
+D[Webapp Build Macro];
+E[%tauri_build];
+end
+subgraph CC [Install Macros];
+F[%electron_install];
+G[%tauri_install];
+end
+H[%tauri_cargo_license];
+A-->D;
+B-->C;
+C -- Using JS Module Tauri -->D;
+C -- Using System Tauri -->E;
+C-- Installing an Electron App -->F;
+C-- Installing a Tauri App -->G;
+E-->G;
+G-->H;"
 />
 
 <Mermaid
@@ -352,18 +377,6 @@ B-->D;
 C-->D;
 D-->E;"
 />
-
-
-```mermaid
----
-config:
-  flowchart:
-    htmlLabels: false
----
-flowchart TD;
-  A --> B;
-  B --> C;
-```
 
 
 #### Electron

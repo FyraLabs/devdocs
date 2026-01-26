@@ -19,15 +19,13 @@ This document only covers the first type.
 <Callout type="info">
     This page does not cover Terra-specific (Anda SRPM) macros. For documentation on these macros, see [here](../terra/srpm). For documentation on our AppStream MetaInfo macros, see [here](../terra/appstream).
 </Callout>
-
-<Callout type="important">
+<Callout title="Macro Argument Syntax" icon="‼️">
   All macro flags followed by `<…>` REQUIRE an argument passed to them.<br />
   All macro flags followed by `[…]` MAY have an argument passed to them.<br />
   All macro flags with `<#>` or `[#]` take only numbers as arguments.<br />
   Additionally, if there is no space between the flag `<…>`/`<#>` or `[…]`/`[#]`, you MUST NOT have a space between the flag and the argument passed to it.<br />
   Conversely, if there *is* a space you SHOULD assume the flag needs a space between them.
 </Callout>
-
 <Callout type="idea">
   For macros which use regex ([`%__requires_exclude`](#__requires_exclude), [`%__requires_exclude_from`](#__requires_exclude_from), [`%__provides_exclude`](#__provides_exclude), [`%__provides_exclude_from`](#__provides_exclude_from), [`%__brp_mangle_shebangs_exclude_from`](#__brp_mangle_shebangs_exclude_from)) you SHOULD also note the [quirks with regex](/rpm/macro#escaping-regex-in-rpm-macros) in RPM.
 </Callout>
