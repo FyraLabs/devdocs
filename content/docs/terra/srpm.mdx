@@ -806,7 +806,7 @@ Tauri apps always require JavaScript package managers AND Cargo, so for this rea
   Take notice of the section [System Tauri](#system-tauri)'s description. Those are macros for using Tauri *installed via the repository,* AKA installed to the system.<br />
   You probably are *not* looking for these by default, especially because there are many cases that system Tauri may not match the version needed by a project.<br />
   You are welcome to try them, but if you hit a version mismatch (unless it is a bug, such as noted [here](#__tauri_ignore_version_mismatches)), use the [webapp build macros](#webapp-build-macros) instead.<br />
-  TL;DR: Use [System Tauri macros](#system-tauri) for Cargo Tauri installed from the repository, use [Webapp Build macros](#webapp-build-macros) for JavaSript Tauri installed as a JS module dependency, and note that the latter will fit most usecases.
+  TL;DR: Use [system Tauri macros](#system-tauri) for Cargo Tauri installed from the repository, use [webapp build macros](#webapp-build-macros) for JavaSript Tauri installed as a JS module dependency, and note that the latter will fit most usecases.
 </Callout>
 
 ##### %tauri_buildrequires
