@@ -739,7 +739,7 @@ Version: 39.2.7
 The architectures Electron supports. Automatically set as `ExclusiveArch:{:rpmspec}` when using `%electronmeta{:rpmspec}`.
 
 As written, the macro expands to:
-- `%{x86_64} %{ix86} %{arm64} armv7l armv7hl armv7hnl %{mips64}{:rpmspec}`
+- `%{x86_64} %{ix86} %{arm64} armv7l armv7hl armv7hnl %{mips64}`
 
 Which expands fully to:
 - `x86_64 x86_64_v2 x86_64_v3 x86_64_v4 amd64 em64t i386 i486 i586 i686 pentium3 pentium4 athlon geode aarch64 armv7l armv7hl armv7hnl mips64 mips64el mips64r6 mips64r6el`
@@ -848,12 +848,12 @@ Available flags:
 A port of `%cargo_vendor_manifest_online` that points to the Tauri app's Cargo.toml.
 
 ##### %tauri_generate_buildrequires
-Generates BuildRequires for a Tauri build.
+Generates `BuildRequires:{:rpmspec}` for a Tauri build.
 
 Supports the same flags as [%tauri_buildrequires](#tauri_buildrequires).
 
 <Callout type="warning">
-  BuildRequires generation only works in Mock.
+  `BuildRequires:{:rpmspec}` generation only works in Mock.
 </Callout>
 
 <Callout type="idea">
