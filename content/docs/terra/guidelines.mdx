@@ -357,25 +357,10 @@ A-->D;
 B-->C;
 C -- Using JS Module Tauri -->D;
 C -- Using System Tauri -->E;
-C-- Installing an Electron App -->F;
-C-- Installing a Tauri App -->G;
+D-- Installing an Electron App -->F;
+D-- Installing a Tauri App -->G;
 E-->G;
 G-->H;"
-/>
-
-<Mermaid
-  chart="
-graph LR;
-A[%tauri_prep];
-B[Webapp Build Macro];
-C[%tauri_build];
-D[%tauri_install];
-E[%tauri_cargo_license];
-A -- Using JS Module Tauri -->B;
-A -- Using System Tauri -->C;
-B-->D;
-C-->D;
-D-->E;"
 />
 
 
