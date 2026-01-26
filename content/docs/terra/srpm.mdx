@@ -89,7 +89,7 @@ Used in [`%pkg_completions`](#pkg_completion), or manually when `%pkg_completion
 ### %_gnomeextensionsdir
 Expands to: `%{_datadir}/gnome-shell/extensions%{?uuid:/%{uuid}}{:rpmspec}`
 
-<Callout>
+<Callout type="idea">
 `%{uuid}` is usually defined in gnome-shell-extension packages. if the macro is defined in your spec file (`%global uuid PKG-UUID`), it will be appended to the path upon expansion as: `%{_datadir}/gnome-shell/extensions/%{uuid}`.<br />
 Otherwise, it will expand without `%{uuid}`, as: `%{_datadir}/gnome-shell/extensions`.<br />
 Note that you SHOULD then need to add the extension's UUID after this macro.
@@ -293,7 +293,7 @@ What `%vendor_nodejs{:rpmspec}` does:
 
 Vendored versions of NPM and NPX are subject to limitations in commands as they must be run through `exec`.
 
-<Callout>
+<Callout type="idea">
   You MUST add `nvm` as a build as a `BuildRequires:{:rpmspec}` if using this macro.
 </Callout>
 
@@ -324,7 +324,7 @@ Example usage:
 #### %npm_install
 Install a Node module to `%{npm_sitelib}{:rpmspec}` and symlink its executable.
 
-<Callout>
+<Callout type="idea">
   This macro sets the environment variable `$_js`. This environment variable has a very simple purpose: It is defined as `.js` if a Node module's executable ends in a `.js` extension.<br />
   How this is used: If for any reason you need to execute a Node module itself as part of the build, you SHOULD do `/path/to/%{npm_name}$_js` after using `%npm_install`. `$_js` will expand to nothing if not defined and will expand to the `.js` extension if defined.
 </Callout>
@@ -505,7 +505,7 @@ SHOULD be used in place of calling `bunx` or `bun x` itself.
 ##### %bun_audit
 Audit with Bun if package uses bundled JavaScript module dependencies. For use in the `%check{:rpmspec}` section.
 
-<Callout>
+<Callout type="idea">
   `bun audit` is currently just a wrapper for NPM audit but lacks the `fix` option; use `%npm_audit_fix` to fix vulnerabilities if they are found in Node modules.
 </Callout>
 
@@ -549,7 +549,7 @@ Audit with Deno if package uses bundled JavaScript module dependencies. For use 
 
 Expands to: `NPM_CONFIG_AUDIT_LEVEL=low %{__deno} audit --level=low --ignore-unfixable --socket{:rpmspec}`
 
-<Callout>
+<Callout type="idea">
   `deno audit` currently lacks a way to fix vulnerabilities; use you MAY try using `%npm_audit_fix` to fix vulnerabilities.
 </Callout>
 
@@ -652,7 +652,7 @@ Expands to: `/usr/bin/env %{yarn_common_envvars} /usr/bin/yarn dlx{:rpmspec}`
 
 SHOULD be used in place of calling `yarn dlx` itself.
 
-<Callout>
+<Callout type="idea">
   `yarnpkg-berry` is REQUIRED as a build dependency instead of `yarnpkg`.
 </Callout>
 
@@ -675,7 +675,7 @@ These macros assist with the general packaging of applications that use [Electro
 ##### %electronmeta
 Set up all basic requirements including build macros for building an Electron app.
 
-<Callout>
+<Callout type="idea">
   This does NOT install the JavaScript package managers used for builds except for NPM (e.g., `bun`, `deno`, `pnpm`, `yarnpkg`, `yarnpkg-berry`).<br />
   Specify these `BuildRequires:{:rpmspec}` manually.
 </Callout>
@@ -721,7 +721,7 @@ Like other meta macros (e.g., `%forgemeta{:rpmspec}` from Fedora), you MUST be m
 
 The safest location is under `Name:{:rpmspec}` and above other preambles. When in doubt, place the macro here.
 
-<Callout>
+<Callout type="idea">
   `%__provides_exclude` and `%__requires_exclude` can be recursively added to if needed by defining the macro again as a `%global` and appending the needed exclusions using [regex](https://wikipedia.org/wiki/Regular_expression).<br />
   Example: `%global __provides_exclude %{__provides_exclude}|libcurl\\.so`<br />
   MUST be done after setting `%electronmeta`.<br />
@@ -793,7 +793,7 @@ Example usage:
   - A second symlink called `alsoapp`.
   - A desktop file with the `Exec` line reading `Exec=/usr/lib(64)/pkgname/app --enable-features=WaylandWindowDecorations --ozone-platform=wayland %u`.
 
-<Callout>
+<Callout type="idea">
   Like the webapp build macros, this macro sets the environment variable `$WEBAPP_BUILD_TOOL` to either `electron-builder` or `electron-forge` depending on which the app is built with. SHOULD NOT need to be used manually, but MAY be if needed for any reason.
 </Callout>
 
@@ -812,7 +812,7 @@ Available flags:
 - `-t{:rpmspec}`: Pull Tauri itself from the repos.
   - This would be used as `BuildRequires: %{tauri_buildrequires -t}{:rpmspec}`
 
-<Callout>
+<Callout type="idea">
   This does NOT install the JavaScript package managers used for builds except for NPM (e.g., `bun`, `deno`, `pnpm`, `yarnpkg`, `yarnpkg-berry`).<br />
   Specify these `BuildRequires:{:rpmspec}` manually.
 </Callout>
@@ -856,7 +856,7 @@ Supports the same flags as [%tauri_buildrequires](#tauri_buildrequires).
   BuildRequires generation only works in Mock.
 </Callout>
 
-<Callout>
+<Callout type="idea">
   This does NOT install the JavaScript package managers used for builds except for NPM (e.g., `bun`, `deno`, `pnpm`, `yarnpkg`, `yarnpkg-berry`).<br />
   Specify these `BuildRequires:{:rpmspec}` manually.
 </Callout>
@@ -902,7 +902,7 @@ Capital letter flags generally denote options that SHOULD be used with caution o
 
 For more information on each package manager, see [NPM Macros](#npm-macros), [Bun Macros](#bun-macros), [Deno Macros](#deno-macros), [PNPM Macros](#pnpm-macros), and [Yarn Macros](#yarn-macros).
 
-<Callout>
+<Callout type="idea">
   All of the following macros set the environment variable `$WEBAPP_BUILD_TOOL` to `electron-builder`, `electron-forge`, or `tauri` depending on which the app is built with. SHOULD NOT need to be used manually, but MAY be if needed for any reason.
 </Callout>
 
@@ -1317,8 +1317,6 @@ Common opts passed to Tauri. Used by macros which call Tauri.
 This macro simply appends the [Mold linker arguments](/terra/guidelines#usage-of-the-mold-linker) onto the `%build_rustflags` macro. It should not need to be manually used as `%build_rustflags` will be appended automatically when using `%cargo_prep_online`.
 
 ---
-
-# Footnotes
 
 [^1]: `x86_64`, `x86_64_v2`, `x86_64_v3`, `x86_64_v4`, `amd64`, `em64t`
 [^2]: `i386`, `i486`, `i586`, `i686`, `pentium3`, `pentium4`, `athlon`, `geode`
