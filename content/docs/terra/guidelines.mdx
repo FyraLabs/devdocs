@@ -344,14 +344,10 @@ A[Electron];
 B[Tauri];
 end
 C[%tauri_prep];
-subgraph BB [Build Macros];
 D[Webapp Build Macro];
 E[%tauri_build];
-end
-subgraph CC [Install Macros];
 F[%electron_install];
 G[%tauri_install];
-end
 H[%tauri_cargo_license];
 A-->D;
 B-->C;
