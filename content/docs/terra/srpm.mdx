@@ -23,11 +23,11 @@ For upstream macros available in Fedora/Terra, check out our unofficial [macros 
   [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and
   [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
 </Callout>
-
-<Callout type="important">
+<Callout title="Macro Argument Syntax" icon="‼️">
   All macro flags followed by `<…>` REQUIRE an argument passed to them.<br />
   All macro flags followed by `[…]` MAY have an argument passed to them.<br />
-  Additionally, if there is no space between the flag `<…>` or `[…]`, you MUST NOT have a space between the flag and the argument passed to it.<br />
+  All macro flags with `<#>` or `[#]` take only numbers as arguments.<br />
+  Additionally, if there is no space between the flag `<…>`/`<#>` or `[…]`/`[#]`, you MUST NOT have a space between the flag and the argument passed to it.<br />
   Conversely, if there *is* a space you SHOULD assume the flag needs a space between them.
 </Callout>
 
@@ -44,7 +44,7 @@ The directory where Bun cache files are stored in.
 
 Expands to: `%{_bun_home}/install/cache{:rpmspec}`
 
-Used for [Bun macros](#bun-macros).
+Used for [Bun macros](#bun).
 
 ### %_bun_home
 The directory where Bun files are stored in.
@@ -53,7 +53,7 @@ However the proposed environment variable is `$BUN_HOME`, so we have this for th
 
 Expands to: `%{rpmbuilddir}/.bun{:rpmspec}`
 
-Used for [Bun macros](#bun-macros).
+Used for [Bun macros](#bun).
 
 ### %_cargo_home
 Set by our [Cargo prep macros](#rust-macros).
@@ -67,14 +67,14 @@ The directory that Deno's files and cache are stored in.
 
 Expands to: `%{rpmbuilddir}/.deno{:rpmspec}`
 
-Used for [Deno macros](#deno-macros).
+Used for [Deno macros](#deno).
 
 ### %_deno_install_root
 Directory where Deno installs dependency packages.
 
 Expands to: `%{_deno_dir}/bin{:rpmspec}`
 
-Used for [Deno macros](#deno-macros).
+Used for [Deno macros](#deno).
 
 ### %_dracut_confdir
 The directory where Dracut config provided by system packages should be installed to.
@@ -113,7 +113,7 @@ If the file is an `.svg`, use the [`%_scalableiconsdir`](#_scalableiconsdir).
 ### %_npm_cache_dir
 Expands to: `%{rpmbuilddir}/.npm{:rpmspec}`
 
-Used with [JavaScript package manager macros](#javascript-runtimes), especially [NPM macros](#npm-macros).
+Used with [JavaScript package manager macros](#javascript-runtimes), especially [NPM macros](#npm).
 
 ### %nushell_completions_dir
 Expands to: `%_datadir/nushell/vendor/autoload{:rpmspec}`
@@ -137,14 +137,14 @@ The directory where PNPM files and cache are stored.
 
 Expands to: `%{rpmbuilddir}/.pnpm{:rpmspec}`
 
-Used for [PNPM macros](#pnpm-macros).
+Used for [PNPM macros](#pnpm).
 
 ### %_pnpm_store
 The directory where JavaScript modules installed by PNPM usually go. This will usually not be produced when using PNPM as a build tool, but exists for rare builds it may be created in.
 
 Expands to: `%{_pnpm_home}/store{:rpmspec}`
 
-Used for [PNPM macros](#pnpm-macros).
+Used for [PNPM macros](#pnpm).
 
 ### %rpmbuilddir
 This macro exists because Terra supports EL distributions (Red Hat Enterprise Linux, Alma Linux, etc.) which currently have an RPM version from before the `%{builddir}{:rpmspec}` change to address issues [like this](https://github.com/rpm-software-management/rpm/issues/3151).
@@ -179,7 +179,7 @@ The directory where Yarn cache files are stored in.
 
 Expands to: `%{rpmbuilddir}/.yarn{:rpmspec}`
 
-Used for [Yarn macros](#yarn-macros).
+Used for [Yarn macros](#yarn).
 
 ## Desktop File Macros
 These are macros used for working with [.desktop files](https://specifications.freedesktop.org/desktop-entry/latest).
@@ -264,7 +264,7 @@ MAY be used to prep a Go package for online builds. Replaces `%goprep{:rpmspec}`
 ## JavaScript
 These are macros to assist with the general packaging of applications that are written in JavaScript and/or use JavaScript runtimes such as Node.js or Bun.
 
-### Node.js Macros
+### Node.js
 Macros for using [Node.js](https://nodejs.org). These require the use of [Fedora Node.js macros](https://docs.fedoraproject.org/en-US/packaging-guidelines/Node.js/#_macros) in the `nodejs-packaging` package.
 
 #### %__nvm
@@ -297,7 +297,7 @@ Vendored versions of NPM and NPX are subject to limitations in commands as they 
   You MUST add `nvm` as a build as a `BuildRequires:{:rpmspec}` if using this macro.
 </Callout>
 
-### Node Module Macros
+### Node Modules
 Macros for packaging Node modules.
 
 #### %npm_prep
@@ -412,7 +412,7 @@ The JavaScript package manager cache directories are placed in [`%{rpmbuilddir}`
 All macros calling the package managers also call NPM environment variables because most of them are using build dependencies from the NPM Registry, some even wrap NPM commands with their own. This ensures consistent NPM behavior.
 </Callout>
 
-#### NPM Macros
+#### NPM
 Macros for using [NPM](https://www.npmjs.com).
 
 ##### %__npm_log_level
@@ -421,8 +421,8 @@ Macro that sets the logging level for NPM. Defaults to `error` because NPM logs 
 If desired, it can be redefined to `silent`, `warn`, `notice`, `info`, `verbose`, or `silly`.
 
 ##### %npm_common_envvars
-<Callout type="important">
-  NPM environment variables written in uppercase will be __ignored__ if the project sets different ones explicitly. This is intentional behavior which these macros do not override in order to avoid build issues. For more information, please see [this issue](https://github.com/npm/npm/issues/14528) in the original NPM GitHub repository.<br />
+<Callout icon="‼️">
+  NPM environment variables written in uppercase will be **ignored** if the project sets different ones explicitly. This is intentional behavior which these macros do not override in order to avoid build issues. For more information, please see [this issue](https://github.com/npm/npm/issues/14528) in the original NPM GitHub repository.<br />
   If for any reason you need to hardcode an environment override, use a flag passed to NPM or manually set the environment variable in all lowercase.<br />
   For more information on NPM config flags and environment variables, please go [here](https://docs.npmjs.com/cli/v11/using-npm/config).
 </Callout>
@@ -477,7 +477,7 @@ Runs NPM tests. This will not be applicable to all projects or Node modules. For
 
 Expands to: `%{__npm} test{:rpmspec}`
 
-#### Bun Macros
+#### Bun
 Macros for using [Bun](https://bun.com).
 
 ##### %bun_common_envvars
@@ -524,7 +524,7 @@ Runs Bun tests. This will not be applicable to all projects. For use in the `%ch
 
 Expands to: `%{__bun} test{:rpmspec}`
 
-#### Deno Macros
+#### Deno
 Macros for using [Deno](https://deno.com).
 
 ##### %deno_common_envvars
@@ -566,7 +566,7 @@ Runs Deno tests. This will not be applicable to all projects. For use in the `%c
 
 Expands to: `%{__deno} test --parallel{:rpmspec}`
 
-#### PNPM Macros
+#### PNPM
 Macros for using [PNPM](https://pnpm.io).
 
 ##### %pnpm_common_envvars
@@ -797,10 +797,17 @@ Example usage:
   Like the webapp build macros, this macro sets the environment variable `$WEBAPP_BUILD_TOOL` to either `electron-builder` or `electron-forge` depending on which the app is built with. SHOULD NOT need to be used manually, but MAY be if needed for any reason.
 </Callout>
 
-#### Tauri Macros
+#### Tauri
 Macros for using [Tauri](https://v2.tauri.app).
 
 Tauri apps always require JavaScript package managers AND Cargo, so for this reason the [Rust macros](#rust) are also relevant.
+
+<Callout title="Important Note for Tauri Macros" icon="‼️">
+  Take notice of the section [System Tauri](#system-tauri)'s description. Those are macros for using Tauri *installed via the repository,* AKA installed to the system.<br />
+  You probably are *not* looking for these by default, especially because there are many cases that system Tauri may not match the version needed by a project.<br />
+  You are welcome to try them, but if you hit a version mismatch (unless it is a bug, such as noted [here](#__tauri_ignore_version_mismatches)), use the [webapp build macros](#webapp-build-macros) instead.<br />
+  TL;DR: Use [System Tauri macros](#system-tauri) for Cargo Tauri installed from the repository, use [Webapp Build macros](#webapp-build-macros) for JavaSript Tauri installed as a JS module dependency, and note that the latter will fit most usecases.
+</Callout>
 
 ##### %tauri_buildrequires
 MAY be used in a spec by setting `BuildRequires: %{tauri_buildrequires}{:rpmspec}`
@@ -838,6 +845,10 @@ A port of `%cargo_license_online` that points to the Tauri app's Cargo.toml.
 Available flags:
 - `-f <…>`: Should be the same as the features that were passed to the Tauri build.
 
+<Callout type="warning">
+  Cargo license macros MUST be wrapped in `{}` when being used to write a license file.
+</Callout>
+
 ##### %tauri_cargo_license_summary
 A port of `%cargo_license_summary_online` that points to the Tauri app's Cargo.toml.
 
@@ -855,7 +866,6 @@ Supports the same flags as [%tauri_buildrequires](#tauri_buildrequires).
 <Callout type="warning">
   BuildRequires generation only works in Mock.
 </Callout>
-
 <Callout type="idea">
   This does NOT install the JavaScript package managers used for builds except for NPM (e.g., `bun`, `deno`, `pnpm`, `yarnpkg`, `yarnpkg-berry`).<br />
   Specify these `BuildRequires:{:rpmspec}` manually.
@@ -875,7 +885,7 @@ This macro disables Tauri version mismatch checking. It can be set to anything.
   Use of this macro is **heavily discouraged.** The option to ignore version mismatches only exists in Tauri, and is only enableable with this macro, because Tauri may detect a version mismatch incorrectly in some situations. You SHOULD NOT use this to force a system Tauri build with an incorrect Tauri version.
 </Callout>
 
-#### System Tauri Macros
+#### System Tauri
 These are macros for use with Tauri if installed from the repo. Please note that using Tauri from the repo MAY NOT WORK with all projects unless you override version checking, which is not advisable in most circumstances.
 
 ##### %__tauri
@@ -896,14 +906,17 @@ Available flags:
 - `-f <…>`: Features to enable in Tauri and Cargo. Comma separated.
 
 #### Webapp Build Macros
-These are macros used to build webapps using JavaScript package managers and builders such as [Electron Builder](https://www.electron.build), [Electron Forge](https://www.electronforge.io), [Electron Vite](https://electron-vite.github.io), or [Tauri](#tauri_macros).
+These are macros used to build webapps using JavaScript package managers and builders such as [Electron Builder](https://www.electron.build), [Electron Forge](https://www.electronforge.io), [Electron Vite](https://electron-vite.github.io), or [Tauri](#tauri).
 
 Capital letter flags generally denote options that SHOULD be used with caution or only if necessary for a build.
 
-For more information on each package manager, see [NPM Macros](#npm-macros), [Bun Macros](#bun-macros), [Deno Macros](#deno-macros), [PNPM Macros](#pnpm-macros), and [Yarn Macros](#yarn-macros).
+For more information on each package manager, seethe [NPM macros](#npm), [Bun macros](#bun), [Deno macros](#deno), [PNPM macros](#pnpm), and [Yarn macros](#yarn).
 
 <Callout type="idea">
   All of the following macros set the environment variable `$WEBAPP_BUILD_TOOL` to `electron-builder`, `electron-forge`, or `tauri` depending on which the app is built with. SHOULD NOT need to be used manually, but MAY be if needed for any reason.
+</Callout>
+<Callout icon="‼️">
+  All webapp build macros run the `install` (or `ci` for applicable package managers) step for dependencies as part of their build process, this is never manually required when using them *unless* some other step in the build process prior to the build step requires the dependencies to be installed first.
 </Callout>
 
 ##### %npm_build
@@ -1080,6 +1093,10 @@ Enables internet access for `%cargo_prep{:rpmspec}`. Replaces `%cargo_prep{:rpms
 Enables internet access for `%cargo_license{:rpmspec}`.
 Replaces `%cargo_license{:rpmspec}` in `%build{:rpmspec}`.
 
+<Callout type="warning">
+  Cargo license macros MUST be wrapped in `{}` when being used to write a license file.
+</Callout>
+
 ### %cargo_license_summary_online
 Enables internet access for `%cargo_license_summary{:rpmspec}`.
 Replaces `%cargo_license_summary{:rpmspec}` in `%build{:rpmspec}`.
@@ -1094,6 +1111,10 @@ Can be used instead of `%cargo_install{:rpmspec}` when [this](https://github.com
 
 ### %rustup_nightly
 Used in the `%prep{:rpmspec}` section for nightly `rustc`/`cargo` from `rustup`.
+
+<Callout type="warning">
+  This macro MUST be used *before* `%cargo_prep_online` (or an equivalent prep macro) if it is used.
+</Callout>
 
 ## Subpackages
 These macros assist with packages that require certain subpackage types.
@@ -1278,6 +1299,8 @@ URL:           https://github.com/ad-oliviero/uwufetch
 ```
 
 `%git_clone` SHOULD only be used when the source tarballs provided by upstream does not include all required sources in the repository (e.g., if the build process expects a Git environment or the tarball doesn't contain submodules).
+
+It is RECOMMENDED to still fetch and include a source tarball via the spec sources even if it is not used so that the source RPM is not empty.
 
 ### %go_task
 Expands to: `go-task --parallel --concurrency %{?_smp_build_ncpus} --verbose --yes`
