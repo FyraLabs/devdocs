@@ -15,6 +15,14 @@ import * as Split from "../../../components/split";
   [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174).
 </Callout>
 
+<Callout title="Macro Argument Syntax" icon="‼️">
+  All macro flags followed by `<…>` REQUIRE an argument passed to them.<br />
+  All macro flags followed by `[…]` MAY have an argument passed to them.<br />
+  All macro flags with `<#>` or `[#]` take only numbers as arguments.<br />
+  Additionally, if there is no space between the flag `<…>`/`<#>` or `[…]`/`[#]`, you MUST NOT have a space between the flag and the argument passed to it.<br />
+  Conversely, if there *is* a space you SHOULD assume the flag needs a space between them.
+</Callout>
+
 Packagers and maintainers MUST follow the policies and guidelines listed in this document.
 Everything covered here is one of 3 things:
 
@@ -402,8 +410,8 @@ It is also acceptable to add more to previous changelogs (for example, adding mi
     - Installing a missing file.
     - Adding any build or non-build, hard or soft, forward or backward dependencies.
     - Changing any user-facing tags (`URL:{:rpmspec}`, `License:{:rpmspec}`, `Summary:{:rpmspec}`, etc.).
-- If a package fix PR is fixing/changing anything build-facing, the `Release:{:rpmspec}` tag SHOULD NOT need to be bumped.
-  - Some (not all!) examples changes NOT requiring a `Release:{:rpmspec}` bump:
+- If a package fix PR is *not* fixing/changing anything build-facing, the `Release:{:rpmspec}` tag SHOULD NOT need to be bumped.
+  - Some (not all!) examples of changes which **don't** require a `Release:{:rpmspec}` bump:
     - Fixing a package that failed to build when the `Version:{:rpmspec}` tag is bumped.
     - Any changes that do not affect the final package.
 - If you are unsure if a bump is needed, bump it.
@@ -411,7 +419,7 @@ It is also acceptable to add more to previous changelogs (for example, adding mi
 
 #### Patches
 
-- Packages SHOULD apply patches (usually via the `-p*` flag) in `%autosetup{:rpmspec}`. If this is not possible (typically when `%autosetup{:rpmspec}` is not used), you SHOULD use [%autopatch](../rpm/macros#autopatch).
+- Packages SHOULD apply patches (usually via the `-p#` flag) in `%autosetup{:rpmspec}`. If this is not possible (typically when `%autosetup{:rpmspec}` is not used), you SHOULD use [%autopatch](../rpm/macros#autopatch).
 
 #### Providing Your Own .desktop File
 
@@ -429,7 +437,7 @@ Icon=ICON NAME
 Type=Application
 ```
 
-The `Icon` tag SHOULD NOT a contain full path, just the name of the icon file.
+The `Icon` tag SHOULD NOT a contain full path, just the name of the icon file **without** the file extension.
 The `Exec` tag SHOULD be a full path if the binary placed in `/usr/bin` is a symlink.
 If this is not the case, it is up to you if you want to use the full path or not (it will look in the user's `$PATH`).
 
@@ -521,8 +529,7 @@ You MUST NOT have a period at the end of any `Summary:{:rpmspec}` tags, and you 
 
 To make specs easier to read, you SHOULD use `%ifarch{:rpmspec}` followed by `%elifarch{:rpmspec}` before `%endif{:rpmspec}` in specs where build steps are arch dependent.
 
-Incorrect:
-
+<Callout title="Incorrect:" type="error">
 ```rpmspec 
 %ifarch x86_64
 %define arch %{nil}
@@ -531,9 +538,9 @@ Incorrect:
 %define arch arm64-
 %endif
 ```
+</Callout>
 
-Correct:
-
+<Callout title="Correct:" type="success">
 ```rpmspec
 %ifarch x86_64
 %define arch %{nil}
@@ -541,6 +548,7 @@ Correct:
 %define arch arm64-
 %endif
 ```
+</Callout>
 
 ---
 
