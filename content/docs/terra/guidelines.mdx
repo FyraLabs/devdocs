@@ -342,6 +342,7 @@ graph LR;
 subgraph AA [Webapp Frameworks]
 A[Electron];
 B[Tauri];
+end
 C[%tauri_prep];
 D[Webapp Build Macro];
 E[%tauri_build];
@@ -350,10 +351,10 @@ G[%tauri_install];
 H[%tauri_cargo_license];
 A-->D;
 B-->C;
-C-- Using JS Module Tauri-->D;
-C-- Using System Tauri-->E;
-D-- Installing Electron Apps-->F;
-D-- Installing Tauri Apps-->G;
+C--Using JS Module Tauri-->D;
+C--Using System Tauri-->E;
+D--Installing Electron Apps-->F;
+D--Installing Tauri Apps-->G;
 E-->G;
 G-->H;"
 />
