@@ -1,0 +1,35 @@
+name: Sync next with main
+permissions:
+  contents: write
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  merge:
+      runs-on: ubuntu-latest
+      steps:
+          - uses: actions/checkout@v6
+            with:
+              ssh-key: ${{ secrets.SSH_AUTHENTICATION_KEY }}
+              ref: next
+
+          - name: Set up Git config
+            run: |
+              git config user.name "Raboneko"
+              git config user.email "raboneko@fyralabs.com"
+              git config gpg.format "ssh"
+              git config user.signingkey "${{ secrets.SSH_SIGNING_KEY }}"
+              git config --global merge.ours.driver true
+              git config --global commit.gpgsign true
+
+          - name: Merge main into next
+            env:
+              GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+            run: |
+              git fetch origin main
+              git merge --no-edit origin/main
+              git push origin next
