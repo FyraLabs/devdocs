@@ -414,6 +414,7 @@ All macros calling the package managers also call NPM environment variables beca
 
 #### NPM
 Macros for using [NPM](https://www.npmjs.com).
+It is REQUIRED to have `BuildRequires: nodejs-npm{:rpmspec}`.
 
 ##### %__npm_log_level
 Macro that sets the logging level for NPM. Defaults to `error` because NPM logs can fill the terminal quickly.
@@ -479,6 +480,7 @@ Expands to: `%{__npm} test{:rpmspec}`
 
 #### Bun
 Macros for using [Bun](https://bun.com).
+It is REQUIRED to have `BuildRequires: bun-bin{:rpmspec}`.
 
 ##### %bun_common_envvars
 Sets the `$BUN_HOME{:bash}` for future use and sets the cache dir.
@@ -526,6 +528,7 @@ Expands to: `%{__bun} test{:rpmspec}`
 
 #### Deno
 Macros for using [Deno](https://deno.com).
+It is REQUIRED to have `BuildRequires: deno{:rpmspec}`.
 
 ##### %deno_common_envvars
 Sets the `$DENO_DIR{:bash}`, `$DENO_INSTALL_ROOT{:bash}`, limits `$DENO_JOBS{:bash}` to `${RPM_BUILD_NCPUS}{:bash}`, disables update notifications, and forces color.
@@ -568,6 +571,7 @@ Expands to: `%{__deno} test --parallel{:rpmspec}`
 
 #### PNPM
 Macros for using [PNPM](https://pnpm.io).
+It is REQUIRED to have `BuildRequires: pnpm{:rpmspec}`.
 
 ##### %pnpm_common_envvars
 Sets the NPM environment variables and the PNPM home directory.
@@ -628,7 +632,7 @@ Expands to: `%{__pnpm} test{:rpmspec}`
 #### Yarn Macros
 Macros for using [Yarn (Yarn Classic/Yarn v1)](https://classic.yarnpkg.com) and [Yarn Berry (Yarn Modern/Yarn v2+)](https://yarnpkg.com).
 
-You SHOULD use `yarnpkg` (Yarn Classic) unless you need `yarnpkg-berry` (Yarn Berry) specifically.
+You SHOULD use `BuildRequires: yarnpkg{:rpmspec}` (Yarn Classic) unless you need `BuildRequires: yarnpkg-berry{:rpmspec}` (Yarn Berry) specifically.
 
 ##### %yarn_common_envvars
 Sets the NPM evironment variables and Yarn's cache folder.
