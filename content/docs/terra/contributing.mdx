@@ -41,23 +41,41 @@ If you ever need help, hop into [our Discord server](https://fyralabs.com/discor
   - Anda is also available via [Cargo](https://crates.io/crates/anda).
   - If on an atomic system, this command works using Podman: `podman run --rm --cap-add=SYS_ADMIN --privileged --volume ./:/anda --volume mock_cache:/var/lib/mock --workdir /anda ghcr.io/terrapkg/builder:frawhide anda`
 - You are now ready for the [Writing Sources](<[contributing#writing-sources](https://developer.fyralabs.com/terra/contributing#writing-sources)>) section below.
-  
+
 #### Dev Container
 
 You can create, build, and push a package all from within our Dev Container.
 This means you do NOT need to be running Fedora/Ultramarine to create a package.
 You can run this devcontainer from Linux, macOS, or Windows.
 
-- If you're Visual Studio Code, open it and navigate to the Extensions menu located at the bottom of the left sidebar.
-- Install [Docker](https://docs.docker.com/engine/install/). If you're on Linux, you'll need to enable the service and reboot.
-- Fork the [Terra sources repo](https://github.com/terrapkg/packages), and `git clone` your fork.
-- Open this folder in Visual Studio Code (File -> Open Folder).
-- It should prompt you to `reopen in Dev Container,` click this and wait for the Dev Container to open. If it doesn't prompt you, press `Ctrl` + `Shift` + `P`, type `Reopen in Container`, and press `Enter`.
-- You are now in the Terra Dev Container, and have all the packages and configuration necessary to start building packages!
+1. Install the Dev Containers extension in your IDE
+
+   a. Zed comes with Dev Containers, see [this documentation](https://zed.dev/docs/dev-containers)
+
+   b. VSCode users need to install the Dev Containers extension
+
+2. Get the container runtime
+
+   a. On Windows and Mac, install [Docker Desktop](https://docs.docker.com/desktop/)
+
+   b. On Linux, install `podman-docker` from your package manager
+
+3. Fork the [Terra sources repo](https://github.com/terrapkg/packages), and `git clone` your fork
+4. Open the folder you cloned in your editor
+5. It should prompt you to `reopen in Dev Container`, click this and wait for the Dev Container to open.
+
+<Callout type="info">
+  If VSCode doesn't prompt you, press `Ctrl` + `Shift` + `P`, type `Reopen in
+  Container`, and press `Enter`
+</Callout>
+
+You are now in the Terra Dev Container, and have all the packages and
+configuration necessary to start building packages!
 
 #### Language Support in Editors
 
 The most common languages you will see:
+
 - RPMSPEC (`.spec`), for the package build scripts
 - rhai, for the auto-update scripts
 - hcl, for informing `anda` of the package
