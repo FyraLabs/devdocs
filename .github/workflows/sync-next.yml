@@ -14,15 +14,23 @@ jobs:
       steps:
           - uses: actions/checkout@v6
             with:
+              fetch-depth: 0
               ssh-key: ${{ secrets.SSH_AUTHENTICATION_KEY }}
               ref: next
+              
+          - name: Install SSH signing key
+            run: |
+             mkdir -p ${{ runner.temp }}
+             echo "${{ secrets.SSH_SIGNING_KEY }}" > ${{ runner.temp }}/signing_key
+             chmod 0700 ${{ runner.temp }}/signing_key
+             git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
           - name: Set up Git config
             run: |
               git config user.name "Raboneko"
               git config user.email "raboneko@fyralabs.com"
               git config gpg.format "ssh"
-              git config user.signingkey "${{ secrets.SSH_SIGNING_KEY }}"
+              git config user.signingkey "${{ runner.temp }}/signing_key"
               git config --global merge.ours.driver true
               git config --global commit.gpgsign true
 
@@ -30,7 +38,6 @@ jobs:
             env:
               GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
             run: |
-              git pull --unshallow
               git fetch origin main
               git merge --no-edit origin/main
               git push origin next
