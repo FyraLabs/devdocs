@@ -30,6 +30,7 @@ jobs:
             env:
               GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
             run: |
+              git pull --unshallow
               git fetch origin main
               git merge --no-edit origin/main
               git push origin next
