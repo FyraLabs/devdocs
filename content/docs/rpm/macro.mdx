@@ -114,7 +114,7 @@ in many cases you will need to use `\\\`:
 
 <Split.Root>
 	<div>
-		```rpmspec filename="/usr/lib/rpm/macros.d/macros.example"
+		```rpmspec title="/usr/lib/rpm/macros.d/macros.example"
 		%say_hello echo \\\
 		Hello, World! && \\\
 		echo This is from the %%say_hello macro! \
@@ -136,7 +136,7 @@ in many cases you will need to use `\\\`:
 
 <Split.Root>
 	<div>
-		```rpmspec filename="/usr/lib/rpm/macros.d/macros.example"
+		```rpmspec title="/usr/lib/rpm/macros.d/macros.example"
 		%say_hello %{lua:
 			print("echo 'Hello, ")
 			-- you also need to escape backslash for the new line character in lua strings
@@ -161,7 +161,7 @@ For definition files in `/usr/lib/rpm/macros.d/`, strictly speaking, RPM assumes
 a blank line separates different macro definitions. Therefore, no macro body may be written
 with any blank lines present. Blank lines must end with a `\`:
 
-```rpmspec filename="/usr/lib/rpm/macros.d/macros.rust-srpm" showLineNumbers {14,18,23}
+```rpmspec title="/usr/lib/rpm/macros.d/macros.rust-srpm" showLineNumbers {14,18,23}
 # rust_arches: list of architectures where building Rust is supported
 #
 # Since RPM itself now depends on Rust code (via its GPG backend, rpm-sequoia),
@@ -263,6 +263,10 @@ In contrast, `!?` / `?!` always expand to nothing regardless.
 If you are looking for something analogous to the tertiary operator,
 use [RPM expression](./expr) as demonstrated on the left.
 
+| Invocation | `%global x 0{:rpmspec}` | `%undefine x{:rpmspec}` |
+| ---------- | ----------------------- | ----------------------- |
+| `%{?x:a}`  | `a`                     | `` ``                   |
+| `%{!?x:a}` | `` ``                   | `a`					 |
 
 | Invocation | `%x` ⇒ `1` | `%x` undefined | Explanation
 | ---------- | ---------- | -------------- | -----------
@@ -280,19 +284,18 @@ use [RPM expression](./expr) as demonstrated on the left.
 | `%{?x:y}`  | `y`        | `` ``          | if defined ⇒ `y`
 | `%{?!x:y}` | `` ``      | `y`            | if undefined ⇒ `y`
 
-
 ## Parameterized Macros
 
 <div style={{ float: "right", marginLeft: "1em", marginTop: "1em" }}>
-```rpmspec filename="greet"
+```rpmspec title="greet"
 %greet(-) %{echo:Hello %*!}
 ```
-```sh filename="Shell"
+```sh title="Shell"
 rpm -E '%{load:greet}
 %greet world
 %greet Linux Torvalds'
 ```
-```ansi filename="Output"
+```ansi title="Output"
 Hello world!
 Hello Linux Torvalds!
 ​

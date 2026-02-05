@@ -69,7 +69,7 @@ To make sure a macro lasts for the entire spec file, use `%global` instead.
 
 <Split.Root>
   <div>
-    ```rpmspec filename="example.spec"
+    ```rpmspec title="example.spec"
     %build
     %define my_macro Hello, World!
     echo %my_macro
@@ -80,7 +80,7 @@ To make sure a macro lasts for the entire spec file, use `%global` instead.
 
   </div>
   <div>
-    ```rpmspec filename="expand.spec"
+    ```rpmspec title="expand.spec"
     %build
     echo Hello, World!
 
@@ -99,7 +99,7 @@ As opposed to [`%define`](#define), macros defined with `%global` will last for 
 
 <Split.Root>
   <div>
-    ```rpmspec filename="example.spec"
+    ```rpmspec title="example.spec"
     %global cat Meow!!!
 
     %prep
@@ -111,7 +111,7 @@ As opposed to [`%define`](#define), macros defined with `%global` will last for 
 
   </div>
   <div>
-    ```rpmspec filename="expand.spec"
+    ```rpmspec title="expand.spec"
     %prep
     echo nya Meow!!!
 
@@ -131,7 +131,7 @@ Instead, this pops the latest definition from the macro stack.
 
 <Split.Root>
   <div>
-    ```rpmspec filename="example.spec"
+    ```rpmspec title="example.spec"
     %global cat Meow!
 
     %prep
@@ -149,7 +149,7 @@ Instead, this pops the latest definition from the macro stack.
 
   </div>
   <div>
-    ```rpmspec filename="expand.spec"
+    ```rpmspec title="expand.spec"
     %prep
     echo Nyaa!
 
@@ -173,14 +173,14 @@ while macros in `# …` are actually expanded.
 
 <Split.Root>
   <div>
-    ```rpmspec filename="example.spec"
+    ```rpmspec title="example.spec"
 		%define meow a
 		# comment %meow
 		%dnl comment %meow
 		```
   </div>
   <div>
-		```rpmspec filename="expand.spec"
+		```rpmspec title="expand.spec"
     # comment a
 		```
 	</div>
@@ -210,7 +210,7 @@ Double-expand the macro.
 
   <Split.Root>
     <div>
-      ```rpmspec filename="example.spec"
+      ```rpmspec title="example.spec"
       %define nya foo
       %define meow %{expand:%%nya}
     
@@ -218,7 +218,7 @@ Double-expand the macro.
       ```
     </div>
     <div>
-      ```rpmspec filename="expand.spec"
+      ```rpmspec title="expand.spec"
       echo foo
       ```
     </div>
@@ -251,7 +251,7 @@ In `rpmspec-rs`, a space must be present after `--`.
 
 <Split.Root>
   <div>
-    ```rpmspec filename="example.spec"
+    ```rpmspec title="example.spec"
     %global my_macro Hello
     %{lua:
       -- this lua block expands to the input
@@ -263,7 +263,7 @@ In `rpmspec-rs`, a space must be present after `--`.
     ```
   </div>
   <div>
-    ```rpmspec filename="expand.spec"
+    ```rpmspec title="expand.spec"
     %prep
     echo Hello from lua!
     ```
@@ -291,12 +291,12 @@ This can be used to pass arguments with spaces to parameterized macros:
 
 <Split.Root>
   <div>
-    ```rpmspec filename="example.spec"
+    ```rpmspec title="example.spec"
     echo %gsub %{quote:hello hello} %{quote:^hello} bye
     ```
   </div>
   <div>
-    ```rpmspec filename="expand.spec"
+    ```rpmspec title="expand.spec"
     echo bye hello
     ```
   </div>
@@ -316,12 +316,12 @@ In short, this replaces `%?4` occurrences of `%2` in `%1` to `%3`.
 
 <Split.Root>
   <div>
-    ```rpmspec filename="example.spec"
+    ```rpmspec title="example.spec"
     echo %gsub %{quote:hello hello} %{quote:^hello} bye
     ```
   </div>
   <div>
-    ```rpmspec filename="expand.spec"
+    ```rpmspec title="expand.spec"
     echo bye hello
     ```
   </div>
@@ -333,13 +333,13 @@ Obtains the length of the given text.
 
 <Split.Root>
   <div>
-    ```rpmspec filename="example.spec"
+    ```rpmspec title="example.spec"
     %define foo meow now!
     echo %{len:%foo}
     ```
   </div>
   <div>
-    ```rpmspec filename="expand.spec"
+    ```rpmspec title="expand.spec"
     echo 9
     ```
   </div>
@@ -489,7 +489,7 @@ Expand to the path to the source file. This is just a fancy macro that transform
 
 	<Split.Root>
 		<div>
-			```rpmspec filename="example.spec"
+			```rpmspec title="example.spec"
 			Source0: https://repos.fyralabs.com/um42/comps.xml
 			
 			%prep
@@ -498,7 +498,7 @@ Expand to the path to the source file. This is just a fancy macro that transform
 			```
 		</div>
 		<div>
-			```rpmspec filename="expand.spec"
+			```rpmspec title="expand.spec"
 			Source0: https://repos.fyralabs.com/um42/comps.xml
 			
 			%prep
@@ -655,7 +655,7 @@ executable. To disable stripping, override the strip call:
 
 Since `rpmbuild` automatically generates `Requires:` by looking at
 what things the binaries are linked to, you may disable that by adding a regex to this macro:
-```rpmspec filename="example.spec" {6}
+```rpmspec title="example.spec" {6}
 # https://github.com/terrapkg/packages/blob/7f0fd6b6a8993d17832403960d4343899cfb0474/anda/apps/youtube-music/youtube-music.spec#L5
 %define debug_package %nil
 
@@ -668,7 +668,7 @@ what things the binaries are linked to, you may disable that by adding a regex t
 
 ##### `%__requires_exclude_from` 🏷️ [#__requires_exclude_from]
 
-```rpmspec filename="example.spec"
+```rpmspec title="example.spec"
 # https://github.com/terrapkg/packages/blob/7f0fd6b6a8993d17832403960d4343899cfb0474/anda/system/opentabletdriver/opentabletdriver.spec#L6
 %global __requires_exclude_from ^/usr/lib/opentabletdriver/.*$
 ```
@@ -676,7 +676,7 @@ what things the binaries are linked to, you may disable that by adding a regex t
 ##### `%__provides_exclude` 🏷️ [#__provides_exclude]
 
 Similarly, since `rpmbuild` automatically generates `Provides:`, you may disable that:
-```rpmspec filename="example.spec" {5}
+```rpmspec title="example.spec" {5}
 # https://github.com/terrapkg/packages/blob/7f0fd6b6a8993d17832403960d4343899cfb0474/anda/apps/youtube-music/youtube-music.spec#L4
 %define debug_package %nil
 
@@ -689,7 +689,7 @@ Similarly, since `rpmbuild` automatically generates `Provides:`, you may disable
 
 ##### `%__provides_exclude_from` 🏷️ [#__provides_exclude_from]
 
-```rpmspec filename="example.spec" {8}
+```rpmspec title="example.spec" {8}
 # https://github.com/terrapkg/packages/blob/7f0fd6b6a8993d17832403960d4343899cfb0474/anda/devs/asar/asar.spec#L7
 %define debug_package %nil
 %define __strip /bin/true
@@ -706,7 +706,7 @@ RPM tries to mangle shebangs (`#!`) by default (see
 [`%__brp_mangle_shebangs`](#__brp_mangle_shebangs)).
 If this breaks, you can ask it to exclude the files that matches a given regex.
 
-```rpmspec filename="example.spec" {6}
+```rpmspec title="example.spec" {6}
 # https://github.com/terrapkg/packages/blob/frawhide/anda/devs/zed/nightly/zed-nightly.spec#L9
 
 %bcond_with check
@@ -1074,7 +1074,7 @@ Additional options:
   --generate-subpackages move language files in one sub package per language
 ```
 
-```rpmspec filename="example.spec" {7,9} /%find_lang/ /-f mugshot.lang/
+```rpmspec title="example.spec" {7,9} /%find_lang/ /-f mugshot.lang/
 # https://github.com/terrapkg/packages/blob/2635988e63fa5a05bd2c42d34c893d9e2bb13580/anda/apps/mugshot/mugshot.spec#L41-L46
 %install
 %pyproject_install
@@ -1097,7 +1097,7 @@ Parameterized as `%fdupes(s)`:
 
 Take in exactly 1 argument: a glob path that lists out files to be deduplicated.
 
-```rpmspec filename="example.spec" {2,12}
+```rpmspec title="example.spec" {2,12}
 # https://github.com/terrapkg/packages/blob/2635988e63fa5a05bd2c42d34c893d9e2bb13580/anda/themes/fluent-theme/fluent-theme.spec#L31
 BuildRequires:  fdupes
 # or BuildRequires:  rpm_macro(fdupes)
@@ -1268,7 +1268,7 @@ If `gdb` crashes in `find-debuginfo`, you might want to lower the value to `1` o
 
 The default value is `2`.
 
-```rpmspec filename="example.spec" {11}
+```rpmspec title="example.spec" {11}
 https://github.com/terrapkg/packages/blob/2df55dad60a58ecf5f8fbe962f877f2834bdfa25/anda/devs/zed/nightly/zed-nightly.spec#L14
 
 %bcond_with check
