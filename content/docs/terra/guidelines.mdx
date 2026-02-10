@@ -417,6 +417,28 @@ It is also acceptable to add more to previous changelogs (for example, adding mi
 - If you are unsure if a bump is needed, bump it.
 - Follow appropriate changelog procedures outlined in the above section.
 
+#### Illegal Char in Version String
+
+In the case of an 'illegal character' in a `Version:{:rpmspec}` tag (such as a `-` or `/`), you will need to define a `%sanitized_ver:{:rpmspec}` macro.
+To do this, add the following lines to your spec file (assuming a `-` is used in the upstream version):
+
+```rpmspec
+%global ver 2005-05-14
+%global sanitized_ver %(echo %{ver} | sed 's/-//g')
+...
+Version: %sanitized_ver # This will expand to 20250514 in this example
+```
+
+Then, the `update.rhai` needs to be appended to replace the globaly defined `ver` instead of the usual `Version` tag.
+Your `update.rhai` should look like this:
+
+```rhai
+rpm.global("ver", gh("upstream/project")); // Remember to change the update function to what your upstream is hosted on, for example, `pypi()` or `hackage()`.
+```
+
+If a different illegal character is used, you will need to write a `sed` script to remove this character.
+More information on writing these scripts can be found [here](https://linux.die.net/man/1/sed).
+
 #### Patches
 
 - Packages SHOULD apply patches (usually via the `-p#` flag) in `%autosetup{:rpmspec}`. If this is not possible (typically when `%autosetup{:rpmspec}` is not used), you SHOULD use [%autopatch](../rpm/macros#autopatch).
