@@ -77,7 +77,7 @@ If you're on atomic system, or otherwise prefer to work with containers, you can
 Simply run:
 
 ```shell
-podman run --rm --cap-add=SYS_ADMIN --privileged --volume ./:/anda --volume mock_cache:/var/lib/mock --workdir /anda ghcr.io/terrapkg/builder:frawhide anda`
+podman run --rm --cap-add=SYS_ADMIN --privileged --volume ./:/anda --volume mock_cache:/var/cache/mock --workdir /anda ghcr.io/terrapkg/builder:frawhide anda`
 ```
 
 #### Cargo
