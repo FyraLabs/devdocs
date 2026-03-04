@@ -186,15 +186,15 @@ These are macros used for working with [.desktop files](https://specifications.f
 
 ### %__desktop_file_edit
 Expands to: `/usr/bin/desktop-file-edit{:rpmspec}`
+Note that this should be used only when [%desktop_file_edit](#desktop_file_edit) can not be used, and that the flags listed for `%desktop_file_edit` will not work.
 
 ### %__desktop_file_install
 Expands to: `/usr/bin/desktop-file-install{:rpmspec}`
+Note that this should be used only when [%desktop_file_install](#desktop_file_install) can not be used, and that the flags listed for `%desktop_file_install` will not work.
 
 ### %__desktop_file_validate
 Expands to: `/usr/bin/desktop-file-validate{:rpmspec}`
-
-### %__update_desktop_database
-Expands to: `/usr/bin/update-desktop-database{:rpmspec}`
+Note that this should be used only when [%desktop_file_validate](#desktop_file_validate) can not be used, and that the flags listed for `%desktop_file_validate` will not work.
 
 ### %desktop_file_edit
 SHOULD be used if you for any reason need to edit a .desktop file a build has already installed.
@@ -1339,6 +1339,10 @@ Anda directory for scripts such as `find-develinfo.sh` used by `%__anda_develfil
 ### %__anda_staticfiles
 Expands to: `%_anda_srpm_macros_dir/find-staticinfo.sh %buildroot > anda-staticfiles.list{:rpmspec}`
 Creates anda-staticfiles.list file in `%{buildroot}{:rpmspec}` to be used by [`%pkg_static_files`](#pkg_static_files).
+
+### %__update_desktop_database
+Expands to: `/usr/bin/update-desktop-database{:rpmspec}`
+This is not used as there is no reason not to use `%update_desktop_database`.
 
 ### %desktop_file_args
 This macro is created when using the `-F` option in `%electron_install`. It's used to pass the appropriate Exec arguments to `desktop-file-install` and has no other use.
