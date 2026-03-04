@@ -186,15 +186,19 @@ These are macros used for working with [.desktop files](https://specifications.f
 
 ### %__desktop_file_edit
 Expands to: `/usr/bin/desktop-file-edit{:rpmspec}`
+Note that this should be used only when [%desktop_file_edit](#desktop_file_edit) does not work, and that the flags listed for `%desktop_file_edit` will not work.
 
 ### %__desktop_file_install
 Expands to: `/usr/bin/desktop-file-install{:rpmspec}`
+Note that this should be used only when [%desktop_file_install](#desktop_file_install) does not work, and that the flags listed for `%desktop_file_install` will not work.
 
 ### %__desktop_file_validate
 Expands to: `/usr/bin/desktop-file-validate{:rpmspec}`
+Note that this should be used only when [%desktop_file_validate](#desktop_file_validate) does not work, and that the flags listed for `%desktop_file_validate` will not work.
 
 ### %__update_desktop_database
 Expands to: `/usr/bin/update-desktop-database{:rpmspec}`
+Note that this should be used only when [%update_desktop_database](#update_desktop_database) does not work.
 
 ### %desktop_file_edit
 SHOULD be used if you for any reason need to edit a .desktop file a build has already installed.
