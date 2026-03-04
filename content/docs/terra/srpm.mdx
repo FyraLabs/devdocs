@@ -1342,7 +1342,7 @@ Creates anda-staticfiles.list file in `%{buildroot}{:rpmspec}` to be used by [`%
 
 ### %__update_desktop_database
 Expands to: `/usr/bin/update-desktop-database{:rpmspec}`
-This is not used as there is no reason not to use [%update_desktop_database](#update_desktop_database).
+This is not used as there is no reason not to use `%update_desktop_database`.
 
 ### %desktop_file_args
 This macro is created when using the `-F` option in `%electron_install`. It's used to pass the appropriate Exec arguments to `desktop-file-install` and has no other use.
