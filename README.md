@@ -4,7 +4,7 @@ The unified documentation experience for developers hacking on Fyra Labs project
 
 ###
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://choosealicense.com/licenses/mit/)
+[![License: GPL-3.0-or-later](https://img.shields.io/badge/License-gpl3-blue.svg)](https://choosealicense.com/licenses/gpl-3.0/)
 
 ## 🛠️ Dependencies
 
