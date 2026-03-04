@@ -1068,7 +1068,7 @@ YARN_OPTS="${YARN_OPTS:-%{yarn_config_opts} }" ; export YARN_OPTS
 
 This ensures the environment variables are explicitly exported and therefor are more likely to be picked up by all shell processes. It also creates environment variables called `$NPM_OPTS{:bash}`, `$BUN_OPTS{:bash}`, and `$YARN_OPTS{:bash}`, which can be passed to NPM in lieu of the macros `%{npm_config_opts}{:rpmspec}`, `%{bun_config_opts}{:rpmspec}`, and `%{yarn_config_opts}{:rpmspec}`, respectively, to force our config if necessary.
 
-This should only be needed in the event you are using [%__npx](#__npx), [%__pnpx](#__pnpx), [%__bunx](#__bunx), [%__dx](#__dx), or [%__yarn_dlx](#__yarn_dlx).
+This should only be needed in the event you are using [%__npx](#__npx), [%__pnpx](#__pnpx), [%__bunx](#__bunx), [%__dx](#__dx), [%__yarn_dlx](#__yarn_dlx), OR the package uses one of these buildsystems in the backend (ex. builds with `wails`).
 
 ## Nim
 These macros assist with building [Nim](https://nim-lang.org) projects.
