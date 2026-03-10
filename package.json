@@ -28,7 +28,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "postcss": "^8.5.8",
-    "serve": "^14.2.5",
+    "serve": "^14.2.6",
     "tailwindcss": "^4.2.1",
     "typescript": "^5.9.3"
   }
