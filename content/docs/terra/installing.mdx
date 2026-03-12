@@ -125,17 +125,47 @@ They can be enabled by installing `terra-release-extras`, `terra-release-nvidia`
 
 The extras subrepo provides miscellaneous packages that conflict with Fedora. Things like patched WINE and Switcheroo control are in Extras.
 
+Run the following to enable `terra-extras`:
+
+```sh
+sudo dnf install terra-release-extras
+```
+
 ### Mesa
 
 The Mesa subrepo provides our build of Mesa, with patches from our friends at Universal Blue and most features enabled, unlike RPMFusion and Fedora's builds.
+
+Run the following to enable `terra-mesa`:
+
+```sh
+sudo dnf install terra-release-mesa
+```
+
+If you already have stock `mesa` installed, run the following command to swap it to `terra-mesa` after enabling the repo:
+
+```sh
+sudo dnf swap mesa-va-drivers-freeworld mesa-va-drivers
+```
 
 ### NVIDIA
 
 The NVIDIA subrepo provides a selection of drivers and software for NVIDIA GPUs. We offer drivers based on [Negativo17](https://negativo17.org/) builds, and CUDA packages.
 
+Run the following to enable `terra-nvidia`:
+
+```sh
+sudo dnf install terra-release-nvidia
+```
+
 ### Multimedia
 
 The multimedia subrepo is only available on Fedora 43 and newer. It provides multimedia codecs and related software, like `gstreamer1` packages and `ffmpeg`.
+
+Run the following to enable `terra-multimedia`:
+
+```sh
+sudo dnf install terra-release-multimedia
+```
 
 ## Using Terra
 
