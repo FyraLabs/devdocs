@@ -9,7 +9,7 @@ export function SearchTerra({ macroname }) {
   // To use: <SearchTerra macroname="test" /> and replace test with the name of the macro with no % or {}.
   
   const url =
-    `https://github.com/search?q=repo%3Aterrapkg%2Fpackages+%25${macroname}+OR+%25%7B${macroname}%7D&type=code`;
+    `https://github.com/search?q=repo%3Aterrapkg%2Fpackages+(%25${macroname}+OR+%25%7B${macroname}%7D)&type=code`;
 
   return (
   <span>
@@ -1273,6 +1273,8 @@ This ensures the environment variables are explicitly exported and therefor are 
 
 This should only be needed in the event you are using [%__npx](#__npx), [%__pnpx](#__pnpx), [%__bunx](#__bunx), [%__dx](#__dx), [%__yarn_dlx](#__yarn_dlx), OR the package uses one of these buildsystems (ex. build command uses `wails`).
 
+<SearchTerra macroname="set_javascript_build_flags" />
+
 ## Nim
 These macros assist with building [Nim](https://nim-lang.org) projects.
 Currently `atlas` is not directly supported by the macros, but you can run it directly in `%build{:rpmspec}`:
@@ -1282,8 +1284,6 @@ atlas init
 atlas rep atlas.lock
 %nim_c src/my_project
 ```
-
-<SearchTerra macroname="set_javascript_build_flags" />
 
 ### %nim_prep
 Set up build environment with required packages via `nimble setup`.
