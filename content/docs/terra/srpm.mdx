@@ -1,7 +1,22 @@
 ---
-title: SRPM Macros
+title: "SRPM Macros"
 description: "Documentation on the macros included in the anda-srpm-macros package."
 ---
+
+export function SearchTerra({ macroname }) {
+
+  // Helper function for generating a sentence fpr quicksearching Terra for the macro you pass it
+  // To use: <SearchTerra macroname="test" /> and replace test with the name of the macro with no % or {}.
+  
+  const url =
+    `https://github.com/search?q=repo%3Aterrapkg%2Fpackages+%25${macroname}+OR+%25%7B${macroname}%7D&type=code`;
+
+  return (
+    <span>
+      Click <a href={url}>here</a> to see all examples of <code>%{macroname}{':rpmspec'}</code>
+    </span>
+  );
+}
 
 ## Overview
 
@@ -39,12 +54,16 @@ Expands to: `%_datadir/applications{:rpmspec}` or `/usr/share/applications{:rpms
 
 This may seem like a directory to place the application itself into, but this directory is used for application's `.desktop` files.
 
+<SearchTerra macroname="_appsdir" />
+
 ### %_bun_cache_dir
 The directory where Bun cache files are stored in.
 
 Expands to: `%{_bun_home}/install/cache{:rpmspec}`
 
 Used for [Bun macros](#bun).
+
+<SearchTerra macroname="_bun_cache_dir" />
 
 ### %_bun_home
 The directory where Bun files are stored in.
@@ -55,12 +74,16 @@ Expands to: `%{rpmbuilddir}/.bun{:rpmspec}`
 
 Used for [Bun macros](#bun).
 
+<SearchTerra macroname="_bun_home" />
+
 ### %_cargo_home
 Set by our [Cargo prep macros](#rust-macros).
 
 We set this specifically because in online builds if the directory is manually changed as a build step (such as multi Crate repo projects), the Crates could be redownloaded during build and slow down build times. Tools like Tauri also read `.cargo` differently because they change the current working directory.
 
 Expands to: `%{rpmbuilddir}%{?buildsubdir:/%{buildsubdir}}/.cargo{:rpmspec}`
+
+<SearchTerra macroname="_cargo_home" />
 
 ### %_deno_dir
 The directory that Deno's files and cache are stored in.
@@ -69,12 +92,16 @@ Expands to: `%{rpmbuilddir}/.deno{:rpmspec}`
 
 Used for [Deno macros](#deno).
 
+<SearchTerra macroname="_deno_dir" />
+
 ### %_deno_install_root
 Directory where Deno installs dependency packages.
 
 Expands to: `%{_deno_dir}/bin{:rpmspec}`
 
 Used for [Deno macros](#deno).
+
+<SearchTerra macroname="_deno_install_root" />
 
 ### %_dracut_confdir
 The directory where Dracut config provided by system packages should be installed to.
