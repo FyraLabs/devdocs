@@ -12,9 +12,9 @@ export function SearchTerra({ macroname }) {
     `https://github.com/search?q=repo%3Aterrapkg%2Fpackages+%25${macroname}+OR+%25%7B${macroname}%7D&type=code`;
 
   return (
-    <span>
-      Click <a href={url}>here</a> to see all examples of <code>%{macroname}{':rpmspec'}</code>
-    </span>
+  <span>
+    Click <a href={url}>here</a> to see all examples of <code className="language-rpm">%{macroname}</code>.
+  </span>
   );
 }
 
