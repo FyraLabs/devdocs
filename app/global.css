@@ -1,3 +1,29 @@
 @import "tailwindcss";
 @import "fumadocs-ui/css/neutral.css";
 @import "fumadocs-ui/css/preset.css";
+
+.terra-search-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    font-size: inherit;
+    /*font-style: inherit; cant figure out how to make the font inherit fumadocs body text idk */
+    cursor: pointer;
+    transition: color 0.15s;
+}
+
+.terra-search-btn:hover {
+    color: var(--color-text-primary);
+    text-decoration: none;
+}
+
+.terra-search-btn code {
+    padding: 1;
+}
+
+.terra-search-btn svg {
+    flex-shrink: 0;
+}

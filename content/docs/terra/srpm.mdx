@@ -3,20 +3,7 @@ title: "SRPM Macros"
 description: "Documentation on the macros included in the anda-srpm-macros package."
 ---
 
-export function SearchTerra({ macroname }) {
-
-  // Helper function for generating a sentence about quicksearching Terra for whatever macro you pass it
-  // To use: <SearchTerra macroname="test" /> and replace test with the name of the macro with no % or {}.
-  
-  const url =
-    `https://github.com/search?q=repo%3Aterrapkg%2Fpackages+(%25${macroname}+OR+%25%7B${macroname}%7D)&type=code`;
-
-  return (
-  <span>
-    Click <a href={url}>here</a> to see all examples of <code className="language-rpm">%{macroname}</code> in Terra.
-  </span>
-  );
-}
+import { SearchTerra } from '@/components/mdx/searchterra';
 
 ## Overview
 
