@@ -5,6 +5,7 @@ description: "Documentations for different RPM macros."
 ---
 
 import * as Split from "../../../components/split";
+import { SearchTerra } from '@/components/mdx/searchterra';
 
 ## RPM Macros
 
@@ -91,6 +92,8 @@ To make sure a macro lasts for the entire spec file, use `%global` instead.
   </div>
 </Split.Root>
 
+<SearchTerra macroname="define" />
+
 ##### `%global` 🔰 [#global]
 
 Defines a macro globally.
@@ -121,6 +124,8 @@ As opposed to [`%define`](#define), macros defined with `%global` will last for 
 
   </div>
 </Split.Root>
+
+<SearchTerra macroname="global" />
 
 ##### `%undefine` 🔦 [#undefine]
 
@@ -163,6 +168,8 @@ Instead, this pops the latest definition from the macro stack.
   </div>
 </Split.Root>
 
+<SearchTerra macroname="undefine" />
+
 ##### `%dnl` 🔰 [#dnl]
 
 Comments.
@@ -186,9 +193,13 @@ while macros in `# …` are actually expanded.
 	</div>
 </Split.Root>
 
+<SearchTerra macroname="dnl" />
+
 ##### `%{load:…}` 🔦🚸 [#load]
 
 Load a macro file.
+
+<SearchTerra macroname="load:" />
 
 ##### `%{expr:…}` 🔦 [#expr]
 
@@ -203,6 +214,8 @@ error: expanded string: 1 + 2
 $ rpm -D 'foo 1 + 2' -E '%{expr:%foo}'
 3
 ```
+
+<SearchTerra macroname="expr:" />
 
 ##### `%{expand:…}` 🛠️ [#expand]
 
@@ -223,6 +236,8 @@ Double-expand the macro.
       ```
     </div>
   </Split.Root>
+  
+  <SearchTerra macroname="expand:" />
 
 ##### `%{lua:…}` 🛠️ [#lua]
 
@@ -270,6 +285,8 @@ In `rpmspec-rs`, a space must be present after `--`.
   </div>
 </Split.Root>
 
+<SearchTerra macroname="lua:" />
+
 ##### `%{macrobody:…}` 🔩 [#macrobody]
 
 Expand to the definition of the given macro.
@@ -281,6 +298,8 @@ $ rpm -E '%dist'
 $ rpm -E '%macrobody dist'
 %{?distprefix}.um41%{?with_bootstrap:~bootstrap}
 ```
+
+<SearchTerra macroname="macrobody:" />
 
 ##### `%{quote:…}` 🔦🛠️ [#quote]
 
@@ -301,6 +320,8 @@ This can be used to pass arguments with spaces to parameterized macros:
     ```
   </div>
 </Split.Root>
+
+<SearchTerra macroname="quote:" />
 
 #### String Operations
 
@@ -327,6 +348,8 @@ In short, this replaces `%?4` occurrences of `%2` in `%1` to `%3`.
   </div>
 </Split.Root>
 
+<SearchTerra macroname="gsub" />
+
 #### `%{len:…}` [#len]
 
 Obtains the length of the given text.
@@ -345,19 +368,29 @@ Obtains the length of the given text.
   </div>
 </Split.Root>
 
+<SearchTerra macroname="len" />
+
 ##### `%{lower:…}` [#lower]
 
 Turn the input into ASCII-lowercase.
+
+<SearchTerra macroname="lower:" />
 
 ##### `%{upper:…}` [#upper]
 
 ASCII-uppercase.
 
+<SearchTerra macroname="upper:" />
+
 #### `%rep …` 🔢🔦 [#rep]
 
 Repeat the first input (`%1`) `n`-times, `n` given by `%2` (lua `string.rep()`).
 
+<SearchTerra macroname="rep" />
+
 #### `%{reverse:…}` [#reverse]
+
+<SearchTerra macroname="reverse" />
 
 #### `%sub …` 🔢🔰 [#sub]
 
@@ -367,6 +400,8 @@ Expand to substring (lua `string.sub()`).
 $ rpm -E '%sub abc 2 3'
 bc
 ```
+
+<SearchTerra macroname="sub" />
 
 ##### `%{shescape:…}` [#shescape]
 
@@ -381,9 +416,13 @@ $ rpm -E "%(echo %{shescape:this is some 'text'})"
 this is some 'text'
 ```
 
+<SearchTerra macroname="shescape" />
+
 ##### `%{shrink:…}` [#shrink]
 
 Trim leading and trailing ASCII-whitespace, and reduce intermediate whitespace to a single space.
+
+<SearchTerra macroname="shrink" />
 
 #### File and Path Operations
 
@@ -391,27 +430,39 @@ Trim leading and trailing ASCII-whitespace, and reduce intermediate whitespace t
 
 > basename(1) macro analogue
 
+<SearchTerra macroname="basename:" />
+
 ##### `%{dirname:…}` 🔦 [#dirname]
 
 > dirname(1) macro analogue
+
+<SearchTerra macroname="dirname:" />
 
 ##### `%{exists:…}` 🔦 [#exists]
 
 > test file existence, expands to 1/0
 
+<SearchTerra macroname="exists:" />
+
 ##### `%{suffix:…}` 🔦 [#suffi]
 
 > expand to suffix part of a file name
 
+<SearchTerra macroname="suffix:" />
+
 ##### `%{url2path:…}` 🔦 [#url2path]
 
 > convert url to a local path
+
+<SearchTerra macroname="url2path:" />
 
 ##### `%{uncompress:…}` [#uncompress]
 
 > expand to a command for outputting argument file to stdout, uncompressing as needed
 
 This macro is used in [`%setup …`](#setup) for uncompressing source files.
+
+<SearchTerra macroname="uncompress:" />
 
 #### Environment info
 
@@ -426,17 +477,25 @@ Also accept extra arguments:
 However, `%getncpus total`, `%getncpus proc` and `%getncpus thread` produce the same results as far as
 concerned. It is suspected that the arguments in most cases have no effect to the output.
 
+<SearchTerra macroname="getncpus:" />
+
 ##### `%getconfdir` 🔦 [#getconfdir]
 
 > expand to rpm "home" directory (typically /usr/lib/rpm)
+
+<SearchTerra macroname="getconfdir" />
 
 ##### `%{getenv:...}` 🔦 [#getenv]
 
 > getenv(3) macro analogue
 
+<SearchTerra macroname="getenv:" />
+
 ##### `%rpmversion` 🔦 [#rpmversion]
 
 > expand to running rpm version
+
+<SearchTerra macroname="rpmversion" />
 
 #### Output
 
@@ -448,6 +507,8 @@ concerned. It is suspected that the arguments in most cases have no effect to th
   The printing happens when the macro is evaluated and expanded, not at the
   section/position it is written.
 </Callout>
+
+<SearchTerra macroname="echo:" />
 
 ##### `%{warn:…}` 🔦 [#warn]
 
@@ -461,6 +522,8 @@ and displayed again at the end of the `rpmbuild` execution (after `Executing(rmb
   section/position it is written.
 </Callout>
 
+<SearchTerra macroname="warn:" />
+
 ##### `%{error:…}` 🔦 [#error]
 
 > print error: ... to stderr and return an error
@@ -473,11 +536,15 @@ perform `Executing(rmbuild)` and exit with a summary of all warnings and errors.
   section/position it is written.
 </Callout>
 
+<SearchTerra macroname="error:" />
+
 ##### `%{verbose:…}` 🔦 [#verbose]
 
 > `%verbose`: expand to 1 if rpm is in verbose mode, 0 if not
 >
 > `%{verbose:...}`: expand to ... if rpm is in verbose mode, the empty string if not
+
+<SearchTerra macroname="verbose" />
 
 #### Spec-specific Macros
 
@@ -507,6 +574,8 @@ Expand to the path to the source file. This is just a fancy macro that transform
 			```
 		</div>
 	</Split.Root>
+	
+<SearchTerra macroname="S:" />
 
 ##### `%{P:#}` [#P]
 
@@ -514,11 +583,15 @@ Expand to the path to the source file. This is just a fancy macro that transform
 
 As you may have guessed, this is basically the `Patch:` version of [`%{S:…}`](#S).
 
+<SearchTerra macroname="P:" />
+
 #### Diagnostics
 
 ##### `%trace` 🔦🛠️ [#trace]
 
 > toggle print of debugging information before/after expansion
+
+<SearchTerra macroname="trace" />
 
 ##### `%dump` 🔩 [#dump]
 
@@ -532,13 +605,19 @@ rpm -E '%dump' 2>&1 | grep x86_64_v3
 
 Or you can just use `less` instead of `grep`.
 
+<SearchTerra macroname="dump" />
+
 ##### `%__file_name` 🔦 [#__file_name]
 
 > current file (if parsing a file)
 
+<SearchTerra macroname="__file_name" />
+
 ##### `%__file_lineno` 🔦 [#__file_lineno]
 
 > line number in current file (if parsing a file)
+
+<SearchTerra macroname="__file_lineno" />
 
 ### Common Macros
 
@@ -549,6 +628,8 @@ Or you can just use `less` instead of `grep`.
 Expand to nothing.
 
 Defined as `%{!?nil}`.
+
+<SearchTerra macroname="nil" />
 
 #### In Preamble
 
@@ -563,19 +644,27 @@ Parameterized as `%forgemeta(z:isva)`:
 - `-a`: process all source archives (when you have `%forgeurl0`, `%forgeurl1`, …)
 - `-z <#>`: process only `%{S:#}` (see [`%{S:}`](#S))
 
+<SearchTerra macroname="forgemeta" />
+
 ##### `%forgeautosetup …` 🔢 [#forgeautosetup]
 
 Somehow pretty rare.
 
 Parameterized as `%forgeautosetup(z:vNS:p:q)`.
 
+<SearchTerra macroname="forgeautosetup" />
+
 ##### `%forgesetup …` 🔢🔰 [#forgesetup]
 
 Parameterized as `%forgesetup(z:va)`.
 
+<SearchTerra macroname="forgesetup" />
+
 ##### `%forgeversion …` 🔢🔦 [#forgeversion]
 
 Parameterized as `%forgeversion(pz:ab:)`.
+
+<SearchTerra macroname="forgeversion" />
 
 ##### `%debug_package` 🔰🏷️ [#debug_package]
 
@@ -593,6 +682,8 @@ You can disable this automatic behavior by setting:
 ```
 
 Then RPM will not strip debug symbols.
+
+<SearchTerra macroname="debug_package" />
 
 ##### `%_build_id_links` 🏷️ [#_build_id_links]
 
@@ -629,6 +720,8 @@ In `/usr/lib/rpm/macros`:
 %_build_id_links compat
 ```
 
+<SearchTerra macroname="_build_id_links" />
+
 ##### `%_missing_build_ids_terminate_build` 🏷️ [#_missing_build_ids_terminate_build]
 
 Still having problems with `/usr/lib/.build-id`? Try setting this to `0`.
@@ -643,6 +736,8 @@ In `/usr/lib/rpm/macros`:
 %_missing_build_ids_terminate_build    1
 ```
 
+<SearchTerra macroname="_missing_build_ids_terminate_build" />
+
 ##### `%__strip` 🏷️ [#__strip]
 
 In some cases (e.g. JavaScript binaries) stripping the binaries may break the
@@ -650,6 +745,8 @@ executable. To disable stripping, override the strip call:
 ```rpmspec
 %global __strip /bin/true
 ```
+
+<SearchTerra macroname="__strip" />
 
 ##### `%__requires_exclude` 🏷️ [#__requires_exclude]
 
@@ -666,12 +763,16 @@ what things the binaries are linked to, you may disable that by adding a regex t
 
 <Callout type="info">If you want to disable all automatic `Requires:`, set `AutoReq: 0`.</Callout>
 
+<SearchTerra macroname="__strip" />
+
 ##### `%__requires_exclude_from` 🏷️ [#__requires_exclude_from]
 
 ```rpmspec title="example.spec"
 # https://github.com/terrapkg/packages/blob/7f0fd6b6a8993d17832403960d4343899cfb0474/anda/system/opentabletdriver/opentabletdriver.spec#L6
 %global __requires_exclude_from ^/usr/lib/opentabletdriver/.*$
 ```
+
+<SearchTerra macroname="__requires_exclude_from" />
 
 ##### `%__provides_exclude` 🏷️ [#__provides_exclude]
 
@@ -687,6 +788,8 @@ Similarly, since `rpmbuild` automatically generates `Provides:`, you may disable
 
 <Callout type="info">If you want to disable all automatic `Provides:`, set `AutoProv: 0`.</Callout>
 
+<SearchTerra macroname="__provides_exclude" />
+
 ##### `%__provides_exclude_from` 🏷️ [#__provides_exclude_from]
 
 ```rpmspec title="example.spec" {8}
@@ -699,6 +802,8 @@ Similarly, since `rpmbuild` automatically generates `Provides:`, you may disable
 %global __requires_exclude libffmpeg.so
 %global __provides_exclude_from %{_datadir}/%{name}/.*\\.so
 ```
+
+<SearchTerra macroname="__provides_exclude_from" />
 
 ##### `%__brp_mangle_shebangs_exclude_from` 🔰🏷️ [#__brp_mangle_shebangs_exclude_from]
 
@@ -720,21 +825,31 @@ If this breaks, you can ask it to exclude the files that matches a given regex.
 %global rustflags_debuginfo 0
 ```
 
+<SearchTerra macroname="__brp_mangle_shebangs_exclude_from" />
+
 ##### `%__brp_mangle_shebangs_exclude` 🏷️ [#__brp_mangle_shebangs_exclude]
 
 Similar to above, but takes in regex for shebangs to exclude instead.
+
+<SearchTerra macroname="__brp_mangle_shebangs_exclude" />
 
 ##### `%__brp_mangle_shebangs_exclude_file` 🏷️ [#__brp_mangle_shebangs_exclude_file]
 
 Similar to above, but takes in path to file that contains the regexes.
 
+<SearchTerra macroname="__brp_mangle_shebangs_exclude_file" />
+
 ##### `%__brp_mangle_shebangs_exclude_from_file` 🏷️ [#__brp_mangle_shebangs_exclude_from_file]
+
+<SearchTerra macroname="__brp_mangle_shebangs_exclude_from_file" />
 
 ##### `%__brp_mangle_shebangs` 🏷️
 
 As a last resort to fixing bugs related to shebangs mangling shenanigans,
 undefine this macro. You really should try using
 [`%__brp_mangle_shebangs_exclude_from`](#__brp_mangle_shebangs_exclude_from) first though.
+
+<SearchTerra macroname="__brp_mangle_shebangs" />
 
 ##### `%bcond_with …` 🔢🔰 [#bcond_with]
 
@@ -745,6 +860,8 @@ Takes in 1 argument: the name of the "conditional".
 
 For more information: https://rpm-software-management.github.io/rpm/manual/conditionalbuilds.html
 
+<SearchTerra macroname="bcond_with" />
+
 ##### `%bcond_without …` 🔢🔰 [#bcond_without]
 
 **ENABLE** a "conditional".
@@ -753,6 +870,8 @@ Parameterized as `%bcond_without()`.
 Takes in 1 argument: the name of the "conditional".
 
 For more information: https://rpm-software-management.github.io/rpm/manual/conditionalbuilds.html
+
+<SearchTerra macroname="bcond_without" />
 
 #### In `%prep`
 
@@ -776,6 +895,8 @@ Parameterized as `%autosetup(a:b:cCDn:TvNS:p:)`:
 This is actually a wrapper around [`%setup`](#setup) and [`%autopatch …`](#autopatch).
 
 If you need to unpack multiple sources, see: http://ftp.rpm.org/max-rpm/s1-rpm-inside-macros.html
+
+<SearchTerra macroname="autosetup" />
 
 ##### `%setup …` 🔢🚸 [#setup]
 
@@ -811,6 +932,8 @@ The `%setup …` macro does 3 things:
   - internally uses [`%{uncompress:…}`](#uncompress)
 - `cd %{?buildsubdir}`
 
+<SearchTerra macroname="setup" />
+
 ##### `%autopatch …` 🔢 [#autopatch]
 
 Apply patches.
@@ -835,6 +958,8 @@ Examples:
 
 Reference: https://rpm-software-management.github.io/rpm/manual/autosetup.html#autopatch
 
+<SearchTerra macroname="autopatch" />
+
 ##### `%patch …` 🔢🚸 [#patch]
 
 Apply a patch.
@@ -846,6 +971,8 @@ Apply a patch.
 We recommend [`%autopatch`](#autopatch) over this.
 
 Parameterized as `%patch(b:p:P:REz:)`.
+
+<SearchTerra macroname="patch" />
 
 ### Paths
 
@@ -1037,6 +1164,8 @@ Macros with the '(Terra only)' warning are part of the `anda-srpm-macros` packag
 Path to a specific directory where files, that get packaged into the final RPM, should live.
 This is the same as `$pkgdir` in Arch Linux PKGBUILDs.
 
+<SearchTerra macroname="buildroot" />
+
 ##### `%find_lang` 🔰 [#find_lang]
 
 From `/usr/lib/rpm/find-lang.sh`:
@@ -1088,6 +1217,8 @@ install -Dm644 data/glib-2.0/schemas/%{lower:%app}.gschema.xml %buildroot%_datad
 …
 ```
 
+<SearchTerra macroname="find_lang" />
+
 #### `%fdupes …` 🔢 [#fdupes]
 
 Hard-link (or symlink) files to save space.
@@ -1125,6 +1256,8 @@ mkdir -p %{buildroot}%{_datadir}/themes
 	```
 </Callout>
 
+<SearchTerra macroname="fdupes" />
+
 ### Per Language
 
 If your language / buildsystem is not listed here, go to
@@ -1141,36 +1274,52 @@ If you need to execute `./configure`, in most cases you should use this macro in
 In some cases where `./configure` is not directly available, you may need to run
 `autoreconf -fi` or `-fiv`.
 
+<SearchTerra macroname="configure" />
+
 ##### `%make_build` 🔰 [#make_build]
 
 ⇒ `%__make -O -j${RPM_BUILD_NCPUS} V=1 VERBOSE=1{:sh}`,
 where `%{__make}` ⇒ `/usr/bin/make`.
 Further arguments to `make` can be attached.
 
+<SearchTerra macroname="make_build" />
+
 ##### `%make_install` 🔰 [#make_install]
 
 ⇒ `%__make install DESTDIR=%?buildroot INSTALL="%__install -p"{:sh}`.
 
+<SearchTerra macroname="make_install" />
+
 ##### `%makeinstall` 🚸 [#makeinstall]
 
 Deprecated. Use [`%make_install`](#make_install) instead.
+
+<SearchTerra macroname="make_install" />
 
 ##### `%cmake` 🔰 [#cmake]
 
 Expand to `%{__cmake}` (⇒ `/usr/bin/cmake`) with the correct flags,
 such as `-B "%__cmake_builddir"{:sh}` (⇒ `-B "redhat-linux-build"{:sh}`).
 
+<SearchTerra macroname="cmake" />
+
 ##### `%cmake_build` 🔰 [#cmake_build]
 
 ⇒ `%__cmake --build "%__cmake_builddir" %?_smp_mflags --verbose{:sh}`.
+
+<SearchTerra macroname="cmake_build" />
 
 ##### `%cmake_install` 🔰 [#cmake_install]
 
 ⇒ `DESTDIR="%buildroot" %__cmake --install "%__cmake_builddir"{:sh}`.
 
+<SearchTerra macroname="cmake_install" />
+
 ##### `%meson` 🔰 [#meson]
 
 ≈ `%__meson setup{:sh}` with correct flags.
+
+<SearchTerra macroname="meson" />
 
 ##### `%meson_build` 🔰 [#meson_build]
 
@@ -1178,15 +1327,21 @@ such as `-B "%__cmake_builddir"{:sh}` (⇒ `-B "redhat-linux-build"{:sh}`).
 
 ⇒ `/usr/bin/meson compile -C redhat-linux-build -j 20 --verbose{:sh}` (on my machine).
 
+<SearchTerra macroname="meson_build" />
+
 ##### `%meson_install` 🔰 [#meson_install]
 
 ⇒ `DESTDIR=%buildroot %__meson install -C %_vpath_builddir --no-rebuild{:sh}`.
 Used in `%install{:rpmspec}`.
 
+<SearchTerra macroname="meson_install" />
+
 ##### `%meson_test` 🔰 [#meson_test]
 
 ⇒ `%__meson test -C %_vpath_builddir --no-rebuild %{!?__meson_verbose:--quiet}{:sh}`.
 Used in `%check{:rpmspec}`.
+
+<SearchTerra macroname="meson_test" />
 
 ##### `%ninja_build` [#ninja_build]
 
@@ -1194,19 +1349,27 @@ Used in `%check{:rpmspec}`.
 
 ⇒ `%__ninja -v -j${RPM_BUILD_NCPUS}{:sh}`.
 
+<SearchTerra macroname="ninja_build" />
+
 ##### `%ninja_install` [#ninja_install]
 
 ⇒ `DESTDIR=%buildroot %__ninja install %__ninja_common_opts{:sh}`.
 
+<SearchTerra macroname="ninja_install" />
+
 ##### `%ninja_test` [#ninja_test]
 
 ⇒ `%__ninja test %__ninja_common_opts{:sh}`.
+
+<SearchTerra macroname="ninja_test" />
 
 ##### `%build_cflags` 🏷️ [#build_cflags]
 
 Flags to be passed to the C compiler.
 
 ⇒ `%{__build_flags_lang_c} %{?_distro_extra_cflags}`
+
+<SearchTerra macroname="build_cflags" />
 
 ##### `%_distro_extra_cflags` 🏷️ [#_distro_extra_cflags]
 
@@ -1215,11 +1378,15 @@ For example, if the compiler is emitting errors that could be disabled with some
 
 This macro is not defined by default on Fedora.
 
+<SearchTerra macroname="_distro_extra_cflags" />
+
 ##### `%build_cxxflags` 🏷️ [#build_cxxflags]
 
 Flags to be passed to the C++ compiler.
 
 ⇒ `%{__build_flags_lang_cxx} %{?_distro_extra_cxxflags}`
+
+<SearchTerra macroname="build_cxxflags" />
 
 ##### `%_distro_extra_cxxflags` 🏷️ [#_distro_extra_cxxflags]
 
@@ -1228,11 +1395,17 @@ For example, if the compiler is emitting errors that could be disabled with some
 
 This macro is not defined by default on Fedora.
 
+<SearchTerra macroname="_distro_extra_cxxflags" />
+
 #### D
 
 ##### `%ldc_arches` [#ldc_arches]
 
+<SearchTerra macroname="ldc_arches" />
+
 ##### `%_d_optflags` [#_d_optflags]
+
+<SearchTerra macroname="_d_optflags" />
 
 #### Java
 
@@ -1246,13 +1419,19 @@ This section is only applicable to Terra (because Fedora does not ship Nim).
 
 Set `mold` as the linker and run `nimble setup -y`.
 
+<SearchTerra macroname="nim_prep" />
+
 ##### `%nim_build` [#nim_build]
 
 Same as [`%nim_c`](#nim_c).
 
+<SearchTerra macroname="nim_build" />
+
 ##### `%nim_c` [#nim_c]
 
 ⇒ `nim c -d:release -t:"%nim_tflags" -l:"%nim_lflags"{:sh}`.
+
+<SearchTerra macroname="nim_c" />
 
 #### Python
 
@@ -1283,3 +1462,5 @@ https://github.com/terrapkg/packages/blob/2df55dad60a58ecf5f8fbe962f877f2834bdfa
 ```
 
 [expression]: ./expr
+
+<SearchTerra macroname="rustflags_debuginfo" />
