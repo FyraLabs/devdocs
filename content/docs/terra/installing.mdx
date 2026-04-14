@@ -38,7 +38,11 @@ Or, just don't use the fancy script. I guess.
 
 #### Ultramarine Linux
 
-Ultramarine already comes with Terra out of the box, simply `dnf` away!
+Ultramarine comes with Terra out of the box, check your app store or just `dnf`!
+
+#### Nobara
+
+Nobara comes with Terra! Simply `dnf` away!
 
 #### Fedora Atomic and Derivatives
 
@@ -51,7 +55,13 @@ sudo rpm-ostree install terra-release
 
 #### Bazzite and Aurora
 
-Bazzite and Aurora come with Terra out of the box, simply `rpm-ostree` away!
+Bazzite and Aurora come with Terra, but disable it.
+
+Edit `/etc/yum.repos.d/terra.repo` and change `enabled=0` to `enabled=1`
+
+Do this again for `/etc/yum.repos.d/terra-extras.repo`
+
+Then you can simply `rpm-ostree` away!
 
 #### Bluefin
 
@@ -133,7 +143,7 @@ sudo dnf install terra-release-extras
 
 ### Mesa
 
-The Mesa subrepo provides our build of Mesa, with patches from our friends at Universal Blue and most features enabled, unlike RPMFusion and Fedora's builds.
+The Mesa subrepo provides our build of Mesa, with patches from the [Open Gaming Collective](https://opengamingcollective.org/) and most features enabled, unlike RPMFusion and Fedora's builds.
 
 Run the following to enable `terra-mesa`:
 
