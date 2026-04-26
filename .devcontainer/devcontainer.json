@@ -1,0 +1,21 @@
+{
+  "name": "Fyra Devdocs",
+  "image": "ghcr.io/ultramarine-linux/ultramarine:43",
+  "onCreateCommand": "sudo dnf install -y bun nodejs",
+  "postCreateCommand": "bun install",
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "4321": {
+      "label": "Astro Dev Server",
+      "onAutoForward": "notify"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "astro-build.astro-vscode",
+        "bradlc.vscode-tailwindcss"
+      ]
+    }
+  }
+}

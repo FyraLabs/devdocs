@@ -1,7 +1,9 @@
 ---
-title: SRPM Macros
+title: "SRPM Macros"
 description: "Documentation on the macros included in the anda-srpm-macros package."
 ---
+
+import { SearchTerra } from '@/components/mdx/searchterra';
 
 ## Overview
 
@@ -39,12 +41,16 @@ Expands to: `%_datadir/applications{:rpmspec}` or `/usr/share/applications{:rpms
 
 This may seem like a directory to place the application itself into, but this directory is used for application's `.desktop` files.
 
+<SearchTerra macroname="_appsdir" />
+
 ### %_bun_cache_dir
 The directory where Bun cache files are stored in.
 
 Expands to: `%{_bun_home}/install/cache{:rpmspec}`
 
 Used for [Bun macros](#bun).
+
+<SearchTerra macroname="_bun_cache_dir" />
 
 ### %_bun_home
 The directory where Bun files are stored in.
@@ -55,12 +61,16 @@ Expands to: `%{rpmbuilddir}/.bun{:rpmspec}`
 
 Used for [Bun macros](#bun).
 
+<SearchTerra macroname="_bun_home" />
+
 ### %_cargo_home
 Set by our [Cargo prep macros](#rust-macros).
 
 We set this specifically because in online builds if the directory is manually changed as a build step (such as multi Crate repo projects), the Crates could be redownloaded during build and slow down build times. Tools like Tauri also read `.cargo` differently because they change the current working directory.
 
 Expands to: `%{rpmbuilddir}%{?buildsubdir:/%{buildsubdir}}/.cargo{:rpmspec}`
+
+<SearchTerra macroname="_cargo_home" />
 
 ### %_deno_dir
 The directory that Deno's files and cache are stored in.
@@ -69,6 +79,8 @@ Expands to: `%{rpmbuilddir}/.deno{:rpmspec}`
 
 Used for [Deno macros](#deno).
 
+<SearchTerra macroname="_deno_dir" />
+
 ### %_deno_install_root
 Directory where Deno installs dependency packages.
 
@@ -76,18 +88,26 @@ Expands to: `%{_deno_dir}/bin{:rpmspec}`
 
 Used for [Deno macros](#deno).
 
+<SearchTerra macroname="_deno_install_root" />
+
 ### %_dracut_confdir
 The directory where Dracut config provided by system packages should be installed to.
 
 Expands to: `%{_prefix}/lib/dracut/dracut.conf.d{:rpmspec}`
 
+<SearchTerra macroname="_dracut_confdir" />
+
 ### %elvish_completions_dir
 Expands to: `%_datadir/elvish/lib/completions{:rpmspec}`
 
-Used in [`%pkg_completions`](#pkg_completion), or manually when `%pkg_completions` cannot be used.
+Used in [`%pkg_completion`](#pkg_completion), or manually when `%pkg_completion` cannot be used.
+
+<SearchTerra macroname="elvish_completions_dir" />
 
 ### %_gnomeextensionsdir
 Expands to: `%{_datadir}/gnome-shell/extensions%{?uuid:/%{uuid}}{:rpmspec}`
+
+<SearchTerra macroname="_gnomeextensionsdir" />
 
 <Callout type="idea">
 `%{uuid}` is usually defined in gnome-shell-extension packages. if the macro is defined in your spec file (`%global uuid PKG-UUID`), it will be appended to the path upon expansion as: `%{_datadir}/gnome-shell/extensions/%{uuid}`.<br />
@@ -110,15 +130,21 @@ install -Dm644 icons/64x64.png %{buildroot}%{_hicolordir}/64x64/apps/%{name}.png
 
 If the file is an `.svg`, use the [`%_scalableiconsdir`](#_scalableiconsdir).
 
+<SearchTerra macroname="_hicolordir" />
+
 ### %_npm_cache_dir
 Expands to: `%{rpmbuilddir}/.npm{:rpmspec}`
 
 Used with [JavaScript package manager macros](#javascript-runtimes), especially [NPM macros](#npm).
 
+<SearchTerra macroname="_npm_cache_dir" />
+
 ### %nushell_completions_dir
 Expands to: `%_datadir/nushell/vendor/autoload{:rpmspec}`
 
-Used in [`%pkg_completions`](#pkg_completion), or manually when `%pkg_completions` cannot be used.
+Used in [`%pkg_completion`](#pkg_completion), or manually when `%pkg_completion` cannot be used.
+
+<SearchTerra macroname="nushell_completions_dir" />
 
 ### %_nvm_dir
 The location in the `%{rpmbuilddir}{:rpmspec}` what will be passed to `$NVM_DIR{:rpmspec}`, which is where vendored Node.js installs and cache are stored.
@@ -127,10 +153,14 @@ Expands to: `%{rpmbuilddir}/.nvm{:rpmspec}`
 
 Only used for for [`%{__nvm}`](#__nvm).
 
+<SearchTerra macroname="_nvm_dir" />
+
 ### %_pkgconfigdir
 Expands to: `%{_libdir}/pkgconfig{:rpmspec}`
 
 Used in the `%files{:rpmspec}` section.
+
+<SearchTerra macroname="_pkgconfigdir" />
 
 ### %_pnpm_home
 The directory where PNPM files and cache are stored.
@@ -139,12 +169,16 @@ Expands to: `%{rpmbuilddir}/.pnpm{:rpmspec}`
 
 Used for [PNPM macros](#pnpm).
 
+<SearchTerra macroname="_pnpm_home" />
+
 ### %_pnpm_store
 The directory where JavaScript modules installed by PNPM usually go. This will usually not be produced when using PNPM as a build tool, but exists for rare builds it may be created in.
 
 Expands to: `%{_pnpm_home}/store{:rpmspec}`
 
 Used for [PNPM macros](#pnpm).
+
+<SearchTerra macroname="_pnpm_store" />
 
 ### %rpmbuilddir
 This macro exists because Terra supports EL distributions (Red Hat Enterprise Linux, Alma Linux, etc.) which currently have an RPM version from before the `%{builddir}{:rpmspec}` change to address issues [like this](https://github.com/rpm-software-management/rpm/issues/3151).
@@ -155,12 +189,16 @@ This macro is subject to deprecation once all EL distributions with an RPM versi
 
 Expands to: `%{?builddir}%{?!builddir:%{_builddir}}{:rpmspec}`
 
+<SearchTerra macroname="rpmbuilddir" />
+
 ### %_rustup_home
 This macro is set by `%rustup_nightly`.
 
 It sets a specific location for Rustup install files so the toolchain information is never potentially lost during different build steps and to keep files out of `$HOME`.
 
 Expands to: `%{rpmbuilddir}/.rustup{:rpmspec}`
+
+<SearchTerra macroname="_rustup_home" />
 
 ### %_scalableiconsdir
 Expands to: `%_hicolordir/scalable/apps{:rpmspec}` or `/usr/share/icons/hicolor/scalable/apps{:rpmspec}`
@@ -174,6 +212,8 @@ install -Dm644 icons/%{name}.svg %{buildroot}%{_scalableiconsdir}/%{name}.svg
 
 If the file is a `.png`, use [`%_hicolordir`](#_hicolordir).
 
+<SearchTerra macroname="_scalableiconsdir" />
+
 ### %_yarn_cache_dir
 The directory where Yarn cache files are stored in.
 
@@ -181,20 +221,28 @@ Expands to: `%{rpmbuilddir}/.yarn{:rpmspec}`
 
 Used for [Yarn macros](#yarn).
 
+<SearchTerra macroname="_yarn_cache_dir" />
+
 ## Desktop File Macros
 These are macros used for working with [.desktop files](https://specifications.freedesktop.org/desktop-entry/latest).
 
 ### %__desktop_file_edit
 Expands to: `/usr/bin/desktop-file-edit{:rpmspec}`
+Note that this should be used only when [%desktop_file_edit](#desktop_file_edit) can not be used, and that the flags listed for `%desktop_file_edit` will not work.
+
+<SearchTerra macroname="__desktop_file_edit" />
 
 ### %__desktop_file_install
 Expands to: `/usr/bin/desktop-file-install{:rpmspec}`
+Note that this should be used only when [%desktop_file_install](#desktop_file_install) can not be used, and that the flags listed for `%desktop_file_install` will not work.
+
+<SearchTerra macroname="__desktop_file_install" />
 
 ### %__desktop_file_validate
 Expands to: `/usr/bin/desktop-file-validate{:rpmspec}`
+Note that this should be used only when [%desktop_file_validate](#desktop_file_validate) can not be used, and that the flags listed for `%desktop_file_validate` will not work.
 
-### %__update_desktop_database
-Expands to: `/usr/bin/update-desktop-database{:rpmspec}`
+<SearchTerra macroname="__desktop_file_validate" />
 
 ### %desktop_file_edit
 SHOULD be used if you for any reason need to edit a .desktop file a build has already installed.
@@ -216,6 +264,8 @@ Example usage:
 ```rpmspec
 %desktop_file_edit -k Exec,Icon -v pkg,pkgicon -u %u -f /path/to/file.desktop
 ```
+
+<SearchTerra macroname="__desktop_file_edit" />
 
 ### %desktop_file_install
 SHOULD be used to install a .desktop file.
@@ -239,6 +289,8 @@ Example usage:
 %desktop_file_install -k Exec,Icon -v pkg,pkgicon -u %u -f path/to/file.desktop
 ```
 
+<SearchTerra macroname="__desktop_file_install" />
+
 ### %desktop_file_validate
 SHOULD be used if you for any reason need to edit a .desktop file a build has already installed.
 
@@ -250,16 +302,22 @@ Example usage:
 %desktop_file_validate -f path/to/file.desktop
 ```
 
+<SearchTerra macroname="__desktop_file_validate" />
+
 ### %update_desktop_database
 A post/postun script to update the .desktop database on install/uninstall of the package. Is most likely not necessary for most things.
 
 Expands to: `%{__update_desktop_database} --quiet || :{:rpmspec}`
+
+<SearchTerra macroname="update_desktop_database" />
 
 ## Go
 These macros assist with building [Go](https://go.dev) projects.
 
 ### %goprep_online
 MAY be used to prep a Go package for online builds. Replaces `%goprep{:rpmspec}` in `%prep{:rpmspec}`.
+
+<SearchTerra macroname="goprep_online" />
 
 ## JavaScript
 These are macros to assist with the general packaging of applications that are written in JavaScript and/or use JavaScript runtimes such as Node.js or Bun.
@@ -271,6 +329,8 @@ Macros for using [Node.js](https://nodejs.org). These require the use of [Fedora
 Calls NVM (Node Version Manager) while setting `$NVM_DIR{:bash}`. Only used if vendoring Node.js.
 
 Expands to: `/usr/bin/env NVM_DIR=%{_nvm_dir} /usr/bin/nvm{:rpmspec}`
+
+<SearchTerra macroname="__nvm" />
 
 #### %vendor_nodejs
 This macro SHOULD only be used if Node.js packages available from the repos are not usable for some reason.
@@ -297,6 +357,8 @@ Vendored versions of NPM and NPX are subject to limitations in commands as they 
   You MUST add `nvm` as a build as a `BuildRequires:{:rpmspec}` if using this macro.
 </Callout>
 
+<SearchTerra macroname="vendor_nodejs" />
+
 ### Node Modules
 Macros for packaging Node modules.
 
@@ -305,6 +367,8 @@ Prepare a Node module for build steps.
 
 Available flags:
 - `-n <…>` MUST be used to define `%{npm_name}{:rpmspec}` if it was not defined as a global macro.
+
+<SearchTerra macroname="npm_prep" />
 
 #### %fetch_node_tests
 Fetch self-tests from a Git repo. MUST include all necessary test files and folders. If used, it SHOULD be placed in the `%prep{:rpmspec}` section.
@@ -320,6 +384,8 @@ Example usage:
 %npm_prep
 %fetch_node_tests -u https://github.com/dev/module.git /tests .eslintrc
 ```
+
+<SearchTerra macroname="fetch_node_tests" />
 
 #### %npm_install
 Install a Node module to `%{npm_sitelib}{:rpmspec}` and symlink its executable.
@@ -339,6 +405,8 @@ Real package example:
 ./bin/%{npm_name}$_js --limitAttributes licenses --out LICENSE.modules
 ```
 
+<SearchTerra macroname="npm_install" />
+
 #### %node_self_test
 Runs self-defined tests on the Node module. This is not applicable for all Node modules. Also, not all tests (that are supported as Node modules) can use a wide variety of testing tools. For use in `%check{:rpmspec}`.
 
@@ -347,6 +415,8 @@ Available flags:
 - `-v{:rpmspec}`: Direct duplicate of a `-v{:rpmspec}` flag. Project dependent.
 
 You MUST use [`%fetch_node_tests`](#fetch_node_tests) first if using this.
+
+<SearchTerra macroname="node_self_test" />
 
 #### %__npm_license_checker
 Expands to: `/usr/bin/license-checker`
@@ -365,6 +435,8 @@ Example output:
    ├─ path: /home/owen/Documents/Projects/devdocs
    └─ licenseFile: /home/owen/Documents/Projects/devdocs/LICENSE
 ```
+
+<SearchTerra macroname="__npm_license_checker" />
 
 #### %npm_license
 Expands to: `/usr/bin/license-checker --limitAttributes licenses`
@@ -398,10 +470,14 @@ OR:
 
 The above would create a `LICENSE.modules` file which can then be packaged using `%license LICENSE.modules{:rpmspec}`.
 
+<SearchTerra macroname="npm_license" />
+
 #### %npm_license_summary
 Outputs a summary of the bundled licenses. Useful for determining what to put in the `License:{:rpmspec}` section for Node modules.
 
 Expands to: `%{__npm_license_checker} --summary`
+
+<SearchTerra macroname="npm_license_summary" />
 
 ### JavaScript Package Managers
 These are macros for working with JavaScript package managers.
@@ -423,6 +499,8 @@ Macro that sets the logging level for NPM. Defaults to `error` because NPM logs 
 
 If desired, it can be redefined to `silent`, `warn`, `notice`, `info`, `verbose`, or `silly`.
 
+<SearchTerra macroname="__npm_log_level" />
+
 ##### %npm_common_envvars
 <Callout icon="‼️">
   NPM environment variables written in uppercase will be **ignored** if the project sets different ones explicitly. This is intentional behavior which these macros do not override in order to avoid build issues. For more information, please see [this issue](https://github.com/npm/npm/issues/14528) in the original NPM GitHub repository.<br />
@@ -439,10 +517,14 @@ What these do:
 - Disables update notifications since we are using a packaged version of NPM unless using `%vendor_nodejs{:rpmspec}`.
 - Sets color to `always` for more easily readable logs.
 
+<SearchTerra macroname="npm_common_envvars" />
+
 ##### %npm_config_opts
 Explicit NPM configuration flags of the environment variables set by the Macros.
 
 Expands to: `--userconfig=%{rpmbuilddir}/.npmrc --globalconfig=%{rpmbuilddir}/npmrc --cache=%{_npm_cache_dir} --loglevel=%{__npm_log_level} --fund=false --update-notifier=false --color=always --init-module=%{rpmbuilddir}/.npm-init.js{:rpmspec}`
+
+<SearchTerra macroname="npm_config_opts" />
 
 ##### %__npm
 Macro to call NPM with predetermined enviroment variables.
@@ -451,15 +533,21 @@ Expands to: `/usr/bin/env %{npm_common_envvars} %{?with_vendored_nodejs:%{__nvm}
 
 SHOULD be used in place of calling `npm` itself.
 
+<SearchTerra macroname="__npm" />
+
 ##### %__npx
 Remotely run Node modules with NPX.
 
 Expands to: `/usr/bin/env %{npm_common_envvars} %{?with_vendored_nodejs:%{__nvm} exec npx --}%{!?with_vendored_nodejs:/usr/bin/npx}{:rpmspec}`
 
+<SearchTerra macroname="__npx" />
+
 ##### %npm_audit
 Audit with NPM if package uses bundled Node module dependencies. For use in the `%check{:rpmspec}` section.
 
 Vulnerabilities for Node modules __not bundled in the final package__ SHOULD NOT be fixed. If a vulnerability is found *only* in build dependencies, you are fine to leave it as is.
+
+<SearchTerra macroname="npm_audit" />
 
 ##### %npm_audit_fix
 Fix vulnerabilities found using `%npm_audit{:rpmspec}`. Should be used in `%prep{:rpmspec}` section.
@@ -475,10 +563,14 @@ Available flags:
 
 LIMITATION: Cannot be used on modules installed using the `-g{:rpmspec}` flag (which is done in `%npm_prep{:rpmspec}`) which use a package lock.
 
+<SearchTerra macroname="npm_audit_fix" />
+
 ##### %npm_test
 Runs NPM tests. This will not be applicable to all projects or Node modules. For use in the `%check{:rpmspec}` section. For some projects it may be necessary to export `NODE_ENV=test` first.
 
 Expands to: `%{__npm} test{:rpmspec}`
+
+<SearchTerra macroname="npm_test" />
 
 #### Bun
 Macros for using [Bun](https://bun.com).
@@ -491,15 +583,21 @@ Sets the `$BUN_HOME{:bash}` for future use and sets the cache dir.
 
 Expands to: `%{npm_common_envvars} BUN_HOME=%{_bun_home} BUN_INSTALL_CACHE_DIR=%{_bun_cache_dir} BUN_RUNTIME_TRANSPILER_CACHE_PATH=%{_bun_cache_dir} FORCE_COLOR=1{:rpmspec}`
 
+<SearchTerra macroname="bun_common_envvars" />
+
 ##### %bun_config_opts
 Explicit Bun configuration flags of the environment variables set by the Macros.
 
 Expands to: `--cache-dir=%{_bun_cache_dir}{:rpmspec}`
 
+<SearchTerra macroname="bun_config_opts" />
+
 ##### %__bun
 Expands to: `/usr/bin/env %{bun_common_envvars} /usr/bin/bun{:rpmspec}`
 
 SHOULD be used in place of calling `bun` itself.
+
+<SearchTerra macroname="__bun" />
 
 ##### %__bunx
 Run JavaScript modules (downloading them if necessary) with Bun.
@@ -507,6 +605,8 @@ Run JavaScript modules (downloading them if necessary) with Bun.
 Expands to: `/usr/bin/env %{bun_common_envvars} /usr/bin/bunx{:rpmspec}`
 
 SHOULD be used in place of calling `bunx` or `bun x` itself.
+
+<SearchTerra macroname="__bunx" />
 
 ##### %bun_audit
 Audit with Bun if package uses bundled JavaScript module dependencies. For use in the `%check{:rpmspec}` section.
@@ -517,6 +617,8 @@ Audit with Bun if package uses bundled JavaScript module dependencies. For use i
 
 You SHOULD NOT need to fix vulnerabilities for JavaScript modules that are __not bundled in the final package__. This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
 
+<SearchTerra macroname="bun_audit" />
+
 ##### %bun_pm_trust
 Add JavaScript modules to trusted dependencies so their postinstall scripts can be run. Requires arguments for dependencies to approve. SHOULD only be used if necessary.
 
@@ -525,10 +627,14 @@ Available flags:
 
 Expands to: `%{__bun} pm trust{:rpmspec}`
 
+<SearchTerra macroname="bun_pm_trust" />
+
 ##### %bun_test
 Runs Bun tests. This will not be applicable to all projects. For use in the `%check{:rpmspec}` section. For some projects it may be necessary to export `NODE_ENV=test` first.
 
 Expands to: `%{__bun} test{:rpmspec}`
+
+<SearchTerra macroname="bun_test" />
 
 #### Deno
 Macros for using [Deno](https://deno.com).
@@ -541,10 +647,14 @@ Sets the `$DENO_DIR{:bash}`, `$DENO_INSTALL_ROOT{:bash}`, limits `$DENO_JOBS{:ba
 
 Expands to: `%{npm_common_envvars} DENO_DIR=%{_deno_dir} DENO_INSTALL_ROOT=%{_deno_install_root} DENO_NO_UPDATE_CHECK=1 DENO_JOBS=${RPM_BUILD_NCPUS} FORCE_COLOR=1{:rpmspec}`
 
+<SearchTerra macroname="deno_common_envvars" />
+
 ##### %__deno
 Expands to: `/usr/bin/env %{deno_common_envvars} /usr/bin/deno{:rpmspec}`
 
 SHOULD be used in place of calling `deno` itself.
+
+<SearchTerra macroname="__deno" />
 
 ##### %__dx
 Call modules directly with DX/Deno X.
@@ -552,6 +662,8 @@ Call modules directly with DX/Deno X.
 Expands to: `/usr/bin/env %{deno_common_envvars} /usr/bin/dx{:rpmspec}`
 
 SHOULD be used in place of calling `dx` or `deno x` itself.
+
+<SearchTerra macroname="__dx" />
 
 ##### %deno_audit
 Audit with Deno if package uses bundled JavaScript module dependencies. For use in the `%check{:rpmspec}` section.
@@ -562,6 +674,8 @@ Expands to: `NPM_CONFIG_AUDIT_LEVEL=low %{__deno} audit --level=low --ignore-unf
   `deno audit` currently lacks a way to fix vulnerabilities; use you MAY try using `%npm_audit_fix` to fix vulnerabilities.
 </Callout>
 
+<SearchTerra macroname="deno_audit" />
+
 ##### %deno_approve_scripts
 Approve dependency scripts with Deno if needed. Requires arguments for dependencies to approve. SHOULD only be used if necessary.
 
@@ -570,10 +684,14 @@ Available flags:
 
 Expands to: `%{__deno} approve-scripts{:rpmspec}`
 
+<SearchTerra macroname="deno_approve_scripts" />
+
 ##### %deno_test
 Runs Deno tests. This will not be applicable to all projects. For use in the `%check{:rpmspec}` section. For some projects it may be necessary to export `NODE_ENV=test` first.
 
 Expands to: `%{__deno} test --parallel{:rpmspec}`
+
+<SearchTerra macroname="deno_test" />
 
 #### PNPM
 Macros for using [PNPM](https://pnpm.io).
@@ -586,10 +704,14 @@ Sets the NPM environment variables and the PNPM home directory.
 
 Expands to: `%{npm_common_envvars} PNPM_HOME=%{_pnpm_home}{:rpmspec}`
 
+<SearchTerra macroname="pnpm_common_envvars" />
+
 ##### %__pnpm
 Expands to: `/usr/bin/env %{pnpm_common_envvars} %{?with_vendored_pnpm:%{_pnpm_home}/pnpm}%{!?with_vendored_pnpm:/usr/bin/pnpm}{:rpmspec}`
 
 SHOULD be used in place of calling `pnpm` itself.
+
+<SearchTerra macroname="__pnpm" />
 
 ##### %__pnpx
 Remotely execute JavaScript modules using PNPX.
@@ -597,6 +719,8 @@ Remotely execute JavaScript modules using PNPX.
 Expands to: `/usr/bin/env %{pnpm_common_envvars} /usr/bin/pnpx{:rpmspec}`
 
 SHOULD be used in place of calling `pnpx` or `pnpm dlx` itself.
+
+<SearchTerra macroname="__pnpx" />
 
 ##### %vendor_pnpm
 This SHOULD only be used if PNPM is not usable/available from the available repositories.
@@ -614,15 +738,21 @@ Usecase examples:
      %endif
     ```
 
+<SearchTerra macroname="vendor_pnpm" />
+
 ##### %pnpm_audit
 Audit with PNPM if the package uses bundled JavaScript module dependencies. For use in the `%check{:rpmspec}` section.
 
 You SHOULD NOT need to fix vulnerabilities for JavaScript modules that are __not bundled in the final package__. This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
 
+<SearchTerra macroname="pnpm_audit" />
+
 ##### %pnpm_audit_fix
 Fix security issues in dependencies using PNPM.
 
 Expands to: `NPM_CONFIG_AUDIT_LEVEL=low %{__pnpm} audit{:rpmspec}`
+
+<SearchTerra macroname="pnpm_audit_fix" />
 
 ##### %pnpm_approve_builds
 Approve dependency scripts with PNPM if needed. Requires arguments for dependencies to approve. SHOULD only be used if necessary.
@@ -632,10 +762,14 @@ Available flags:
 
 Expands to: `%{__pnpm} approve-builds{:rpmspec}`
 
+<SearchTerra macroname="pnpm_approve_builds" />
+
 ##### %pnpm_test
 Runs PNPM tests. This will not be applicable to all JavaScript modules. For use in the `%check{:rpmspec}` section. For some projects it may be necessary to export `NODE_ENV=test` first.
 
 Expands to: `%{__pnpm} test{:rpmspec}`
+
+<SearchTerra macroname="pnpm_test" />
 
 #### Yarn Macros
 Macros for using [Yarn (Yarn Classic/Yarn v1)](https://classic.yarnpkg.com) and [Yarn Berry (Yarn Modern/Yarn v2+)](https://yarnpkg.com).
@@ -649,15 +783,21 @@ Sets the NPM evironment variables and Yarn's cache folder.
 
 Expands to: `%{npm_common_envvars} YARN_CACHE_FOLDER=%{_yarn_cache_dir}{:rpmspec}`
 
+<SearchTerra macroname="yarn_common_envvars" />
+
 ##### %yarn_config_opts
 Explicit Yarn configuration flags of the environment variables set by the Macros.
 
 Expands to: `--cache-folder=%{_yarn_cache_dir}{:rpmspec}`
 
+<SearchTerra macroname="yarn_config_opts" />
+
 ##### %__yarn
 Expands to: `/usr/bin/env %{yarn_common_envvars} /usr/bin/yarn{:rpmspec}`
 
 SHOULD be used in place of calling `yarn` itself.
+
+<SearchTerra macroname="__yarn" />
 
 ##### %__yarn_dlx
 Remotely execute a JavaScript module with Yarn DLX.
@@ -670,15 +810,21 @@ SHOULD be used in place of calling `yarn dlx` itself.
   `yarnpkg-berry` is REQUIRED as a build dependency instead of `yarnpkg`.
 </Callout>
 
+<SearchTerra macroname="__yarn_dlx" />
+
 ##### %yarn_audit
 Audit Yarn if the package uses bundled JavaScript module dependencies. For use in the `%check{:rpmspec}` section.
 
 You SHOULD NOT need to fix vulnerabilities for JavaScript modules that are __not bundled in the final package__. This means if a vulnerability is found *only* in build dependencies, you are fine to leave them be.
 
+<SearchTerra macroname="yarn_audit" />
+
 ##### %yarn_test
 Runs Yarn tests. This will not be applicable to all projects. For use in the `%check{:rpmspec}` section. For some projects it may be necessary to export `NODE_ENV=test` first.
 
 Expands to: `%{__yarn} test{:rpmspec}`
+
+<SearchTerra macroname="yarn_test" />
 
 ### Webapp Macros
 Macros for building [webapps](https://en.wikipedia.org/wiki/Web_application).
@@ -749,6 +895,8 @@ Name:    electron
 Version: 39.2.7
 ```
 
+<SearchTerra macroname="electronmeta" />
+
 ##### %electron_arches
 The architectures Electron supports. Automatically set as `ExclusiveArch:{:rpmspec}` when using `%electronmeta{:rpmspec}`.
 
@@ -762,12 +910,16 @@ Which simply means Electron supports [x86_64](https://en.wikipedia.org/wiki/X86-
 
 However, at this time, Terra only supports x86_64, AArch64, and 32-bit x86.
 
+<SearchTerra macroname="electron_arches" />
+
 ##### %electron_license
 The license for bundled Electron.
 NOT set by default in `%electronmeta{:rpmspec}` because you cannot set the license field twice.
 MAY be used in combination with manually adding the other relevant licenses (if this is done, a proper license tag would be `License: XXX-x.x AND %{electron_license}{:rpmspec}`).
 
 [`%electronmeta`](#electronmeta) SHOULD be used BEFORE the `License:{:rpmspec}` preamble but AFTER `Name:{:rpmspec}` if using this macro.
+
+<SearchTerra macroname="electron_license" />
 
 ##### %electron_install
 Install files of apps built using Electron Builder or Electron Forge. MUST be used after an appropriate [build macro](#webapp-build-macros).
@@ -811,6 +963,8 @@ Example usage:
   Like the webapp build macros, this macro sets the environment variable `$WEBAPP_BUILD_TOOL` to either `electron-builder` or `electron-forge` depending on which the app is built with. SHOULD NOT need to be used manually, but MAY be if needed for any reason.
 </Callout>
 
+<SearchTerra macroname="electron_install" />
+
 #### Tauri
 Macros for using [Tauri](https://v2.tauri.app).
 
@@ -838,11 +992,15 @@ Available flags:
   Specify these `BuildRequires:{:rpmspec}` manually.
 </Callout>
 
+<SearchTerra macroname="tauri_buildrequires" />
+
 ##### %tauri_prep
 Preps a Tauri package. Wrapper for `%cargo_prep_online` that checks that the Tauri subdirectory is correct.
 
 Available flags:
 - `-n <…>`: The name of the subdirectory to `cd` into before running `%cargo_prep_online`. This value is also used when setting a macro used in other Tauri macros. If this flag is not passed, the macro will default to the most common name used for this subdirectory which is `src-tauri`.
+
+<SearchTerra macroname="tauri_prep" />
 
 ##### %tauri_install
 MAY be used to install a built Tauri package. A port of `%cargo_install`.
@@ -850,8 +1008,12 @@ MAY be used to install a built Tauri package. A port of `%cargo_install`.
 Available flags:
 - `-f <…>`: Should be the same as the features that were passed to the Tauri build. Used for installing the Cargo development files.
 
+<SearchTerra macroname="tauri_install" />
+
 ##### %tauri_install_bin
 A wrapper around [`%crate_install_bin`](#crate_install_bin) for Tauri.
+
+<SearchTerra macroname="tauri_install_bin" />
 
 ##### %tauri_cargo_license
 A port of `%cargo_license_online` that points to the Tauri app's Cargo.toml.
@@ -863,14 +1025,20 @@ Available flags:
   Cargo license macros MUST be wrapped in `{}` when being used to write a license file.
 </Callout>
 
+<SearchTerra macroname="tauri_cargo_license" />
+
 ##### %tauri_cargo_license_summary
 A port of `%cargo_license_summary_online` that points to the Tauri app's Cargo.toml.
 
 Available flags:
 - `-f <…>`: Should be the same as the features that were passed to the Tauri build.
 
+<SearchTerra macroname="tauri_cargo_license_summary" />
+
 ##### %tauri_cargo_vendor_manifest
 A port of `%cargo_vendor_manifest_online` that points to the Tauri app's Cargo.toml.
+
+<SearchTerra macroname="tauri_cargo_vendor_manifest" />
 
 ##### %tauri_generate_buildrequires
 Generates `BuildRequires:{:rpmspec}` for a Tauri build.
@@ -885,6 +1053,8 @@ Supports the same flags as [%tauri_buildrequires](#tauri_buildrequires).
   Specify these `BuildRequires:{:rpmspec}` manually.
 </Callout>
 
+<SearchTerra macroname="tauri_generate_buildrequires" />
+
 #### Configurable Tauri Macros
 
 ##### %__tauri_bundles
@@ -892,12 +1062,16 @@ By default, all macros which call Tauri do not build bundles. Set `%global __tau
 
 This may be useful for, for example, building an AppImage to extract a .desktop file from.
 
+<SearchTerra macroname="__tauri_bundles" />
+
 ##### %__tauri_ignore_version_mismatches
 This macro disables Tauri version mismatch checking. It can be set to anything.
 
 <Callout type="warning">
   Use of this macro is **heavily discouraged.** The option to ignore version mismatches only exists in Tauri, and is only enableable with this macro, because Tauri may detect a version mismatch incorrectly in some situations. You SHOULD NOT use this to force a system Tauri build with an incorrect Tauri version.
 </Callout>
+
+<SearchTerra macroname="__tauri_ignore_version_mismatches" />
 
 #### System Tauri
 These are macros for use with Tauri if installed from the repo. Please note that using Tauri from the repo MAY NOT WORK with all projects unless you override version checking, which is not advisable in most circumstances.
@@ -907,17 +1081,23 @@ Calls Tauri while setting the Fedora Cargo environment variables.
 
 Expands to: `/usr/bin/env CARGO_HOME=%{_cargo_home}%{!?with_rust_nightly: RUSTC_BOOTSTRAP=1}%{?with_rust_nightly: RUSTUP_HOME=%{_rustup_home}} RUSTFLAGS='%{build_rustflags}' /usr/bin/tauri`
 
+<SearchTerra macroname="__tauri" />
+
 ##### %tauri_build
 Build with system Tauri.
 
 Available flags:
 - `-f <…>`: Features to enable in Tauri and Cargo. Comma separated.
 
+<SearchTerra macroname="tauri_build" />
+
 ##### %tauri_build_crate
 A port of [%cargo_build_crate](https://codeberg.org/rust2rpm/cargo-rpm-macros/src/commit/754ec0c9a09d8a89990f454c17dc0da07861741f/macros.d/macros.cargo#L280) for Tauri.
 
 Available flags:
 - `-f <…>`: Features to enable in Tauri and Cargo. Comma separated.
+
+<SearchTerra macroname="tauri_build_crate" />
 
 #### Webapp Build Macros
 These are macros used to build webapps using JavaScript package managers and builders such as [Electron Builder](https://www.electron.build), [Electron Forge](https://www.electronforge.io), [Electron Vite](https://electron-vite.github.io), or [Tauri](#tauri).
@@ -954,6 +1134,8 @@ Example usage:
 
 The above would run the necessary install steps, run script and script2, execute Node.js to run task1.js and task2.js, then call the build tool.
 
+<SearchTerra macroname="npm_build" />
+
 ##### %bun_build
 SHOULD be used to build Electron or Tauri apps with Bun.
 
@@ -975,6 +1157,8 @@ Example usage:
 
 The above would run `%{__bun} ci`, run script and script2, the JavaScript module executable `ng` to build with, call echo, then call the build tool.
 
+<SearchTerra macroname="bun_build" />
+
 ##### %deno_build
 SHOULD be used to build Electron or Tauri apps with Deno.
 
@@ -994,6 +1178,8 @@ Example usage:
 ```
 
 The above would run run script and script2, then run file1.js and file2.js with Deno before running the build tool.
+
+<SearchTerra macroname="deno_build" />
 
 ##### %pnpm_build
 SHOULD be used for building Electron or Tauri apps with PNPM.
@@ -1015,6 +1201,8 @@ Example usage:
 
 The above would run `%{__pnpm} install --no-frozen-lockfile`, run script and script2, then call Electron Vite before the build tool.
 
+<SearchTerra macroname="pnpm_build" />
+
 ##### %yarn_build
 SHOULD be used to build Electron or Tauri apps with Yarn or Yarn Berry.
 
@@ -1033,6 +1221,8 @@ Example usage:
 ```
 
 The above would run Yarn build steps and execute a Tauri build with the features `wayland` and `x11`.
+
+<SearchTerra macroname="yarn_build" />
 
 ### Other
 JavaScript related macros that apply to all or do not fit into any of the above categories.
@@ -1068,7 +1258,9 @@ YARN_OPTS="${YARN_OPTS:-%{yarn_config_opts} }" ; export YARN_OPTS
 
 This ensures the environment variables are explicitly exported and therefor are more likely to be picked up by all shell processes. It also creates environment variables called `$NPM_OPTS{:bash}`, `$BUN_OPTS{:bash}`, and `$YARN_OPTS{:bash}`, which can be passed to NPM in lieu of the macros `%{npm_config_opts}{:rpmspec}`, `%{bun_config_opts}{:rpmspec}`, and `%{yarn_config_opts}{:rpmspec}`, respectively, to force our config if necessary.
 
-This should only be needed in the event you are using [%__npx](#__npx), [%__pnpx](#__pnpx), [%__bunx](#__bunx), [%__dx](#__dx), or [%__yarn_dlx](#__yarn_dlx).
+This should only be needed in the event you are using [%__npx](#__npx), [%__pnpx](#__pnpx), [%__bunx](#__bunx), [%__dx](#__dx), [%__yarn_dlx](#__yarn_dlx), OR the package uses one of these buildsystems (ex. build command uses `wails`).
+
+<SearchTerra macroname="set_javascript_build_flags" />
 
 ## Nim
 These macros assist with building [Nim](https://nim-lang.org) projects.
@@ -1085,23 +1277,33 @@ Set up build environment with required packages via `nimble setup`.
 
 This also adds the configuration for enabling mold automatically if found in the build environment.
 
+<SearchTerra macroname="nim_prep" />
+
 ### %nim_build (or %nim_c)
 Builds a Nim package.
 Requires an argument to `src/pkgname`.
 
 Note that this does not invoke `nimble`. All dependencies SHOULD be ready before `%build{:rpmspec}`.
 
+<SearchTerra macroname="nim_build" />
+
 ### %nim_tflags
 C compiler flags used in `%nim_c{:rpmspec}`.
 
+<SearchTerra macroname="nim_tflags" />
+
 ### %nim_lflags
 Linker flags used in `%nim_c{:rpmspec}`.
+
+<SearchTerra macroname="nim_lflags" />
 
 ## Rust
 These macros assist with building [Rust](https://rust-lang.org) projects.
 
 ### %cargo_prep_online
 Enables internet access for `%cargo_prep{:rpmspec}`. Replaces `%cargo_prep{:rpmspec}` in `%prep{:rpmspec}`.
+
+<SearchTerra macroname="cargo_prep_online" />
 
 ### %cargo_license_online
 Enables internet access for `%cargo_license{:rpmspec}`.
@@ -1111,17 +1313,25 @@ Replaces `%cargo_license{:rpmspec}` in `%build{:rpmspec}`.
   Cargo license macros MUST be wrapped in `{}` when being used to write a license file.
 </Callout>
 
+<SearchTerra macroname="cargo_license_online" />
+
 ### %cargo_license_summary_online
 Enables internet access for `%cargo_license_summary{:rpmspec}`.
 Replaces `%cargo_license_summary{:rpmspec}` in `%build{:rpmspec}`.
+
+<SearchTerra macroname="cargo_license_summary_online" />
 
 ### %cargo_vendor_manifest_online
 Enables internet access for `%cargo_vendor_manifest_online{:rpmspec}`.
 Replaces `%cargo_vendor_manifest{:rpmspec}` in `%build{:rpmspec}`.
 
+<SearchTerra macroname="cargo_vendor_manifest_online" />
+
 ### %crate_install_bin
 Used to install crates that build as single binary.
 Can be used instead of `%cargo_install{:rpmspec}` when [this](https://github.com/terrapkg/packages/issues/1169) is applicable.
+
+<SearchTerra macroname="crate_install_bin" />
 
 ### %rustup_nightly
 Used in the `%prep{:rpmspec}` section for nightly `rustc`/`cargo` from `rustup`.
@@ -1129,6 +1339,8 @@ Used in the `%prep{:rpmspec}` section for nightly `rustc`/`cargo` from `rustup`.
 <Callout type="warning">
   This macro MUST be used *before* `%cargo_prep_online` (or an equivalent prep macro) if it is used.
 </Callout>
+
+<SearchTerra macroname="rustup_nightly" />
 
 ## Subpackages
 These macros assist with packages that require certain subpackage types.
@@ -1138,6 +1350,8 @@ More information on subpackages can be found on the [Fedora Packaging Guidelines
 ### %files_libs
 This macro creates library subpackages and installs the library files.
 This is only for use in the [`%pkg_devel_files` macro](#pkg_devel_files).
+
+<SearchTerra macroname="files_libs" />
 
 ### %pkg_completion
 This macro creates shell completion subpackages and installs the shell completion files.
@@ -1175,6 +1389,8 @@ yadm-fish-completion-x.x.x-x.fcxx.noarch.rpm - contains `/usr/share/fish/vendor_
 yadm-zsh-completion-x.x.x-x.fcxx.noarch.rpm - contains `/usr/share/zsh/site-functions/_yadm`
 ```
 
+<SearchTerra macroname="pkg_completion" />
+
 ### %pkg_devel_files
 Set the summary & description, then find development files and install them to a subpackages `%files`.
 SHOULD be used in place of manually creating `-devel` subpackages.
@@ -1192,6 +1408,8 @@ For example:
 %pkg_devel_files
 ```
 
+<SearchTerra macroname="pkg_devel_files" />
+
 ### %pkg_static_files
 Set the summary & description, then find static libraries.
 SHOULD be used in place of manually creating `-static` subpackages.
@@ -1206,6 +1424,8 @@ For example:
 # -N <mainpkg>: name of the main package
 %pkg_static_files
 ```
+
+<SearchTerra macroname="pkg_static_files" />
 
 ### %pkg_libs_files
 Set the summary & description, then find dynamic library files (will be placed as `%_libdir/*.so.*`).
@@ -1222,11 +1442,15 @@ For example:
 %pkg_static_files
 ```
 
+<SearchTerra macroname="pkg_libs_files" />
+
 ## Zig
 These macros assist with building Zig projects.
 
 ### %__zig
 This macro is the same as `%zig` but formatted to match how most macros calling binaries are. Use of it is not encouraged *or* discouraged, it only exists because it's an easy mistake to make.
+
+<SearchTerra macroname="__zig" />
 
 ### %zig_build_target
 Build Zig projects with a specified architecture and build mode.
@@ -1249,6 +1473,8 @@ Example:
 ```
 
 More information can be found on our [Zig packaging guidelines](../terra/guidelines#zig).
+
+<SearchTerra macroname="zig_build_target" />
 
 ## Miscellaneous
 General macros that do not fit into a specific category.
@@ -1287,6 +1513,8 @@ Provides:		%realname-devel = %evr
 Conflicts:		%realname-devel
 ```
 
+<SearchTerra macroname="evr" />
+
 ### %git_clone
 Downloads the source code via `git clone`, and passes useful (in this situation) flags such as`--depth 1`, `-q`, `--recursive-submodules`, and `-j${RPM_BUILD_NCPUS}`.
 A git URL and a `%version{:rpmspec}` or `%commit{:rpmspec}` MAY be passed to this macro.
@@ -1316,9 +1544,13 @@ URL:           https://github.com/ad-oliviero/uwufetch
 
 It is RECOMMENDED to still fetch and include a source tarball via the spec sources even if it is not used so that the source RPM is not empty.
 
+<SearchTerra macroname="git_clone" />
+
 ### %go_task
 Expands to: `go-task --parallel --concurrency %{?_smp_build_ncpus} --verbose --yes`
 SHOULD be used in place of `go-task` if using Go Task.
+
+<SearchTerra macroname="go_task" />
 
 ## Unused in Spec Files
 These macros are ONLY used by other macros in their expansion processes, as programmed [here](https://github.com/terrapkg/srpm-macros).
@@ -1339,6 +1571,10 @@ Anda directory for scripts such as `find-develinfo.sh` used by `%__anda_develfil
 ### %__anda_staticfiles
 Expands to: `%_anda_srpm_macros_dir/find-staticinfo.sh %buildroot > anda-staticfiles.list{:rpmspec}`
 Creates anda-staticfiles.list file in `%{buildroot}{:rpmspec}` to be used by [`%pkg_static_files`](#pkg_static_files).
+
+### %__update_desktop_database
+Expands to: `/usr/bin/update-desktop-database{:rpmspec}`
+This is not used as there is no reason not to use `%update_desktop_database`.
 
 ### %desktop_file_args
 This macro is created when using the `-F` option in `%electron_install`. It's used to pass the appropriate Exec arguments to `desktop-file-install` and has no other use.

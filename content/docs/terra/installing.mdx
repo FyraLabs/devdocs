@@ -38,7 +38,11 @@ Or, just don't use the fancy script. I guess.
 
 #### Ultramarine Linux
 
-Ultramarine already comes with Terra out of the box, simply `dnf` away!
+Ultramarine comes with Terra out of the box, check your app store or just `dnf`!
+
+#### Nobara
+
+Nobara comes with Terra! Simply `dnf` away!
 
 #### Fedora Atomic and Derivatives
 
@@ -51,7 +55,13 @@ sudo rpm-ostree install terra-release
 
 #### Bazzite and Aurora
 
-Bazzite and Aurora come with Terra out of the box, simply `rpm-ostree` away!
+Bazzite and Aurora come with Terra, but disable it.
+
+Edit `/etc/yum.repos.d/terra.repo` and change `enabled=0` to `enabled=1`
+
+Do this again for `/etc/yum.repos.d/terra-extras.repo`
+
+Then you can simply `rpm-ostree` away!
 
 #### Bluefin
 
@@ -125,17 +135,47 @@ They can be enabled by installing `terra-release-extras`, `terra-release-nvidia`
 
 The extras subrepo provides miscellaneous packages that conflict with Fedora. Things like patched WINE and Switcheroo control are in Extras.
 
+Run the following to enable `terra-extras`:
+
+```sh
+sudo dnf install terra-release-extras
+```
+
 ### Mesa
 
-The Mesa subrepo provides our build of Mesa, with patches from our friends at Universal Blue and most features enabled, unlike RPMFusion and Fedora's builds.
+The Mesa subrepo provides our build of Mesa, with patches from the [Open Gaming Collective](https://opengamingcollective.org/) and most features enabled, unlike RPMFusion and Fedora's builds.
+
+Run the following to enable `terra-mesa`:
+
+```sh
+sudo dnf install terra-release-mesa
+```
+
+If you have `mesa-va-drivers-freeworld` installed from RPMFusion, run the following command to swap it to Terra's `mesa-va-drivers` after enabling the repo:
+
+```sh
+sudo dnf swap mesa-va-drivers-freeworld mesa-va-drivers
+```
 
 ### NVIDIA
 
 The NVIDIA subrepo provides a selection of drivers and software for NVIDIA GPUs. We offer drivers based on [Negativo17](https://negativo17.org/) builds, and CUDA packages.
 
+Run the following to enable `terra-nvidia`:
+
+```sh
+sudo dnf install terra-release-nvidia
+```
+
 ### Multimedia
 
 The multimedia subrepo is only available on Fedora 43 and newer. It provides multimedia codecs and related software, like `gstreamer1` packages and `ffmpeg`.
+
+Run the following to enable `terra-multimedia`:
+
+```sh
+sudo dnf install terra-release-multimedia
+```
 
 ## Using Terra
 

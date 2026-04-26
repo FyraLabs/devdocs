@@ -24,7 +24,7 @@ Packages that fit any of the following cases SHOULD provide the metainfo file.
 
 - If upstream already provides the metainfo file, you SHOULD `install` it instead of making your own
 - Graphical apps
-- TUI applications that make sense to be opened in a graphical environment
+- TUI applications that make sense to be opened in a graphical environment (ships a `.desktop` file)
 
 Other packages MAY also provide appstream metadata files.
 
@@ -142,6 +142,8 @@ Freedesktop's example:
  </screenshots>
 ```
 
+## Using your metainfo.xml file in your .spec file
+
 ### Macros
 
 #### %terra_appstream
@@ -182,6 +184,20 @@ Source1: %appid.metainfo.xml   # This specifies your metainfo.xml file as a sour
 ```
 
 ---
+
+## Validating Your metainfo.xml File
+
+To validate your `metainfo.xml` file, install `appstream`, then run `appstreamcli validate NAME.metainfo.xml`.
+Errors and warnings should be corrected to the best of your ability. In rare cases, errors are fine to have, such as `E: com.github.neohtop:6: metainfo-invalid-icon-type local`.
+`infos` can be ignored or corrected at your discretion.
+
+Here is an example of the output of running `appstreamcli validate` on a proper metainfo.xml file:
+
+```bash
+appstreamcli validate games/minecraft-java/com.mojang.Minecraft.metainfo.xml
+I: com.mojang.Minecraft:50: nonstandard-gnome-extension metadata
+I: com.mojang.Minecraft:~: developer-info-missing
+``` 
 
 [^1]: libraries are also supported, see Freedesktop docs for tag provides: https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html#tag-provides
 
