@@ -13,9 +13,7 @@ updates:
       fumadocs:
         patterns: ["fumadocs*"]
       react:
-        patterns: ["react", "react-dom"]
-      react-types:
-        patterns: ["@types/react", "@types/react-dom"]
+        patterns: ["react", "react-dom", "@types/react", "@types/react-dom"]
       tailwindcss:
         patterns: ["tailwindcss", "@tailwindcss*"]
   - package-ecosystem: "github-actions"
