@@ -9,6 +9,15 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+    groups:
+      fumadocs:
+        patterns: ["fumadocs*"]
+      react:
+        patterns: ["react", "react-dom"]
+      react-types:
+        patterns: ["@types/react", "@types/react-dom"]
+      tailwindcss:
+        patterns: ["tailwindcss", "@tailwindcss*"]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
