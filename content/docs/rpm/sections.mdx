@@ -164,15 +164,6 @@ If `subpkg` is given without `-n`, specify the description of the subpackage `%{
 
 Each subpackage requires its own `%description{:rpmspec}` too.
 
-## `%package`
-
-Not a step. Optional. `%package [-n] subpkg{:rpmspec}`
-
-Specify the preambles for a subpackage. The name of the subpackage is
-
-- `subpkg` if `-n` is given; and
-- `%{name}-subpkg` otherwise.
-
 ## `%mkbuilddir`
 
 Step `Executing(%mkbuilddir)`. Optional.
@@ -271,64 +262,6 @@ Step `Executing(%check)`. Optional.
 
 If you would like to make sure the software actually works properly, you may optionally
 choose to execute unit tests here.
-
-## Package scripts
-
-> Package scripts execute before and after the main operation (install/remove etc.) of the package inside a transaction.
->
-> Package scripts should only be used for actions that are fundamentally package specific.
-> Domain specific registries, databases, caches and such are much better handled centrally
-> by file triggers. Similarly, user and group creation should be handled by rpm-sysusers, rather than scripting them.
-
-### `%pre`
-> Executed just before unpacking the contents of the package.
-> Non-zero exit prevents the installation of the containing package.
-
-### `%post`
-> Executed just after unpacking the contents of the package.
-
-### `%preun`
-> Executed just before removing the contents of the package.
-> Non-zero exit prevents the uninstallation of the containing package.
-
-### `%postun`
-> Executed just after removing the contents of the package.
-
-### `%verify`
-
-> Executed when a package is verified using rpm --verify.
->
-> Unlike all the other scriptlet types, `%verify` never executes as a part of install/erase etc. operations.
-
-## Transaction scripts
-
-> Transaction scripts run before and after all the other package level
-> operations (install/remove etc.) in a transaction.
->
-> When multiple transaction scripts for a given slot are present in a transaction,
-> they are executed in the order of their install/removal order within the transaction.
-
-### `%pretrans`
-> Executed just before an install/update/reinstall transaction on the containing package starts.
->
-> No files from the transaction have been installed or removed yet. That is, in a fresh
-> installation to an empty system root, there are no files around and no interpreter to run,
-> so the only interpreter that can be reliably used in this slot is the embedded rpm-lua(7) interpreter.
->
-> Non-zero exit prevents the installation of the containing package.
->
-> This is a very special and a dangerous slot, and is best avoided.
-
-### `%posttrans`
-> Executed just after an install/update/reinstall transaction on the containing package finishes.
->
-> All files from the transaction have been installed or removed at this point.
-
-### `%preuntrans`
-> Executed just before an uninstall/updated-from transaction on the containing package starts.
-
-### `%postuntrans`
-> Executed just after an uninstall/updated-from transaction on the containing package finishes.
 
 ## `%clean`
 
@@ -433,6 +366,95 @@ Must either use `%autochangelog`, or follow this structure:
 - Change you made
 - Another change, if there's enough to justify two lines
 ```
+
+## Package scripts
+
+> Package scripts execute before and after the main operation (install/remove etc.) of the package inside a transaction.
+>
+> Package scripts should only be used for actions that are fundamentally package specific.
+> Domain specific registries, databases, caches and such are much better handled centrally
+> by file triggers. Similarly, user and group creation should be handled by rpm-sysusers, rather than scripting them.
+
+### `%pre`
+> Executed just before unpacking the contents of the package.
+> Non-zero exit prevents the installation of the containing package.
+
+### `%post`
+> Executed just after unpacking the contents of the package.
+
+### `%preun`
+> Executed just before removing the contents of the package.
+> Non-zero exit prevents the uninstallation of the containing package.
+
+### `%postun`
+> Executed just after removing the contents of the package.
+
+### `%verify`
+
+> Executed when a package is verified using rpm --verify.
+>
+> Unlike all the other scriptlet types, `%verify` never executes as a part of install/erase etc. operations.
+
+## Transaction scripts
+
+> Transaction scripts run before and after all the other package level
+> operations (install/remove etc.) in a transaction.
+>
+> When multiple transaction scripts for a given slot are present in a transaction,
+> they are executed in the order of their install/removal order within the transaction.
+
+### `%pretrans`
+> Executed just before an install/update/reinstall transaction on the containing package starts.
+>
+> No files from the transaction have been installed or removed yet. That is, in a fresh
+> installation to an empty system root, there are no files around and no interpreter to run,
+> so the only interpreter that can be reliably used in this slot is the embedded rpm-lua(7) interpreter.
+>
+> Non-zero exit prevents the installation of the containing package.
+>
+> This is a very special and a dangerous slot, and is best avoided.
+
+### `%posttrans`
+> Executed just after an install/update/reinstall transaction on the containing package finishes.
+>
+> All files from the transaction have been installed or removed at this point.
+
+### `%preuntrans`
+> Executed just before an uninstall/updated-from transaction on the containing package starts.
+
+### `%postuntrans`
+> Executed just after an uninstall/updated-from transaction on the containing package finishes.
+
+## Sub-sections
+
+These are optional macros that are not their own build steps, but are also not
+standalone macros.
+
+### `%sourcelist`
+> List of sources, one per line. Handled like unnumbered Source tags. For clarity,
+> mixing Source tags and %sourcelist in one specfile is not recommended.
+
+### `%patchlist`
+Like `%sourcelist`, but for patches.
+
+### `%package [-n]<name>`
+
+Not a step. Optional. `%package [-n] subpkg{:rpmspec}`
+
+Specify the preambles for a subpackage. The name of the subpackage is
+
+- `subpkg` if `-n` is given; and
+- `%{name}-subpkg` otherwise.
+
+### `%description [-n]<name>`
+Used to define a description for a subpackage.
+Requires if `%package` is used.
+
+The `-n` and `<name>` options work the same, however if not defined this will refer to the main package.
+
+## File Triggers
+
+For information on file triggers, check out the [RPM documentation](https://rpm-software-management.github.io/rpm/man/rpm-scriptlets.7#FILE_TRIGGERS).
 
 [expression]: #rpm-expression
 [RPM manual]: https://github.com/rpm-software-management/rpm/blob/b043604b9eb684dc761aeacf55a784632ca0ebcd/docs/manual/macros.md
