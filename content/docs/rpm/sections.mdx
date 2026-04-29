@@ -314,7 +314,7 @@ The following is an exhaustive list of file attributes available:
 # the user would be interested in. Such files can be easily filtered out on queries.
 %caps
 # ╰─ sets the given POSIX.1e draft 15 capabilities on the file
-%config(…) …
+%config(…) … (can be used on it's own or with parameters)
 # ╰─ exhaustive list:
 # - config(missingok)
 # - config(noreplace)
@@ -340,7 +340,7 @@ The following is an exhaustive list of file attributes available:
 # - verify(link symlink) ← same
 # - verify(rdev)
 # - verify(mtime)
-# - verify(not ...)
+# - verify(not ...) (don't verify this attribute)
 %missingok
 # ╰─ mark file presence optional
 %readme
