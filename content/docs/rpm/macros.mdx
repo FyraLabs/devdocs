@@ -226,7 +226,7 @@ Double-expand the macro.
       ```rpmspec title="example.spec"
       %define nya foo
       %define meow %{expand:%%nya}
-    
+
       echo %meow
       ```
     </div>
@@ -236,7 +236,7 @@ Double-expand the macro.
       ```
     </div>
   </Split.Root>
-  
+
   <SearchTerra macroname="expand:" />
 
 ##### `%{lua:…}` 🛠️ [#lua]
@@ -466,6 +466,18 @@ This macro is used in [`%setup …`](#setup) for uncompressing source files.
 
 #### Environment info
 
+##### `%?dist` [#?dist]
+
+Used in the `Release:` tag, expands to the dist tag, which is the builder OS shortened identifer and version. Examples:
+
+`.fc44`
+`.um43`
+
+Can either be used as `%?dist` or `%dist`, The `?` prefix just means it expands to nothing if the macro is
+undefined, which avoids errors when building without a dist tag.
+
+<SearchTerra macroname="?dist" />
+
 ##### `%{getncpus:…}` [#getncpus]
 
 When used as `%{getncpus}` with no arguments, expand to the number of available CPU cores.
@@ -496,6 +508,22 @@ concerned. It is suspected that the arguments in most cases have no effect to th
 > expand to running rpm version
 
 <SearchTerra macroname="rpmversion" />
+
+##### `%_smp_build_ncpus`	[#_smp_build_ncpus]
+
+Expands to the output of `nproc` (the build host's thread count)
+
+Example use case: `%make_build GHCJOBS=%{_smp_build_ncpus}`
+
+<SearchTerra macroname="_smp_build_ncpus" />
+
+##### `%_smp_mflags`	[#_smp_mflags]
+
+Expands to `-j${RPM_BUILD_NCPUS}`
+
+Example use case: `make %{_smp_mflags}`
+
+<SearchTerra macroname="_smp_mflags" />
 
 #### Output
 
@@ -558,7 +586,7 @@ Expand to the path to the source file. This is just a fancy macro that transform
 		<div>
 			```rpmspec title="example.spec"
 			Source0: https://repos.fyralabs.com/um42/comps.xml
-			
+
 			%prep
 			cat %{S:0}
 			echo %{S:1}
@@ -567,14 +595,14 @@ Expand to the path to the source file. This is just a fancy macro that transform
 		<div>
 			```rpmspec title="expand.spec"
 			Source0: https://repos.fyralabs.com/um42/comps.xml
-			
+
 			%prep
 			cat %{_sourcedir}/comps.xml
 			echo %SOURCE1
 			```
 		</div>
 	</Split.Root>
-	
+
 <SearchTerra macroname="S:" />
 
 ##### `%{P:#}` [#P]
@@ -622,6 +650,18 @@ Or you can just use `less` instead of `grep`.
 ### Common Macros
 
 #### Miscellaneous
+
+##### `%_lib`	[#_lib]
+
+Expands to `lib` (on noarch or 32-bit packages) or `lib64` (on 64-bit packages)
+
+<SearchTerra macroname="_lib" />
+
+##### `%__ln_s`	[#__ln_s]
+
+Expands to the system's `ln -s` command (should be used when symlinks are needed)
+
+<SearchTerra macroname="__ln_s" />
 
 ##### `%nil` 🔰 [#nil]
 
@@ -763,7 +803,7 @@ what things the binaries are linked to, you may disable that by adding a regex t
 
 <Callout type="info">If you want to disable all automatic `Requires:`, set `AutoReq: 0`.</Callout>
 
-<SearchTerra macroname="__strip" />
+<SearchTerra macroname="__requires_exclude" />
 
 ##### `%__requires_exclude_from` 🏷️ [#__requires_exclude_from]
 
@@ -840,6 +880,8 @@ Similar to above, but takes in path to file that contains the regexes.
 <SearchTerra macroname="__brp_mangle_shebangs_exclude_file" />
 
 ##### `%__brp_mangle_shebangs_exclude_from_file` 🏷️ [#__brp_mangle_shebangs_exclude_from_file]
+
+Similar to above, but takes a path to a file containing the list of file paths to exclude.
 
 <SearchTerra macroname="__brp_mangle_shebangs_exclude_from_file" />
 
@@ -1125,7 +1167,6 @@ Macros with the '(Terra only)' warning are part of the `anda-srpm-macros` packag
 /run                                   ⇒ %{_rundir}
 /usr                                   ⇒ %{_usr}
 /usr/bin                               ⇒ %{_bindir}
-/usr/sbin                              ⇒ %{_sbindir} maybe?
 /usr/src                               ⇒ %{_usrsrc}
 /usr/include                           ⇒ %{_includedir}
 /usr/lib64                             ⇒ %{_libdir}
@@ -1263,6 +1304,50 @@ mkdir -p %{buildroot}%{_datadir}/themes
 If your language / buildsystem is not listed here, go to
 https://docs.fedoraproject.org/en-US/packaging-guidelines/
 and find them on the navigation rail on the left.
+
+TODO: add macros/sections on these(?):
+
+- R-rpm-macros
+- blender-rpm-macros
+- moby-rpm-macros
+- pyproject-rpm-macros
+- cargo-rpm-macros
+- cmake-rpm-macros
+- cmake-rpm-macros
+- erlang-rpm-macros
+- fedora-rpm-macros
+- flatpak-rpm-macros
+- folly-rpm-macros
+- fonts-rpm-macros
+- gap-rpm-macros
+- ghc-rpm-macros
+- go-rpm-macros
+- kernel-rpm-macros
+- lua-rpm-macros
+- magicmirror-rpm-macros
+- ocaml-rpm-macros
+- python-rpm-macros
+- rpmautospec-rpm-macros
+- rocm-rpm-macros
+- sgx-rpm-macros
+- systemd-rpm-macros
+- zig-rpm-macros
+- cargo-rpm-macros
+- epel-rpm-macros
+- kde-apps-rpm-macros
+- qt6-rpm-macros
+- build2-rpm-macros
+- build-constraints-rpm-macros
+- kf5-rpm-macros
+- kf6-rpm-macros
+- postgresql-test-rpm-macros
+- qt5-rpm-macros
+- go-rpm-macros-epel
+- python-pyqt6-rpm-macros
+- postgresql17-test-rpm-macros
+- python-qt5-rpm-macros
+- romc-rpm-macros7.2
+- the srpm ones I don't feel like listing rn
 
 #### C and C++
 
