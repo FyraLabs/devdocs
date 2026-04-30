@@ -226,7 +226,7 @@ Double-expand the macro.
       ```rpmspec title="example.spec"
       %define nya foo
       %define meow %{expand:%%nya}
-    
+
       echo %meow
       ```
     </div>
@@ -236,7 +236,7 @@ Double-expand the macro.
       ```
     </div>
   </Split.Root>
-  
+
   <SearchTerra macroname="expand:" />
 
 ##### `%{lua:…}` 🛠️ [#lua]
@@ -466,6 +466,20 @@ This macro is used in [`%setup …`](#setup) for uncompressing source files.
 
 #### Environment info
 
+##### `%?dist` [#?dist]
+
+Used in the `Release:` tag, expands to the dist tag, which is the builder OS shortened identifer and version. Examples:
+
+```
+.fc44
+.um43
+```
+
+Can either be used as `%?dist` or `%dist`, The `?` prefix just means it expands to nothing if the macro is
+undefined, which avoids errors when building without a dist tag.
+
+<SearchTerra macroname="?dist" />
+
 ##### `%{getncpus:…}` [#getncpus]
 
 When used as `%{getncpus}` with no arguments, expand to the number of available CPU cores.
@@ -496,6 +510,22 @@ concerned. It is suspected that the arguments in most cases have no effect to th
 > expand to running rpm version
 
 <SearchTerra macroname="rpmversion" />
+
+##### `%_smp_build_ncpus`	[#_smp_build_ncpus]
+
+Expands to the output of `nproc` (the build host's thread count)
+
+Example use case: `%make_build GHCJOBS=%{_smp_build_ncpus}`
+
+<SearchTerra macroname="_smp_build_ncpus" />
+
+##### `%_smp_mflags`	[#_smp_mflags]
+
+Expands to `-j${RPM_BUILD_NCPUS}`
+
+Example use case: `make %{_smp_mflags}`
+
+<SearchTerra macroname="_smp_mflags" />
 
 #### Output
 
@@ -558,7 +588,7 @@ Expand to the path to the source file. This is just a fancy macro that transform
 		<div>
 			```rpmspec title="example.spec"
 			Source0: https://repos.fyralabs.com/um42/comps.xml
-			
+
 			%prep
 			cat %{S:0}
 			echo %{S:1}
@@ -567,14 +597,14 @@ Expand to the path to the source file. This is just a fancy macro that transform
 		<div>
 			```rpmspec title="expand.spec"
 			Source0: https://repos.fyralabs.com/um42/comps.xml
-			
+
 			%prep
 			cat %{_sourcedir}/comps.xml
 			echo %SOURCE1
 			```
 		</div>
 	</Split.Root>
-	
+
 <SearchTerra macroname="S:" />
 
 ##### `%{P:#}` [#P]
@@ -622,6 +652,18 @@ Or you can just use `less` instead of `grep`.
 ### Common Macros
 
 #### Miscellaneous
+
+##### `%_lib`	[#_lib]
+
+Expands to `lib` (on noarch or 32-bit packages) or `lib64` (on 64-bit packages)
+
+<SearchTerra macroname="_lib" />
+
+##### `%__ln_s`	[#__ln_s]
+
+Expands to the system's `ln -s` command (should be used when symlinks are needed)
+
+<SearchTerra macroname="__ln_s" />
 
 ##### `%nil` 🔰 [#nil]
 
@@ -763,7 +805,7 @@ what things the binaries are linked to, you may disable that by adding a regex t
 
 <Callout type="info">If you want to disable all automatic `Requires:`, set `AutoReq: 0`.</Callout>
 
-<SearchTerra macroname="__strip" />
+<SearchTerra macroname="__requires_exclude" />
 
 ##### `%__requires_exclude_from` 🏷️ [#__requires_exclude_from]
 
@@ -840,6 +882,8 @@ Similar to above, but takes in path to file that contains the regexes.
 <SearchTerra macroname="__brp_mangle_shebangs_exclude_file" />
 
 ##### `%__brp_mangle_shebangs_exclude_from_file` 🏷️ [#__brp_mangle_shebangs_exclude_from_file]
+
+Similar to above, but takes a path to a file containing the list of file paths to exclude.
 
 <SearchTerra macroname="__brp_mangle_shebangs_exclude_from_file" />
 
@@ -1125,7 +1169,6 @@ Macros with the '(Terra only)' warning are part of the `anda-srpm-macros` packag
 /run                                   ⇒ %{_rundir}
 /usr                                   ⇒ %{_usr}
 /usr/bin                               ⇒ %{_bindir}
-/usr/sbin                              ⇒ %{_sbindir} maybe?
 /usr/src                               ⇒ %{_usrsrc}
 /usr/include                           ⇒ %{_includedir}
 /usr/lib64                             ⇒ %{_libdir}
@@ -1257,210 +1300,3 @@ mkdir -p %{buildroot}%{_datadir}/themes
 </Callout>
 
 <SearchTerra macroname="fdupes" />
-
-### Per Language
-
-If your language / buildsystem is not listed here, go to
-https://docs.fedoraproject.org/en-US/packaging-guidelines/
-and find them on the navigation rail on the left.
-
-#### C and C++
-
-##### `%configure` [#configure]
-
-Expand to `./configure` with the correct flags and arguments.
-If you need to execute `./configure`, in most cases you should use this macro instead.
-
-In some cases where `./configure` is not directly available, you may need to run
-`autoreconf -fi` or `-fiv`.
-
-<SearchTerra macroname="configure" />
-
-##### `%make_build` 🔰 [#make_build]
-
-⇒ `%__make -O -j${RPM_BUILD_NCPUS} V=1 VERBOSE=1{:sh}`,
-where `%{__make}` ⇒ `/usr/bin/make`.
-Further arguments to `make` can be attached.
-
-<SearchTerra macroname="make_build" />
-
-##### `%make_install` 🔰 [#make_install]
-
-⇒ `%__make install DESTDIR=%?buildroot INSTALL="%__install -p"{:sh}`.
-
-<SearchTerra macroname="make_install" />
-
-##### `%makeinstall` 🚸 [#makeinstall]
-
-Deprecated. Use [`%make_install`](#make_install) instead.
-
-<SearchTerra macroname="make_install" />
-
-##### `%cmake` 🔰 [#cmake]
-
-Expand to `%{__cmake}` (⇒ `/usr/bin/cmake`) with the correct flags,
-such as `-B "%__cmake_builddir"{:sh}` (⇒ `-B "redhat-linux-build"{:sh}`).
-
-<SearchTerra macroname="cmake" />
-
-##### `%cmake_build` 🔰 [#cmake_build]
-
-⇒ `%__cmake --build "%__cmake_builddir" %?_smp_mflags --verbose{:sh}`.
-
-<SearchTerra macroname="cmake_build" />
-
-##### `%cmake_install` 🔰 [#cmake_install]
-
-⇒ `DESTDIR="%buildroot" %__cmake --install "%__cmake_builddir"{:sh}`.
-
-<SearchTerra macroname="cmake_install" />
-
-##### `%meson` 🔰 [#meson]
-
-≈ `%__meson setup{:sh}` with correct flags.
-
-<SearchTerra macroname="meson" />
-
-##### `%meson_build` 🔰 [#meson_build]
-
-⇒ `%__meson compile -C "%_vpath_builddir" -j %_smp_build_ncpus %{?__meson_verbose:--verbose}{:sh}`
-
-⇒ `/usr/bin/meson compile -C redhat-linux-build -j 20 --verbose{:sh}` (on my machine).
-
-<SearchTerra macroname="meson_build" />
-
-##### `%meson_install` 🔰 [#meson_install]
-
-⇒ `DESTDIR=%buildroot %__meson install -C %_vpath_builddir --no-rebuild{:sh}`.
-Used in `%install{:rpmspec}`.
-
-<SearchTerra macroname="meson_install" />
-
-##### `%meson_test` 🔰 [#meson_test]
-
-⇒ `%__meson test -C %_vpath_builddir --no-rebuild %{!?__meson_verbose:--quiet}{:sh}`.
-Used in `%check{:rpmspec}`.
-
-<SearchTerra macroname="meson_test" />
-
-##### `%ninja_build` [#ninja_build]
-
-⇒ `%__ninja %__ninja_common_opts{:sh}`
-
-⇒ `%__ninja -v -j${RPM_BUILD_NCPUS}{:sh}`.
-
-<SearchTerra macroname="ninja_build" />
-
-##### `%ninja_install` [#ninja_install]
-
-⇒ `DESTDIR=%buildroot %__ninja install %__ninja_common_opts{:sh}`.
-
-<SearchTerra macroname="ninja_install" />
-
-##### `%ninja_test` [#ninja_test]
-
-⇒ `%__ninja test %__ninja_common_opts{:sh}`.
-
-<SearchTerra macroname="ninja_test" />
-
-##### `%build_cflags` 🏷️ [#build_cflags]
-
-Flags to be passed to the C compiler.
-
-⇒ `%{__build_flags_lang_c} %{?_distro_extra_cflags}`
-
-<SearchTerra macroname="build_cflags" />
-
-##### `%_distro_extra_cflags` 🏷️ [#_distro_extra_cflags]
-
-For example, if the compiler is emitting errors that could be disabled with some
-`-Wno-…` flags, you can define this macro with extra flags.
-
-This macro is not defined by default on Fedora.
-
-<SearchTerra macroname="_distro_extra_cflags" />
-
-##### `%build_cxxflags` 🏷️ [#build_cxxflags]
-
-Flags to be passed to the C++ compiler.
-
-⇒ `%{__build_flags_lang_cxx} %{?_distro_extra_cxxflags}`
-
-<SearchTerra macroname="build_cxxflags" />
-
-##### `%_distro_extra_cxxflags` 🏷️ [#_distro_extra_cxxflags]
-
-For example, if the compiler is emitting errors that could be disabled with some
-`-Wno-…` flags, you can define this macro with extra flags.
-
-This macro is not defined by default on Fedora.
-
-<SearchTerra macroname="_distro_extra_cxxflags" />
-
-#### D
-
-##### `%ldc_arches` [#ldc_arches]
-
-<SearchTerra macroname="ldc_arches" />
-
-##### `%_d_optflags` [#_d_optflags]
-
-<SearchTerra macroname="_d_optflags" />
-
-#### Java
-
-https://docs.fedoraproject.org/en-US/java-packaging-howto/
-
-#### Nim
-
-This section is only applicable to Terra (because Fedora does not ship Nim).
-
-##### `%nim_prep` [#nim_prep]
-
-Set `mold` as the linker and run `nimble setup -y`.
-
-<SearchTerra macroname="nim_prep" />
-
-##### `%nim_build` [#nim_build]
-
-Same as [`%nim_c`](#nim_c).
-
-<SearchTerra macroname="nim_build" />
-
-##### `%nim_c` [#nim_c]
-
-⇒ `nim c -d:release -t:"%nim_tflags" -l:"%nim_lflags"{:sh}`.
-
-<SearchTerra macroname="nim_c" />
-
-#### Python
-
-https://docs.fedoraproject.org/en-US/packaging-guidelines/Python/
-
-#### Rust
-
-https://docs.fedoraproject.org/en-US/packaging-guidelines/Rust/
-
-##### `%rustflags_debuginfo` 🏷️ [#rustflags_debuginfo]
-
-If `gdb` crashes in `find-debuginfo`, you might want to lower the value to `1` or even `0`.
-
-The default value is `2`.
-
-```rpmspec title="example.spec" {11}
-https://github.com/terrapkg/packages/blob/2df55dad60a58ecf5f8fbe962f877f2834bdfa25/anda/devs/zed/nightly/zed-nightly.spec#L14
-
-%bcond_with check
-
-# Exclude input files from mangling
-%global __brp_mangle_shebangs_exclude_from ^/usr/src/.*$
-
-%global crate zed
-%global app_id dev.zed.Zed-Nightly
-
-%global rustflags_debuginfo 0
-```
-
-[expression]: ./expr
-
-<SearchTerra macroname="rustflags_debuginfo" />
