@@ -3,7 +3,7 @@
   "configVersion": 0,
   "workspaces": {
     "": {
-      "name": "devdocs",
+      "name": "@fyralabs/devdocs",
       "dependencies": {
         "@orama/orama": "^3.1.18",
         "fumadocs-core": "16.8.7",
