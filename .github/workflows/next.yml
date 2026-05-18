@@ -8,6 +8,8 @@ on:
       - next
 permissions:
   contents: read
+env:
+  NEXT_TELEMETRY_DISABLED: 1
 
 jobs:
   build:
@@ -41,6 +43,4 @@ jobs:
         run: bun ci
 
       - name: Build with Next.js
-        env:
-          NEXT_TELEMETRY_DISABLED: 1
         run: bun run build
