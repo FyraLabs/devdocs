@@ -4,8 +4,8 @@ export async function generateStaticParams() {
   return [
     { slug: ["appstream"] },
     { slug: ["autoupdate"] },
+    { slug: ["contributing"] },
     { slug: ["faq"] },
-    { slug: ["getting-started"] },
     { slug: ["guidelines"] },
     { slug: ["index"] },
     { slug: ["infrastructure"] },
@@ -23,7 +23,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const REDIRECT_MAP: Record<string, string> = {
     appstream: `https://docs.terrapkg.com/contributing/${slug}`,
     autoupdate: `https://docs.terrapkg.com/contributing/${slug}`,
-    getting-started: `https://docs.terrapkg.com/contributing/${slug}`,
+    contributing: `https://docs.terrapkg.com/contributing/getting-started`,
     guidelines: `https://docs.terrapkg.com/contributing/${slug}`,
     policies: `https://docs.terrapkg.com/contributing/${slug}`,
     srpm: `https://docs.terrapkg.com/contributing/${slug}`,
