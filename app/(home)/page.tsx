@@ -48,15 +48,13 @@ function getIcon(iconName: string | undefined): React.ReactNode | undefined {
 export default function HomePage() {
   const fyraProjects = FYRA_PROJECTS.map((section) => ({
     description: source.getPage([section.slug])?.data.description ?? "",
-    // @ts-ignore
+    ...section,
     icon: getIcon(section.icon),
-    ...section
   }));
   const otherProjects = OTHER_PROJECTS.map((section) => ({
     description: source.getPage([section.slug])?.data.description ?? "",
-    // @ts-ignore
+    ...section,
     icon: getIcon(section.icon),
-    ...section
   }));
 
   return (
