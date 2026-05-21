@@ -10,7 +10,7 @@ const FYRA_PROJECTS = [
     slug: "helium/hig",
     icon: "Atom",
   },
-  { title: "Terra", href: "/terra", slug: "terra", icon: "Earth" },
+  { title: "Terra", href: "/terra", slug: "terra", icon: "Earth", description: "Welcome to the documentation for the Terra repository." },
   { title: "Andaman", href: "/andaman", slug: "andaman", icon: "Hammer" },
   {
     title: "Submarine",
@@ -47,13 +47,13 @@ function getIcon(iconName: string | undefined): React.ReactNode | undefined {
 
 export default function HomePage() {
   const fyraProjects = FYRA_PROJECTS.map((section) => ({
-    ...section,
     description: source.getPage([section.slug])?.data.description ?? "",
+    ...section,
     icon: getIcon(section.icon),
   }));
   const otherProjects = OTHER_PROJECTS.map((section) => ({
-    ...section,
     description: source.getPage([section.slug])?.data.description ?? "",
+    ...section,
     icon: getIcon(section.icon),
   }));
 
