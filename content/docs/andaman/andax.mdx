@@ -118,6 +118,13 @@ let latest_tag = codeberg_tag("GeopJr/BLAHAJ");
 let latest_commit = codeberg_commit("GeopJr/BLAHAJ");
 let raw_readme_content = codeberg_rawfile("GeopJr/BLAHAJ", "main", "README.md");
 
+// Similar functions exist for Gitea,
+// but you need to specify the custom domain as the first argument:
+let latest_ver = gitea("git.pika-os.com", "general-packages/falcond");
+let latest_tag = gitea_tag("git.pika-os.com", "general-packages/falcond");
+let latest_commit = gitea_commit("git.pika-os.com", "general-packages/falcond");
+// WARN: There is no `gitea_rawfile()`.
+
 
 // Others
 let pypi_latest = pypi("example");
@@ -126,6 +133,7 @@ let max_version = crates_max("anda");
 let newest_version = crates_newest("anda");
 let npm_latest = npm("example");
 let hackage_latest = hackage("example");
+let rubygems_latest = gems("example");
 ```
 
 ### JSON Operations
