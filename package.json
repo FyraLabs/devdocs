@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@orama/orama": "^3.1.18",
+    "@types/deno": "^2.7.0",
     "fumadocs-core": "16.9.3",
     "fumadocs-mdx": "15.0.11",
     "fumadocs-ui": "16.9.3",

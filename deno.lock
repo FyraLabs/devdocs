@@ -3,6 +3,7 @@
   "specifiers": {
     "npm:@orama/orama@^3.1.18": "3.1.18",
     "npm:@tailwindcss/postcss@^4.3.0": "4.3.1",
+    "npm:@types/deno@^2.7.0": "2.7.0",
     "npm:@types/mdx@^2.0.14": "2.0.14",
     "npm:@types/react-dom@^19.2.3": "19.2.3_@types+react@19.2.17",
     "npm:@types/react@^19.2.17": "19.2.17",
@@ -1300,6 +1301,9 @@
       "dependencies": [
         "@types/ms"
       ]
+    },
+    "@types/deno@2.7.0": {
+      "integrity": "sha512-Y6fWcV8KpYeO3Lik/RiYnUxtr/LWqoeACciU0CA+dr1U/45tGgaX3HWQQAPCNN53raN4Rr4Fht4y6qsUH57fDA=="
     },
     "@types/estree-jsx@1.0.5": {
       "integrity": "sha512-52CcUVNFyfb1A2ALocQw/Dd1BQFNmSdkuC3BkZ6iqhdMfQz7JWOFRuJFloOzjk+6WijU56m9oKXFAXc7o3Towg==",
@@ -3827,6 +3831,7 @@
       "dependencies": [
         "npm:@orama/orama@^3.1.18",
         "npm:@tailwindcss/postcss@^4.3.0",
+        "npm:@types/deno@^2.7.0",
         "npm:@types/mdx@^2.0.14",
         "npm:@types/react-dom@^19.2.3",
         "npm:@types/react@^19.2.17",
