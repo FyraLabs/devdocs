@@ -8,7 +8,7 @@ The unified documentation experience for developers hacking on Fyra Labs project
 
 ## 🛠️ Dependencies
 
-Please make sure you have `deno` first before building.
+Please make sure you have `pnpm` first before building.
 
 ## Hacking
 ### Dev Containers
@@ -21,8 +21,8 @@ Please make sure you have `deno` first before building.
    - Podman users need to install `podman-docker` from their package manager
    
 2. Open your IDE and select the "Reopen in Dev Container" option
-3. Run `deno i` to install deps
-4. Run `deno run dev` or `deno run dev --host` to start the dev server
+3. Run `pnpm i` to install deps
+4. Run `pnpm run dev` or `pnpm run dev --host` to start the dev server
    
 ### Flox
 1. Get [Flox](https://flox.dev/docs/install-flox/install/)
@@ -32,9 +32,9 @@ Please make sure you have `deno` first before building.
 You can run the dev server with `flox services start dev`, or to expose to LAN or Tailnet, run `flox services start dev-host`
 
 ### On the Host
-1. Install `deno` and `nodejs`
-2. Run `deno i` to install deps
-3. Run `deno run dev` or `deno run dev --host` to start the dev server
+1. Install `pnpm` and `nodejs`
+2. Run `pnpm i` to install deps
+3. Run `pnpm run dev` or `pnpm run dev --host` to start the dev server
 
    
 ## 🏗️ Building
@@ -42,6 +42,6 @@ You can run the dev server with `flox services start dev`, or to expose to LAN o
 Simply clone this repo, then:
 
 ```bash
-deno install
-deno run build # or `deno run dev` to run a development server
+pnpm install
+pnpm run build # or `pnpm run dev` to run a development server
 ```

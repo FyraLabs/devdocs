@@ -1,8 +1,8 @@
 {
   "name": "Fyra Devdocs",
   "image": "ghcr.io/ultramarine-linux/ultramarine:43",
-  "onCreateCommand": "sudo dnf install -y bun nodejs",
-  "postCreateCommand": "bun install",
+  "onCreateCommand": "sudo dnf install -y pnpm nodejs",
+  "postCreateCommand": "pnpm install --frozen-lockfile",
   "forwardPorts": [3000],
   "portsAttributes": {
     "4321": {
