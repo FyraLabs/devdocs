@@ -27,6 +27,8 @@ All the scripts in Anda can either be a command that can be executed with `sh -c
   </Callout>
 - Docker/Podman: Anda calls `docker build` or `podman build`.
 
+For RPMs, `./anda-build/rpm` will be initialized with `createrepo_c` after the build process, so you can just write a `.repo` file and use it as a repository locally.
+
 ## AndaX
 
 AndaX is an embedded scripting system powered by [Rhai](https://https://rhai.rs/). It is mainly for supporting automatic updates, but it is also the scripting system used behind `pre_script` and `post_script`.
