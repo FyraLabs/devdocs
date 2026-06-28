@@ -13,7 +13,7 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "astro-build.astro-vscode",
+        "nextjs.vscode-nextjs-extension",
         "bradlc.vscode-tailwindcss"
       ]
     }
