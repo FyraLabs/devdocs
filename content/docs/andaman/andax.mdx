@@ -125,6 +125,17 @@ let latest_tag = gitea_tag("git.pika-os.com", "general-packages/falcond");
 let latest_commit = gitea_commit("git.pika-os.com", "general-packages/falcond");
 // WARN: There is no `gitea_rawfile()`.
 
+// Sourcehut is here too! :)
+let latest_ver = sourcehut("~kennylevinsen/greetd");
+// WARN: There is no `sourcehut_tag()`.
+let latest_commit = sourcehut_commit("~kennylevinsen/greetd");
+let raw_readme_content = sourcehut_rawfile("~kennylevinsen/greetd", master, "README.md");
+
+// Just like Gitea, Forgejo requires specifiying a custom domain, and has the same functions available.
+let latest_ver = forgejo("forgejo.ellis.link", "continuwuation/continuwuity");
+let latest_tag = forgejo_tag("forgejo.ellis.link", "continuwuation/continuwuity");
+let latest_commit = forgejo_commit("forgejo.ellis.link", "continuwuation/continuwuity");
+// WARN: There is no `forgejo_rawfile()`.
 
 // Others
 let pypi_latest = pypi("example");
@@ -134,6 +145,7 @@ let newest_version = crates_newest("anda");
 let npm_latest = npm("example");
 let hackage_latest = hackage("example");
 let rubygems_latest = gems("example");
+let gnome_extensions_latest_version = gnome_extensions("<uuid>");
 ```
 
 ### JSON Operations
