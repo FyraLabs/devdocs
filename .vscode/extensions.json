@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "nextjs.vscode-nextjs-extension",
+    "bradlc.vscode-tailwindcss"
+  ],
+  "unwantedRecommendations": []
+}
