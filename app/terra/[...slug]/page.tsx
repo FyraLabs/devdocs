@@ -12,6 +12,7 @@ export async function generateStaticParams() {
     { slug: ["installing"] },
     { slug: ["lifecycle"] },
     { slug: ["policies"] },
+    { slug: ["policy"] },
     { slug: ["srpm"] },
   ];
 }
@@ -26,6 +27,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     contributing: `https://docs.terrapkg.com/contributing/getting-started`,
     guidelines: `https://docs.terrapkg.com/contributing/${slug}`,
     policies: `https://docs.terrapkg.com/contributing/${slug}`,
+    policy: `https://docs.terrapkg.com/contributing/policies`,
     srpm: `https://docs.terrapkg.com/contributing/${slug}`,
     installing: `https://docs.terrapkg.com/usage/${slug}`,
     lifecycle: `https://docs.terrapkg.com/usage/${slug}`,
