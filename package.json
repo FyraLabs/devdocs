@@ -6,6 +6,8 @@
     "build": "next build",
     "dev": "next dev",
     "start": "serve out",
+    "preview": "next build && wrangler dev",
+    "deploy": "next build && wrangler deploy",
     "types:check": "fumadocs-mdx && next typegen && tsc --noEmit",
     "postinstall": "fumadocs-mdx"
   },
@@ -30,6 +32,7 @@
     "postcss": "^8.5.15",
     "serve": "^14.2.6",
     "tailwindcss": "^4.3.0",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "wrangler": "^4.112.0"
   }
 }
