@@ -9,7 +9,7 @@ Andaman is a meta-build system that calls upon other build systems to build pack
 
 It reads the project manifest in `anda.hcl` and calls the corresponding build system to build the package. Multiple projects can be included in a single repository (known as a monorepo) recursively in different directories.
 
-The root directory contains a main configuration file (also `anda.hcl`) and the configurations will be inherited. All the other `anda.hcl` files in its subdirectory can independently represent multiple projects, and multiple ways to build a package can be specified in each project. Once properly configured, a project can be built by `anda build subdirectory_path/project_name`.
+The root directory contains a main configuration file (also `anda.hcl`) and the configurations will be inherited. All the other `anda.hcl` files in its subdirectory can independently represent multiple projects, and multiple ways to build a package can be specified in each project. Once properly configured, a project can be built by `anda build subdirectory_path/project_name`. A list of valid projects can be seen by `anda list`.
 
 All configurations should be written in the HashiCorp Configuration Language with the filename `anda.hcl` and will be parsed in `anda-config`.
 
@@ -26,6 +26,8 @@ All the scripts in Anda can either be a command that can be executed with `sh -c
     opposed to `anda-build/` used by other package types.
   </Callout>
 - Docker/Podman: Anda calls `docker build` or `podman build`.
+
+For RPMs, `./anda-build/rpm` will be initialized with `createrepo_c` after the build process, so you can just write a `.repo` file and use it as a repository locally.
 
 ## AndaX
 
@@ -88,3 +90,5 @@ project project_name {
 Then, AndaX executes the scripts in parallel, where each update script gets its own thread. This greatly reduces the time required to fetch package versions. Note that Rhai does not support asynchronous programming. Around 200 update scripts in Terra can be processed under a second.
 
 Projects can also be filtered by adding `--filters key=value,key2=value2` to the command. For example, the update script for the above project will be executed for `--filters a=1` or even without filters related to `a`, but it won't be executed for `--filters a=2`.
+
+To execute the update script for just 1 project, run `anda update subdirectory_path/project_name`.
