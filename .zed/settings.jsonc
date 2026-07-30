@@ -1,0 +1,6 @@
+{
+  "auto_install_extensions": {
+    "MDX": true,
+    "NextJS DevTools MCP": true,
+  },
+}
