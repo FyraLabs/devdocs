@@ -144,6 +144,16 @@ let latest_tag = forgejo_tag("forgejo.ellis.link", "continuwuation/continuwuity"
 let latest_commit = forgejo_commit("forgejo.ellis.link", "continuwuation/continuwuity");
 // WARN: There is no `forgejo_rawfile()`.
 
+// Google Source hosts different projects at subdomains
+let googlesource_latest = googlesource("go.googlesource.com/go");
+let googlesource_tag_latest = googlesource_tag("go.googlesource.com/go");
+let googlesource_commit_latest = googlesource_commit("go.googlesource.com/go");
+let googlesource_readme = googlesource_rawfile(
+  "chromium.googlesource.com/chromium/src",
+  "main",
+  "tools/symsrc/source_index.py",
+);
+
 // Others
 let pypi_latest = pypi("example");
 let max_stable_version = crates("anda");
