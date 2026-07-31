@@ -118,6 +118,13 @@ let latest_tag = codeberg_tag("GeopJr/BLAHAJ");
 let latest_commit = codeberg_commit("GeopJr/BLAHAJ");
 let raw_readme_content = codeberg_rawfile("GeopJr/BLAHAJ", "main", "README.md");
 
+// The same functions exist for Tangled. Simply replace `gh` with
+// `tangled`.
+let latest_ver = tangled("tangled.org/core");
+let latest_tag = tangled_tag("tangled.org/core");
+let latest_commit = tangled_commit("tangled.org/core");
+let raw_readme_content = tangled_rawfile("tangled.org/core", "master", "docs/DOCS.md");
+
 // Similar functions exist for Gitea,
 // but you need to specify the custom domain as the first argument:
 let latest_ver = gitea("git.pika-os.com", "general-packages/falcond");
@@ -375,10 +382,7 @@ Additionally, the `rpm` object is provided under `[1;32manda[97m update{:ansi}
 // note that the `rpm` object is only available in `anda update`, but not `anda run`.
 rpm.version(latest_ver); // note that version() resets the release back to 1 automatically
 // Source0: https://github.com/FyraLabs/anda/archive/refs/tags/0.1.17.tar.gz
-rpm.source(
-  0,
-  "https://github.com/FyraLabs/anda/archive/refs/tags/0.1.17.tar.gz",
-);
+rpm.source(0, "https://github.com/FyraLabs/anda/archive/refs/tags/0.1.17.tar.gz");
 // %define abc hai bai
 rpm.define("abc", "hai bai");
 // %global def give rabonuko a headpat!
