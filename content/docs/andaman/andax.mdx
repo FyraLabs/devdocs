@@ -144,6 +144,12 @@ let latest_tag = forgejo_tag("forgejo.ellis.link", "continuwuation/continuwuity"
 let latest_commit = forgejo_commit("forgejo.ellis.link", "continuwuation/continuwuity");
 // WARN: There is no `forgejo_rawfile()`.
 
+// Sourcearcade functions
+let sourcearcade_latest = sourcearcade("flashprog");
+let sourcearcade_tag_latest = sourcearcade_tag("flashprog");
+let sourcearcade_commit_latest = sourcearcade_commit("flashprog");
+let sourcearcade_readme = sourcearcade_rawfile("flashprog", "main", "README.md");
+
 // Others
 let pypi_latest = pypi("example");
 let max_stable_version = crates("anda");
