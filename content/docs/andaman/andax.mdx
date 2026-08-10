@@ -150,6 +150,9 @@ let sourcearcade_tag_latest = sourcearcade_tag("flashprog");
 let sourcearcade_commit_latest = sourcearcade_commit("flashprog");
 let sourcearcade_readme = sourcearcade_rawfile("flashprog", "main", "README.md");
 
+// Or you can fetch plain Git tags from any forge
+let andaman_tags = git_tags("https://github.com/FyraLabs/anda");
+
 // Others
 let pypi_latest = pypi("example");
 let max_stable_version = crates("anda");
