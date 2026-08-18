@@ -22,11 +22,13 @@ Here is a non-exclusive (but nearly exclusive) list of preambles available:
 Name:           pkgname
 Version:        1.2.3
 Release:        1%?dist
-Summary:        Package summary (usually do not add period at the end)
+Summary:        Package summary (do not add period at the end)
 # As opposed to the guidelines given by RPM, we (and also Fedora!) strongly
 # recommend using SPDX identifiers.
 License:        MIT
 URL:            https://terra.fyralabs.com/
+Source0:        Link to download the source code. If more then one link is needed,
+specify with Source1:, Source2:, etc.
 
 ## terra also enforces the following preamble:
 
@@ -44,6 +46,7 @@ AutoProv:       1
 
 ## these fields are optional
 
+Patch:
 SourceLicense:
 BugURL:
 ModularityLabel:
@@ -59,6 +62,8 @@ ExclusiveOS:
 BuildArch:
 BuildArchitectures:
 BuildRequires:
+NoSource:
+NoPatch:
 
 Group:
 Provides:
@@ -78,6 +83,11 @@ RemovePathPostFixes:
 
 BuildSystem:
 BuildOption:
+
+Icon: (Obsolete)
+Buildroot: (Obsolete)
+BuildPrereq: (Obsolete)
+Prereq: (Obsolete)
 ```
 
 <Callout type="warning">
@@ -154,15 +164,6 @@ If `subpkg` is given without `-n`, specify the description of the subpackage `%{
 
 Each subpackage requires its own `%description{:rpmspec}` too.
 
-## `%package`
-
-Not a step. Optional. `%package [-n] subpkg{:rpmspec}`
-
-Specify the preambles for a subpackage. The name of the subpackage is
-
-- `subpkg` if `-n` is given; and
-- `%{name}-subpkg` otherwise.
-
 ## `%mkbuilddir`
 
 Step `Executing(%mkbuilddir)`. Optional.
@@ -217,12 +218,11 @@ Step `Executing(%conf)`. Optional. Since `rpm >= 4.18`.
 > %configure
 > ```
 
-When in doubt, you can always put `%configure{:rpmspec}` and other commands at the start of
-`%build{:rpmspec}` instead.
+Macros such as `%cmake` and `%meson` should also be placed in this section.
 
 ## `%build`
 
-Step `Executing(%build)`. Optional.
+Step `Executing(%build)`. If there is nothing to build, you should still declare this step in your spec.
 
 > In `%build`, the unpacked (and configured) sources are compiled to binaries.
 >
@@ -253,14 +253,6 @@ In this step, files should be installed to the `%{buildroot}` folder, e.g.:
 install -Dpm755 my_binary -t %{buildroot}/usr/bin/
 install -Dpm644 rand_file -t %{buildroot}/usr/share/my_software/
 ```
-
-## `%doc`
-
-Step `Executing(%doc)`. **Not a section**. See [`%files{:rpmspec}`](#files).
-
-## `%license`
-
-Step `Executing(%license)`. **Not a section**. See [`%files{:rpmspec}`](#files).
 
 ## `%check`
 
@@ -318,13 +310,16 @@ The following is an exhaustive list of file attributes available:
 
 ```rpmspec
 %artifact …
-# ╰─ mado: personally never seen this used
-%config(…) …
+# ╰─ denote files that are more like side-effects of packaging than actual content
+# the user would be interested in. Such files can be easily filtered out on queries.
+%caps
+# ╰─ sets the given POSIX.1e draft 15 capabilities on the file
+%config(…) … (can be used on it's own or with parameters)
 # ╰─ exhaustive list:
 # - config(missingok)
 # - config(noreplace)
 %dir …
-# ╰─ specify a directory the package owns
+# ╰─ explicitly own the directory itself but not it’s contents
 %doc …
 # ╰─ store the file into %{_docdir}
 %docdir
@@ -345,14 +340,121 @@ The following is an exhaustive list of file attributes available:
 # - verify(link symlink) ← same
 # - verify(rdev)
 # - verify(mtime)
-# - verify(not ...)
+# - verify(not ...) (don't verify this attribute)
+%missingok
+# ╰─ mark file presence optional
+%readme
+# ╰─ Obsolete - use %doc
 
 # special:
 %attr(…) …
 %defattr(…)
 ```
 
-For more information about `%attr{:rpmspec}` and `%defattr{:rpmspec}`, see: http://ftp.rpm.org/max-rpm/s1-rpm-inside-files-list-directives.html
+For more information about `%attr{:rpmspec}` and `%defattr{:rpmspec}`, see: https://rpm-software-management.github.io/rpm/manual/spec.html
+
+## `%changelog`
+
+Metadata section. Optional, but required in Fedora and Terra
+
+Specify a change to the spec.
+
+Must either use `%autochangelog`, or follow this structure:
+
+```
+* Day Mon DD YYYY Name <email> - version-release
+- Change you made
+- Another change, if there's enough to justify two lines
+```
+
+## Package scripts
+
+> Package scripts execute before and after the main operation (install/remove etc.) of the package inside a transaction.
+>
+> Package scripts should only be used for actions that are fundamentally package specific.
+> Domain specific registries, databases, caches and such are much better handled centrally
+> by file triggers. Similarly, user and group creation should be handled by rpm-sysusers, rather than scripting them.
+
+### `%pre`
+> Executed just before unpacking the contents of the package.
+> Non-zero exit prevents the installation of the containing package.
+
+### `%post`
+> Executed just after unpacking the contents of the package.
+
+### `%preun`
+> Executed just before removing the contents of the package.
+> Non-zero exit prevents the uninstallation of the containing package.
+
+### `%postun`
+> Executed just after removing the contents of the package.
+
+### `%verify`
+
+> Executed when a package is verified using rpm --verify.
+>
+> Unlike all the other scriptlet types, `%verify` never executes as a part of install/erase etc. operations.
+
+## Transaction scripts
+
+> Transaction scripts run before and after all the other package level
+> operations (install/remove etc.) in a transaction.
+>
+> When multiple transaction scripts for a given slot are present in a transaction,
+> they are executed in the order of their install/removal order within the transaction.
+
+### `%pretrans`
+> Executed just before an install/update/reinstall transaction on the containing package starts.
+>
+> No files from the transaction have been installed or removed yet. That is, in a fresh
+> installation to an empty system root, there are no files around and no interpreter to run,
+> so the only interpreter that can be reliably used in this slot is the embedded rpm-lua(7) interpreter.
+>
+> Non-zero exit prevents the installation of the containing package.
+>
+> This is a very special and a dangerous slot, and is best avoided.
+
+### `%posttrans`
+> Executed just after an install/update/reinstall transaction on the containing package finishes.
+>
+> All files from the transaction have been installed or removed at this point.
+
+### `%preuntrans`
+> Executed just before an uninstall/updated-from transaction on the containing package starts.
+
+### `%postuntrans`
+> Executed just after an uninstall/updated-from transaction on the containing package finishes.
+
+## Sub-sections
+
+These are optional macros that are not their own build steps, but are also not
+standalone macros.
+
+### `%sourcelist`
+> List of sources, one per line. Handled like unnumbered Source tags. For clarity,
+> mixing Source tags and %sourcelist in one specfile is not recommended.
+
+### `%patchlist`
+Like `%sourcelist`, but for patches.
+
+### `%package [-n]<name>`
+
+Not a step. Optional. `%package [-n] subpkg{:rpmspec}`
+
+Specify the preambles for a subpackage. The name of the subpackage is
+
+- `subpkg` if `-n` is given; and
+- `%{name}-subpkg` otherwise.
+
+### `%description [-n]<name>`
+Used to define a description for a subpackage.
+Requires if `%package` is used.
+
+The `-n` and `<name>` options work the same, however if not defined this will refer to the main package.
+
+## File Triggers
+
+For information on file triggers, check out the [RPM documentation](https://rpm-software-management.github.io/rpm/man/rpm-scriptlets.7#FILE_TRIGGERS).
 
 [expression]: #rpm-expression
 [RPM manual]: https://github.com/rpm-software-management/rpm/blob/b043604b9eb684dc761aeacf55a784632ca0ebcd/docs/manual/macros.md
