@@ -33,6 +33,6 @@
     "serve": "^14.2.6",
     "tailwindcss": "^4.3.0",
     "typescript": "^7.0.2",
-    "wrangler": "^4.123.0"
+    "wrangler": "^4.125.0"
   }
 }
