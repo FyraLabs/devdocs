@@ -13,9 +13,9 @@
   },
   "dependencies": {
     "@orama/orama": "^3.1.18",
-    "fumadocs-core": "16.13.0",
-    "fumadocs-mdx": "15.2.0",
-    "fumadocs-ui": "16.13.0",
+    "fumadocs-core": "16.15.9",
+    "fumadocs-mdx": "15.4.0",
+    "fumadocs-ui": "16.15.9",
     "lucide-react": "^1.46.0",
     "mermaid": "^11.17.2",
     "next": "16.3.5",
