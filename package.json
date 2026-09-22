@@ -33,7 +33,7 @@
     "serve": "^14.2.6",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
-    "wrangler": "^4.131.2"
+    "wrangler": "^4.135.0"
   },
   "workspaces": ["."]
 }
