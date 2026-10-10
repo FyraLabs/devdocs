@@ -885,7 +885,7 @@ Parameterized as `%autosetup(a:b:cCDn:TvNS:p:)`:
 - `-a<#>`: unpack `%{S:#}` after changing directory
 - `-b<#>`: unpack `%{S:#}` before changing directory
 - `-c`: create directory, `cd` into it, then unpack the source (useful if archive lacks top-level directory)
-- `-C`: I've no idea what this does! — Mado
+- `-C`: create directory, `cd` into it, then unpack the source contents directly inside it, stripping any top-level directory present in the archive paths
 - `-D`: do not delete folder before unpacking sources
 - `-T`: disable unpacking `%SOURCE0`
 - `-v`: verbose. If specified, `%autosetup` will omit the `-q` argument to [`%setup`](#setup)
