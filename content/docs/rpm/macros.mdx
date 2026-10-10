@@ -890,6 +890,14 @@ Parameterized as `%autosetup(a:b:cCDn:TvNS:p:)`:
 - `-T`: disable unpacking `%SOURCE0`
 - `-v`: verbose. If specified, `%autosetup` will omit the `-q` argument to [`%setup`](#setup)
 - `-S <…>`: specify the SCM, equivalent to `%global __scm …` then `%__scm_setup_git` (replace `git` with the argument). With this argument, the specified SCM will be set up in the uncompressed directory
+	- Supported SCMs:
+		- git
+		- hg (for mercurial)
+		- bzr
+		- quilt
+		- patch
+		- git_am
+		- gendiff
 - `-N`: do not run [`%autopatch …`](#autopatch)
 
 This is actually a wrapper around [`%setup`](#setup) and [`%autopatch …`](#autopatch).
