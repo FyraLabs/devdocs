@@ -18,3 +18,7 @@ updates:
     groups:
       actions:
         patterns: ["*"]
+  - package-ecosystem: "docker"
+    directory: "/.devcontainer"
+    schedule:
+      interval: "weekly"
