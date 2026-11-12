@@ -20,5 +20,6 @@ WORKDIR /workspaces/devdocs
 # Copy the bare minimum for dep fetching
 COPY ../package.json ../pnpm-lock.yaml ../pnpm-workspace.yaml .
 
-RUN sudo dnf install -y pnpm${PNPM_VERSION} nodejs && \
-pnpm ci
+# Update this when UM45 has a container
+RUN sudo dnf install -y pnpm nodejs && \
+pnpm install --frozen-lockfile
