@@ -1,12 +1,17 @@
 {
   "name": "Fyra Devdocs",
-  "image": "ghcr.io/ultramarine-linux/ultramarine:43",
-  "onCreateCommand": "sudo dnf install -y pnpm nodejs",
-  "postCreateCommand": "pnpm install --frozen-lockfile",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "..",
+    "args": {
+      "USERNAME": "${localEnv:USER}",
+      "PNPM_VERSION": "12"
+    }
+  },
   "forwardPorts": [3000],
   "portsAttributes": {
-    "4321": {
-      "label": "Astro Dev Server",
+    "3000": {
+      "label": "Next.js Dev Server",
       "onAutoForward": "notify"
     }
   },
