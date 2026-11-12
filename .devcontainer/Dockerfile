@@ -11,7 +11,7 @@ ARG USER_GID=$USER_UID
 RUN groupadd --gid $USER_GID $USERNAME && \
 useradd --uid $USER_UID --gid $USER_GID -m $USERNAME && \
 echo "$USERNAME ALL = (ALL) NOPASSWD: ALL" > /etc/sudoers.d/$USERNAME && \
-mkdir -p /workspaces/docs && \
+mkdir -p /workspaces/devdocs && \
 chown -R $USERNAME /workspaces/devdocs
 
 USER 1000:1000
