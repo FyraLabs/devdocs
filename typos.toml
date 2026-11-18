@@ -1,0 +1,10 @@
+[files]
+extend-exclude = ["pnpm-lock.yaml"]
+
+# define exceptions for false positives
+[default.extend-words]
+ND = "ND"
+noet = "noet"
+
+[default.extend-identifiers]
+x64cros = "x64cros"
